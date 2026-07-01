@@ -63,7 +63,8 @@ const closeBtn = document.getElementById("closeMaps");
 const modal = document.getElementById("mapModal");
 
 if (openBtn && closeBtn && modal) {
-  openBtn.addEventListener("click", () => {
+  openBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     modal.classList.add("active");
   });
 
@@ -83,3 +84,37 @@ if (openBtn && closeBtn && modal) {
     }
   });
 }
+/* ==========================
+   Hide Header On Scroll
+========================== */
+
+let lastScroll = 0;
+
+window.addEventListener("scroll", () => {
+  const currentScroll = window.pageYOffset;
+
+  if (currentScroll <= 50) {
+    header.classList.remove("hide");
+    lastScroll = currentScroll;
+    return;
+  }
+
+  if (currentScroll > lastScroll) {
+    header.classList.add("hide");
+  } else {
+    header.classList.remove("hide");
+  }
+
+  lastScroll = currentScroll;
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (e.clientY <= 20) {
+    header.classList.remove("hide");
+  }
+});
+console.log("JS Loaded");
+
+window.addEventListener("scroll", () => {
+  console.log(window.scrollY);
+});

@@ -232,7 +232,13 @@ select:focus-visible {
   z-index: 1000;
   padding: 22px 0;
   background: transparent;
-  transition: all 0.35s ease;
+
+  transition:
+    transform 0.35s ease,
+    background 0.35s ease,
+    padding 0.35s ease;
+
+  transform: translateY(0);
 }
 
 .header.scrolled {
@@ -242,7 +248,34 @@ select:focus-visible {
   box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
   padding: 16px 0;
 }
+.header.hide {
+  transform: translateY(-100%);
+}
+.header.hide {
+  transform: translateY(-100%);
+}
 
+.header:hover {
+  transform: translateY(0);
+}
+
+/* وقتی هدر روی بخش‌های سفید قرار دارد */
+.header:not(.scrolled) .nav a,
+.header:not(.scrolled) .logo,
+.header:not(.scrolled) .btn {
+  color: #ffffff;
+}
+
+/* وقتی اسکرول کردی */
+.header.scrolled .nav a,
+.header.scrolled .logo {
+  color: #0f172a;
+}
+
+.header.scrolled .nav a:hover,
+.header.scrolled .nav a.active {
+  color: #f59e0b;
+}
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -262,7 +295,7 @@ select:focus-visible {
 
 .nav a {
   font-weight: 700;
-  color: var(--gray-700);
+  color: #ffffff;
   transition: var(--transition);
 }
 
