@@ -47,8 +47,8 @@
       </div>
     </div>
   </header>
-  <section class="service-hero">
-    <div class="container">
+ <section class="service-hero">
+    <div class="container service-hero-content">
       <span class="section-badge"> خدمات تخصصی شاهکار </span>
 
 <h1>
@@ -268,3 +268,19 @@ alt="سرویس دوره‌ای خودرو در تعمیرگاه شاهکار">
 </section>
 </body>
 </html>
+.service-hero-content{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    min-height:500px;
+}
+
+.service-hero-content h1,
+.service-hero-content p,
+.service-hero-content .section-badge,
+.service-hero-content .btn{
+    margin-left:auto;
+    margin-right:auto;
+}

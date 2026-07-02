@@ -314,12 +314,21 @@ select:focus-visible {
   align-items: center;
   position: relative;
   overflow: hidden;
+
   background:
     linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.82)),
     url("../assets/images/workshop-bg.jpg");
+
   background-size: cover;
   background-position: center;
-  animation: heroZoom 20s ease-in-out infinite alternate;
+}
+.home-hero {
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.35)),
+    url("../assets/images/hero-banner.webp");
+
+  background-size: cover;
+  background-position: center;
 }
 
 .hero::before {
@@ -1002,31 +1011,22 @@ select:focus-visible {
     url("../assets/images/workshop-bg.jpg");
 
   background-size: cover;
-
   background-position: center;
-
-  text-align: center;
-
-  color: white;
 }
 
 .service-hero h1 {
   font-size: 64px;
-
   margin: 25px 0;
+  color: #ffffff;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
 }
 
 .service-hero p {
   max-width: 750px;
-
   margin: auto;
-
   line-height: 2;
-
-  color: #cbd5e1;
-
+  color: rgba(255, 255, 255, 0.9);
   font-size: 20px;
-
   margin-bottom: 45px;
 }
 /*======================================
@@ -1420,4 +1420,49 @@ select:focus-visible {
   font-size: 20px;
 
   flex-shrink: 0;
+}
+.hero-logo {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  display: block;
+
+  filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.55));
+
+  animation: heroLogo 1.2s ease;
+}
+@keyframes heroLogo {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.service-hero p {
+  max-width: 750px;
+  margin: auto;
+  line-height: 2;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 20px;
+  margin-bottom: 45px;
+}
+.service-hero-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 500px;
+}
+
+.service-hero-content h1,
+.service-hero-content p,
+.service-hero-content .section-badge,
+.service-hero-content .btn {
+  margin-left: auto;
+  margin-right: auto;
 }
