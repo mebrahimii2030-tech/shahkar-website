@@ -1,139 +1,111 @@
-<section class="services">
-  <div class="container">
-    <div class="section-title">
-      <span class="section-badge"> خدمات ما </span>
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>خدمات شاهکار</title>
 
-      <h2>خدمات تخصصی شاهکار</h2>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-      <p>
-        ارائه کامل‌ترین خدمات تعمیر، عیب‌یابی و سرویس خودرو با تجهیزات مدرن و
-        تکنسین‌های حرفه‌ای
-      </p>
-    </div>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700;900&display=swap"
+      rel="stylesheet"
+    />
 
-  <div class="service-icon">
-  <i class="fa-solid fa-wrench"></i>
-</div>
-      <div class="service-card">
-        <div class="service-icon">🔧</div>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
 
-        <h3>تعمیر موتور</h3>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <header class="header">
+      <div class="container">
+        <div class="navbar">
+          <a href="index.html" class="logo">شاهکار</a>
+
+          <nav class="nav">
+            <ul>
+              <li><a href="index.html">خانه</a></li>
+              <li><a href="about.html">درباره ما</a></li>
+              <li><a class="active" href="services.html">خدمات</a></li>
+              <li><a href="gallery.html">گالری</a></li>
+              <li><a href="blog.html">وبلاگ</a></li>
+              <li><a href="pricing.html">تعرفه‌ها</a></li>
+              <li><a href="faq.html">سوالات</a></li>
+              <li><a href="contact.html">تماس</a></li>
+            </ul>
+          </nav>
+
+          <a href="contact.html" class="btn btn-primary">رزرو وقت</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="service-hero">
+      <div class="container">
+        <span class="section-badge">خدمات تخصصی شاهکار</span>
+
+        <h1>تمامی خدمات تعمیرگاه شاهکار</h1>
 
         <p>
-          تعمیر تخصصی موتور خودروهای داخلی و خارجی با استفاده از قطعات اصلی.
+          تمامی خدمات تعمیر، سرویس و دیاگ خودرو با تجهیزات مدرن و تکنسین‌های
+          متخصص انجام می‌شود.
         </p>
-
-        <ul>
-          <li>عیب‌یابی کامل</li>
-
-          <li>قطعات اورجینال</li>
-
-          <li>ضمانت خدمات</li>
-        </ul>
-
-        <a href="#" class="service-link"> مشاهده جزئیات → </a>
       </div>
+    </section>
 
-      <!-- Card -->
+    <!-- SERVICES -->
+    <section class="services">
+      <div class="container">
+        <div class="services-grid">
+          <a href="engine.html" class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-wrench"></i></div>
+            <h3>تعمیر موتور</h3>
+            <p>تعمیر تخصصی انواع موتور خودرو</p>
+          </a>
 
-      <div class="service-card">
-        <div class="service-icon">⚙️</div>
+          <a href="gearbox.html" class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-gears"></i></div>
+            <h3>گیربکس</h3>
+            <p>تعمیر گیربکس دستی و اتومات</p>
+          </a>
 
-        <h3>گیربکس</h3>
+          <a href="electrical.html" class="service-card">
+            <div class="service-icon">
+              <i class="fa-solid fa-car-battery"></i>
+            </div>
+            <h3>برق خودرو</h3>
+            <p>عیب‌یابی سیستم برق و ECU</p>
+          </a>
 
-        <p>تعمیر تخصصی گیربکس دستی و اتومات با تجهیزات پیشرفته.</p>
+          <a href="suspension.html" class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-car-side"></i></div>
+            <h3>جلوبندی</h3>
+            <p>تنظیم و تعمیر جلوبندی خودرو</p>
+          </a>
 
-        <ul>
-          <li>تعمیر تخصصی</li>
+          <a href="maintenance.html" class="service-card">
+            <div class="service-icon"><i class="fa-solid fa-oil-can"></i></div>
+            <h3>سرویس دوره‌ای</h3>
+            <p>تعویض روغن و سرویس کامل خودرو</p>
+          </a>
 
-          <li>تعویض روغن</li>
-
-          <li>تنظیم کامل</li>
-        </ul>
-
-        <a href="#" class="service-link"> مشاهده جزئیات → </a>
+          <a href="diagnostics.html" class="service-card">
+            <div class="service-icon">
+              <i class="fa-solid fa-laptop-code"></i>
+            </div>
+            <h3>دیاگ تخصصی</h3>
+            <p>اسکن ECU و بررسی خطاها</p>
+          </a>
+        </div>
       </div>
-
-      <!-- Card -->
-
-      <div class="service-icon">
-  <i class="fa-solid fa-car-battery"></i>
-</div>
-        <h3>برق خودرو</h3>
-
-        <p>عیب‌یابی سیستم برق و ECU با دستگاه‌های روز دنیا.</p>
-
-        <ul>
-          <li>بررسی ECU</li>
-
-          <li>رفع خطا</li>
-
-          <li>دیاگ کامل</li>
-        </ul>
-
-        <a href="#" class="service-link"> مشاهده جزئیات → </a>
-      </div>
-
-      <!-- Card -->
-
-      <div class="service-icon">
-  <i class="fa-solid fa-car-side"></i>
-</div>
-        <h3>جلوبندی</h3>
-
-        <p>تنظیم و تعمیر سیستم تعلیق و جلوبندی خودرو.</p>
-
-        <ul>
-          <li>تنظیم فرمان</li>
-
-          <li>کمک فنر</li>
-
-          <li>میزان فرمان</li>
-        </ul>
-
-        <a href="#" class="service-link"> مشاهده جزئیات → </a>
-      </div>
-
-      <!-- Card -->
-
-      <div class="service-icon">
-  <i class="fa-solid fa-oil-can"></i>
-</div>
-
-        <h3>سرویس دوره‌ای</h3>
-
-        <p>سرویس کامل خودرو مطابق استاندارد کارخانه.</p>
-
-        <ul>
-          <li>تعویض روغن</li>
-
-          <li>فیلترها</li>
-
-          <li>بازرسی کامل</li>
-        </ul>
-
-        <a href="#" class="service-link"> مشاهده جزئیات → </a>
-      </div>
-
-      <!-- Card -->
-
-     <div class="service-icon">
-  <i class="fa-solid fa-laptop-code"></i>
-</div>
-        <h3>دیاگ تخصصی</h3>
-
-        <p>بررسی کامل خودرو با دستگاه‌های حرفه‌ای دیاگ.</p>
-
-        <ul>
-          <li>اسکن ECU</li>
-
-          <li>حذف خطا</li>
-
-          <li>گزارش کامل</li>
-        </ul>
-
-        <a href="#" class="service-link"> مشاهده جزئیات → </a>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
+  </body>
+</html>
