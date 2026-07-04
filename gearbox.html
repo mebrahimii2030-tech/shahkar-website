@@ -34,10 +34,7 @@
         <nav class="nav">
           <ul>
             <li><a href="index.html">خانه</a></li>
-            <li><a href="about.html">درباره ما</a></li>
             <li><a href="services.html" class="active">خدمات</a></li>
-            <li><a href="gallery.html">گالری</a></li>
-            <li><a href="blog.html">وبلاگ</a></li>
             <li><a href="pricing.html">تعرفه‌ها</a></li>
             <li><a href="faq.html">سؤالات</a></li>
             <li><a href="contact.html">تماس</a></li>
@@ -265,5 +262,58 @@
     </div>
 
 </section>
+<script>
+function updateShopStatus() {
+
+    const status = document.getElementById("shopStatus");
+    if (!status) return;
+
+    const now = new Date();
+
+    const currentTime = now.getHours() + (now.getMinutes() / 60);
+
+    const openHour = 8;
+    const closeHour = 18;
+
+    if (currentTime >= openHour && currentTime < closeHour) {
+
+        const remain = Math.floor(closeHour - currentTime);
+
+        status.className = "shop-status open";
+
+        status.innerHTML =
+            "🟢 اکنون تعمیرگاه باز است<br><small>حدود " +
+            remain +
+            " ساعت تا پایان ساعت کاری باقی مانده است.</small>";
+
+    } else {
+
+        let remain;
+
+        if (currentTime < openHour) {
+
+            remain = Math.ceil(openHour - currentTime);
+
+        } else {
+
+            remain = Math.ceil((24 - currentTime) + openHour);
+
+        }
+
+        status.className = "shop-status closed";
+
+        status.innerHTML =
+            "🔴 در حال حاضر تعمیرگاه تعطیل است<br><small>حدود " +
+            remain +
+            " ساعت تا شروع فعالیت باقی مانده است.</small>";
+
+    }
+
+}
+
+updateShopStatus();
+
+setInterval(updateShopStatus,60000);
+</script>
   </body>
 </html>

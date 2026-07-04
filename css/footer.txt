@@ -1,0 +1,309 @@
+/* ==============================
+        VIP FOOTER STYLE
+============================== */
+
+.footer {
+  background: #0f172a;
+  color: #fff;
+  padding: 80px 0 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* wave */
+.footer-wave {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+}
+
+/* grid */
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  margin-top: 40px;
+}
+
+/* about */
+.footer-about h3 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #f59e0b;
+}
+
+.footer-about p {
+  line-height: 2;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+/* rating */
+.footer-rating {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.footer-rating i {
+  color: #f59e0b;
+}
+
+.footer-rating span {
+  margin-right: 10px;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+/* social */
+.footer-social {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.footer-social a {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.footer-social a:hover {
+  background: #f59e0b;
+  transform: translateY(-3px);
+}
+
+/* links */
+.footer-links h4,
+.footer-services h4,
+.footer-contact h4 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #fff;
+}
+
+.footer-links ul,
+.footer-services ul,
+.footer-contact ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links ul li,
+.footer-services ul li,
+.footer-contact ul li {
+  margin-bottom: 10px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+/* map card */
+.navigation-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 12px;
+  color: #fff;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.navigation-card:hover {
+  background: #1e293b;
+  transform: translateY(-3px);
+}
+
+.navigation-card img {
+  width: 40px;
+  height: 40px;
+}
+
+/* working hours */
+.working-hours {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.shop-status {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.shop-status.open {
+  background: #22c55e;
+}
+
+.shop-status.closed {
+  background: #ef4444;
+}
+
+/* bottom */
+.footer-bottom {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 13px;
+}
+/* ==============================
+      FINAL VIP POLISH
+============================== */
+
+/* hover کلی برای کل فوتر */
+.footer a,
+.footer li {
+  transition: all 0.3s ease;
+}
+
+/* لینک‌ها */
+.footer-links ul li:hover,
+.footer-services ul li:hover,
+.footer-contact ul li:hover {
+  color: #f59e0b;
+  transform: translateX(-5px);
+}
+
+/* کارت مسیریابی glow */
+.navigation-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.navigation-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.navigation-card:hover::before {
+  right: 100%;
+}
+
+/* شیشه‌ای کردن ساعت کاری */
+.working-hours {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* انیمیشن ورود */
+.footer {
+  animation: fadeUp 0.8s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* =========================
+   MAP MODAL VIP
+========================= */
+
+.map-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.map-modal.active {
+  display: flex;
+}
+
+.map-box {
+  background: #0f172a;
+  padding: 25px;
+  border-radius: 16px;
+  width: 320px;
+  text-align: center;
+}
+
+.map-box h3 {
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.map-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.map-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.map-item i {
+  font-size: 18px;
+}
+
+/* رنگ‌ها */
+.map-item.google {
+  background: #1a73e8;
+}
+.map-item.neshan {
+  background: #f59e0b;
+}
+.map-item.balad {
+  background: #22c55e;
+}
+
+.map-item:hover {
+  transform: scale(1.05);
+}
+
+.close-modal {
+  margin-top: 15px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: #fff;
+  cursor: pointer;
+}

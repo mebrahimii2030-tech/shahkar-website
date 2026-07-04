@@ -33,10 +33,7 @@
           <nav class="nav">
             <ul>
               <li><a href="index.html">خانه</a></li>
-              <li><a href="about.html">درباره ما</a></li>
               <li><a href="services.html" class="active">خدمات</a></li>
-              <li><a href="gallery.html">گالری</a></li>
-              <li><a href="blog.html">وبلاگ</a></li>
               <li><a href="pricing.html">تعرفه‌ها</a></li>
               <li><a href="faq.html">سؤالات</a></li>
               <li><a href="contact.html">تماس</a></li>
@@ -216,5 +213,28 @@
         </div>
       </div>
     </section>
+    <script>
+      const backBtn = document.getElementById("backToTop");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 400) {
+          backBtn.style.display = "flex";
+
+          backBtn.style.alignItems = "center";
+
+          backBtn.style.justifyContent = "center";
+        } else {
+          backBtn.style.display = "none";
+        }
+      });
+
+      backBtn.addEventListener("click", () => {
+        window.scrollTo({
+          top: 0,
+
+          behavior: "smooth",
+        });
+      });
+    </script>
   </body>
 </html>

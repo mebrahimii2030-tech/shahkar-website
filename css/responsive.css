@@ -495,3 +495,172 @@ img {
   padding: 14px 28px;
   border-radius: 12px;
 }
+/*======================================
+        PRICING RESPONSIVE
+======================================*/
+
+@media (max-width: 992px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+
+  .featured {
+    transform: none;
+  }
+
+  .featured:hover {
+    transform: translateY(-10px);
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-section {
+    padding: 80px 0;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .pricing-card {
+    padding: 35px 28px;
+  }
+
+  .pricing-icon {
+    width: 75px;
+    height: 75px;
+    font-size: 30px;
+  }
+
+  .pricing-card h3 {
+    font-size: 24px;
+  }
+
+  .price {
+    font-size: 30px;
+  }
+
+  .pricing-card ul li {
+    font-size: 15px;
+    line-height: 2;
+  }
+
+  .pricing-badge {
+    left: -42px;
+    font-size: 12px;
+    padding: 7px 52px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pricing-card {
+    padding: 30px 22px;
+    border-radius: 20px;
+  }
+
+  .pricing-icon {
+    width: 68px;
+    height: 68px;
+    font-size: 28px;
+  }
+
+  .pricing-card h3 {
+    font-size: 22px;
+  }
+
+  .price {
+    font-size: 26px;
+  }
+
+  .pricing-card .btn {
+    width: 100%;
+  }
+}
+/*======================================
+    PRICING FEATURES RESPONSIVE
+======================================*/
+
+@media (max-width: 992px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-features {
+    padding: 80px 0;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .feature-box {
+    padding: 35px 25px;
+  }
+}
+/*======================================
+            FAQ RESPONSIVE
+======================================*/
+
+@media (max-width: 768px) {
+  .faq-section {
+    padding: 80px 0;
+  }
+
+  .faq-question {
+    font-size: 17px;
+    padding: 22px;
+  }
+
+  .faq-answer p {
+    padding: 0 22px 22px;
+    font-size: 15px;
+  }
+}
+/*======================================
+        FOOTER RESPONSIVE
+======================================*/
+
+@media (max-width: 992px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 70px 0 25px;
+
+    text-align: center;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+
+    gap: 45px;
+  }
+
+  .footer h4::after {
+    right: 50%;
+
+    transform: translateX(50%);
+  }
+
+  .footer-contact ul li {
+    justify-content: center;
+  }
+
+  .footer-social {
+    justify-content: center;
+  }
+
+  .footer h3 {
+    font-size: 32px;
+  }
+}

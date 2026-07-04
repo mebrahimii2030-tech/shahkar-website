@@ -118,4 +118,71 @@ console.log("JS Loaded");
 window.addEventListener("scroll", () => {
   console.log(window.scrollY);
 });
-ظظ;
+// ==============================
+//   SHAHKAR FOOTER VIP SCRIPT
+// ==============================
+
+function updateShopStatus() {
+  const status = document.getElementById("shopStatus");
+  if (!status) return;
+
+  const now = new Date();
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  const time = hour + minute / 60;
+
+  const openHour = 8;
+  const closeHour = 18;
+
+  let isOpen = time >= openHour && time < closeHour;
+
+  if (isOpen) {
+    status.classList.add("open");
+    status.classList.remove("closed");
+    status.innerHTML = "🟢 اکنون تعمیرگاه باز است";
+  } else {
+    status.classList.add("closed");
+    status.classList.remove("open");
+    status.innerHTML = "🔴 در حال حاضر تعمیرگاه تعطیل است";
+  }
+}
+
+// اجرا
+updateShopStatus();
+
+// هر دقیقه آپدیت شود
+setInterval(updateShopStatus, 60000);
+
+// ==============================
+//   MAP MODAL CONTROL
+// ==============================
+
+document.addEventListener("DOMContentLoaded", function () {
+  const openMaps = document.getElementById("openMaps");
+  const mapModal = document.getElementById("mapModal");
+  const closeMaps = document.getElementById("closeMaps");
+
+  console.log("Map Script Loaded");
+
+  if (!openMaps || !mapModal || !closeMaps) {
+    console.log("Map elements not found!");
+    return;
+  }
+
+  openMaps.addEventListener("click", function (e) {
+    e.preventDefault();
+    mapModal.classList.add("active");
+    console.log("Modal Opened");
+  });
+
+  closeMaps.addEventListener("click", function () {
+    mapModal.classList.remove("active");
+    console.log("Modal Closed");
+  });
+
+  window.addEventListener("click", function (e) {
+    if (e.target === mapModal) {
+      mapModal.classList.remove("active");
+    }
+  });
+});
