@@ -312,8 +312,6 @@ select:focus-visible {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background: url("../assets/images/hero-banner.webp") center center / cover
-    no-repeat;
 }
 .home-hero {
   position: relative;
@@ -1317,7 +1315,7 @@ select:focus-visible {
 }
 .hero-logo {
   width: 100%;
-  max-width: 900px;
+  max-width: 650px;
   margin: auto;
   display: block;
 
@@ -2404,4 +2402,81 @@ select:focus-visible {
 
   filter: drop-shadow(0 0 35px rgba(255, 150, 0, 0.35))
     drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6));
+}
+/* ===========================
+   Mobile Responsive Header
+=========================== */
+
+.menu-toggle {
+  display: none;
+  font-size: 30px;
+  color: #fff;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .header .container {
+    padding: 0 15px;
+  }
+
+  .navbar {
+    height: 70px;
+
+    padding: 0 15px;
+
+    justify-content: space-between;
+  }
+
+  .logo img {
+    width: 120px;
+  }
+
+  .nav {
+    position: fixed;
+
+    top: 70px;
+
+    right: -100%;
+
+    width: 260px;
+
+    height: calc(100vh - 70px);
+
+    background: #081018;
+
+    transition: 0.4s;
+
+    z-index: 999;
+  }
+
+  .nav.active {
+    right: 0;
+  }
+
+  .nav ul {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 30px;
+
+    margin-top: 40px;
+  }
+
+  .btn-primary {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+}
+@media (max-width: 768px) {
+  .hero-left {
+    max-width: 100%;
+
+    text-align: center;
+  }
 }
