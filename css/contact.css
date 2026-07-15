@@ -41,7 +41,7 @@
 }
 
 .contact-hero h1 {
-  color: #fff;
+  color: #ffffff;
 
   font-size: 60px;
 
@@ -55,7 +55,7 @@
 }
 
 .contact-hero p {
-  color: #d5d5d5;
+  color: #f3f4f6;
 
   line-height: 2;
 
@@ -67,7 +67,7 @@ GRID
 =========================== */
 
 .contact-section {
-  padding: 90px 0;
+  padding: 120px 0 90px;
 }
 
 .contact-grid {
@@ -92,9 +92,11 @@ INFO
 
 .contact-info h2,
 .contact-form h2 {
-  color: #fff;
+  color: #111827;
 
-  margin-bottom: 12px;
+  font-size: 32px;
+
+  font-weight: 800;
 }
 
 .info-card {
@@ -108,8 +110,7 @@ INFO
 
   border-radius: 22px;
 
-  background: rgba(255, 255, 255, 0.05);
-
+  background: #1f2937;
   border: 1px solid rgba(255, 255, 255, 0.08);
 
   backdrop-filter: blur(20px);
@@ -144,13 +145,13 @@ INFO
 }
 
 .info-card h3 {
-  color: #fff;
+  color: #ffffff;
 
   margin-bottom: 8px;
 }
 
 .info-card p {
-  color: #bdbdbd;
+  color: #374151;
 
   line-height: 1.8;
 }
@@ -249,9 +250,11 @@ FORM
 
   border-radius: 16px;
 
-  background: rgba(255, 255, 255, 0.06);
+  background: #ffffff;
 
-  color: #fff;
+  border: 1px solid #d1d5db;
+
+  color: #111827;
 
   font-family: inherit;
 
@@ -331,4 +334,8 @@ RESPONSIVE
   .contact-buttons {
     flex-direction: column;
   }
+}
+.input-box input::placeholder,
+.input-box textarea::placeholder {
+  color: #111827;
 }
