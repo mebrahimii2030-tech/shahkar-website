@@ -132,7 +132,7 @@ function updateShopStatus() {
   const time = hour + minute / 60;
 
   const openHour = 8;
-  const closeHour = 18;
+  const closeHour = 20;
 
   let isOpen = time >= openHour && time < closeHour;
 
