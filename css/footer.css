@@ -307,3 +307,65 @@
   color: #fff;
   cursor: pointer;
 }
+/* =====================================
+   FOOTER RESPONSIVE
+===================================== */
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 60px 20px 20px;
+  }
+
+  .footer-grid {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 40px;
+
+    text-align: center;
+  }
+
+  .footer-about,
+  .footer-links,
+  .footer-services,
+  .footer-contact {
+    width: 100%;
+  }
+
+  .footer-about p {
+    max-width: 320px;
+
+    margin: 15px auto;
+  }
+
+  .footer-rating {
+    justify-content: center;
+  }
+
+  .footer-social {
+    justify-content: center;
+  }
+
+  .footer-links ul,
+  .footer-services ul,
+  .footer-contact ul {
+    padding: 0;
+  }
+
+  .footer-links li,
+  .footer-services li,
+  .footer-contact li {
+    text-align: center;
+  }
+
+  .navigation-card {
+    justify-content: center;
+  }
+
+  .working-hours {
+    max-width: 320px;
+
+    margin: 25px auto 0;
+  }
+}
