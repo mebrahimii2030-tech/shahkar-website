@@ -26,25 +26,9 @@
   </head>
 
 <body>
-  <header class="header">
-    <div class="container">
-      <div class="navbar">
-        <a href="index.html" class="logo"> شاهکار </a>
 
-        <nav class="nav">
-          <ul>
-            <li><a href="index.html">خانه</a></li>
-            <li><a href="services.html" class="active">خدمات</a></li>
-            <li><a href="pricing.html">تعرفه‌ها</a></li>
-            <li><a href="faq.html">سؤالات</a></li>
-            <li><a href="contact.html">تماس</a></li>
-          </ul>
-        </nav>
-
-        <a href="contact.html" class="btn btn-primary"> رزرو وقت </a>
-      </div>
-    </div>
-  </header>
+<div id="header"></div>
+ 
   <section class="service-hero">
     <div class="container service-hero-content">
       <span class="section-badge"> خدمات تخصصی شاهکار </span>
@@ -65,8 +49,7 @@
       <div class="overview-content">
         <span class="section-badge"> معرفی خدمت </span>
 
-        <h2>تعمیر تخصصی موتور خودرو</h2>
-
+<h2>تعمیر تخصصی گیربکس خودرو</h2>
         <p>
           موتور قلب خودرو است و عملکرد صحیح آن نقش مهمی در قدرت، مصرف سوخت و
           ایمنی خودرو دارد. در تعمیرگاه شاهکار با استفاده از تجهیزات پیشرفته و
@@ -100,7 +83,7 @@
       <div class="overview-image">
        <img
     src="assets/images/gearbox.jpg"
-    alt="تعمیر تخصصی موتور خودرو در تعمیرگاه شاهکار">
+    alt="تعمیر تخصصی گیربکس  خودرو در تعمیرگاه شاهکار">
       </div>
     </div>
   </section>
@@ -131,8 +114,7 @@
 
           <h3>عیب‌یابی تخصصی</h3>
 
-          <p>بررسی کامل موتور با دستگاه‌های پیشرفته دیاگ.</p>
-        </div>
+بررسی کامل گیربکس با دستگاه‌های پیشرفته دیاگ        </div>
 
         <div class="process-card">
           <div class="process-number">3</div>
@@ -262,58 +244,17 @@
     </div>
 
 </section>
-<script>
-function updateShopStatus() {
 
-    const status = document.getElementById("shopStatus");
-    if (!status) return;
 
-    const now = new Date();
 
-    const currentTime = now.getHours() + (now.getMinutes() / 60);
 
-    const openHour = 8;
-    const closeHour = 18;
 
-    if (currentTime >= openHour && currentTime < closeHour) {
 
-        const remain = Math.floor(closeHour - currentTime);
+  
+<div id="footer"></div>
 
-        status.className = "shop-status open";
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
 
-        status.innerHTML =
-            "🟢 اکنون تعمیرگاه باز است<br><small>حدود " +
-            remain +
-            " ساعت تا پایان ساعت کاری باقی مانده است.</small>";
-
-    } else {
-
-        let remain;
-
-        if (currentTime < openHour) {
-
-            remain = Math.ceil(openHour - currentTime);
-
-        } else {
-
-            remain = Math.ceil((24 - currentTime) + openHour);
-
-        }
-
-        status.className = "shop-status closed";
-
-        status.innerHTML =
-            "🔴 در حال حاضر تعمیرگاه تعطیل است<br><small>حدود " +
-            remain +
-            " ساعت تا شروع فعالیت باقی مانده است.</small>";
-
-    }
-
-}
-
-updateShopStatus();
-
-setInterval(updateShopStatus,60000);
-</script>
-  </body>
+</body>
 </html>
