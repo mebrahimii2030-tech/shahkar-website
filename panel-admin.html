@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>پنل مدیریت مشتریان | تعمیرگاه تخصصی شاهکار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+  </head>
+  <body class="panel-body">
+    <div class="panel-topbar">
+      <div class="panel-topbar__brand">
+        <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
+        <div class="panel-topbar__title">پنل مدیریت <span>مشتریان</span></div>
+      </div>
+      <a href="index.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">بازگشت به سایت</a>
+    </div>
+
+    <div class="panel-wrap">
+      <!-- خلاصه وضعیت -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h2>وضعیت کلی موعدها</h2>
+        </div>
+        <div id="summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
+      </div>
+
+      <!-- افزودن مشتری جدید -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h3>افزودن مشتری جدید</h3>
+        </div>
+        <form id="new-customer-form">
+          <div class="form-grid">
+            <div class="field">
+              <label>نام</label>
+              <input type="text" name="first_name" required />
+            </div>
+            <div class="field">
+              <label>نام خانوادگی</label>
+              <input type="text" name="last_name" required />
+            </div>
+            <div class="field">
+              <label>شماره تماس</label>
+              <input type="text" name="phone" placeholder="09xxxxxxxxx" />
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <button type="submit" class="btn btn-primary">ثبت مشتری</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- لیست مشتری‌ها -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h3>همه مشتری‌ها</h3>
+          <input
+            id="search-box"
+            type="text"
+            placeholder="جستجوی نام مشتری..."
+            style="border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 14px; font-family:var(--font-family);"
+          />
+        </div>
+        <table class="customers-table">
+          <thead>
+            <tr>
+              <th>مشتری</th>
+              <th>تماس</th>
+              <th>تعداد خودرو</th>
+              <th>نزدیک‌ترین موعد</th>
+              <th>لینک اختصاصی</th>
+            </tr>
+          </thead>
+          <tbody id="customers-tbody">
+            <tr><td colspan="5" class="empty-state">در حال بارگذاری...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="js/jalali.js"></script>
+    <script src="js/panel-api.js"></script>
+    <script src="js/panel-admin.js"></script>
+  </body>
+</html>

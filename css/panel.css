@@ -1,0 +1,474 @@
+/* =====================================================
+   شماکار | استایل پنل مشتریان و پنل مدیریت
+   مبتنی بر توکن‌های variables.css همین سایت
+===================================================== */
+
+.panel-body {
+  background: var(--gray-50);
+  min-height: 100vh;
+  font-family: var(--font-family);
+}
+
+/* ---------- نوار بالای پنل ---------- */
+.panel-topbar {
+  background: var(--primary);
+  color: var(--white);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-topbar__brand img {
+  height: 34px;
+}
+
+.panel-topbar__title {
+  font-weight: 800;
+  font-size: var(--fs-lg);
+}
+
+.panel-topbar__title span {
+  color: var(--secondary);
+}
+
+.panel-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+/* ---------- کارت‌ها ---------- */
+.panel-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.panel-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.panel-card__head h2,
+.panel-card__head h3 {
+  margin: 0;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+/* ---------- نشانگر وضعیت موعد (به شکل چراغ داشبورد) ---------- */
+.due-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  padding: 5px 12px 5px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.due-pill::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 3px currentColor22;
+}
+
+.due-pill--overdue {
+  background: #fef2f2;
+  color: var(--danger);
+}
+.due-pill--overdue::before {
+  background: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
+}
+
+.due-pill--soon {
+  background: #fffbeb;
+  color: var(--secondary-dark);
+}
+.due-pill--soon::before {
+  background: var(--secondary);
+  box-shadow: 0 0 8px var(--secondary);
+}
+
+.due-pill--ok {
+  background: #f0fdf4;
+  color: var(--success);
+}
+.due-pill--ok::before {
+  background: var(--success);
+}
+
+.due-pill--none {
+  background: var(--gray-100);
+  color: var(--gray-500);
+}
+.due-pill--none::before {
+  background: var(--gray-400);
+}
+
+/* ---------- جدول مشتری‌ها در پنل مدیریت ---------- */
+.customers-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.customers-table th {
+  text-align: right;
+  font-size: var(--fs-sm);
+  color: var(--gray-500);
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.customers-table td {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: var(--fs-md);
+}
+
+.customers-table tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.customers-table tbody tr:hover {
+  background: var(--gray-50);
+}
+
+.customer-name {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.copy-link-btn {
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-600);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: 0.15s;
+}
+.copy-link-btn:hover {
+  border-color: var(--secondary);
+  color: var(--secondary-dark);
+}
+
+/* ---------- فرم‌ها ---------- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.form-grid--full {
+  grid-template-columns: 1fr;
+}
+
+.field label {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--gray-700);
+  margin-bottom: 6px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: var(--font-family);
+  font-size: var(--fs-md);
+  color: var(--primary);
+  transition: 0.15s;
+  background: var(--white);
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.field textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.btn {
+  font-family: var(--font-family);
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  padding: 11px 22px;
+  font-size: var(--fs-md);
+  border: none;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.btn-primary {
+  background: var(--secondary);
+  color: var(--primary);
+}
+.btn-primary:hover {
+  background: var(--secondary-dark);
+  color: var(--white);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--gray-600);
+  border: 1.5px solid var(--gray-200);
+}
+.btn-ghost:hover {
+  border-color: var(--gray-400);
+  color: var(--primary);
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--danger);
+  border: 1.5px solid transparent;
+  padding: 6px 10px;
+  font-size: var(--fs-sm);
+}
+.btn-danger-ghost:hover {
+  background: #fef2f2;
+}
+
+/* ---------- منوی کشویی جستجوپذیر (Combobox) ---------- */
+.combo {
+  position: relative;
+}
+
+.combo input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: var(--font-family);
+  font-size: var(--fs-md);
+  background: var(--white);
+}
+
+.combo input:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.combo-list {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+}
+
+.combo-list.open {
+  display: block;
+}
+
+.combo-option {
+  padding: 9px 13px;
+  font-size: var(--fs-md);
+  cursor: pointer;
+  color: var(--gray-700);
+}
+
+.combo-option:hover,
+.combo-option.active {
+  background: var(--gray-50);
+  color: var(--primary);
+}
+
+.combo-option--add {
+  color: var(--secondary-dark);
+  font-weight: 700;
+  border-top: 1px solid var(--gray-100);
+}
+
+.combo-group-label {
+  padding: 8px 13px 2px;
+  font-size: var(--fs-xs);
+  color: var(--gray-400);
+  font-weight: 700;
+}
+
+/* ---------- تایم‌لاین سوابق مراجعات (صفحه اختصاصی مشتری) ---------- */
+.visit-timeline {
+  position: relative;
+  padding-right: 26px;
+}
+
+.visit-timeline::before {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--gray-200);
+}
+
+.visit-item {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.visit-item::before {
+  content: "";
+  position: absolute;
+  right: -26px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 3px solid var(--white);
+  box-shadow: 0 0 0 2px var(--secondary);
+}
+
+.visit-item__date {
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.visit-item__row {
+  font-size: var(--fs-sm);
+  color: var(--gray-600);
+  margin-bottom: 4px;
+}
+
+.visit-item__row b {
+  color: var(--gray-700);
+}
+
+.parts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.part-chip {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: var(--fs-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.car-card {
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.car-card__title {
+  font-weight: 800;
+  color: var(--primary);
+  font-size: var(--fs-lg);
+  margin-bottom: 4px;
+}
+
+.car-card__sub {
+  color: var(--gray-500);
+  font-size: var(--fs-sm);
+  margin-bottom: 14px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--gray-400);
+  padding: 40px 10px;
+  font-size: var(--fs-md);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.modal-box h3 {
+  margin-top: 0;
+  color: var(--primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel-wrap {
+    padding: 18px 14px 50px;
+  }
+  .panel-topbar {
+    padding: 14px 16px;
+  }
+}

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>مدیریت پرونده مشتری | تعمیرگاه تخصصی شاهکار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+  </head>
+  <body class="panel-body">
+    <div class="panel-topbar">
+      <div class="panel-topbar__brand">
+        <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
+        <div class="panel-topbar__title">مدیریت پرونده <span>مشتری</span></div>
+      </div>
+      <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">بازگشت به لیست</a>
+    </div>
+
+    <div class="panel-wrap">
+      <!-- اطلاعات مشتری -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h2 id="customer-title">در حال بارگذاری...</h2>
+          <button class="copy-link-btn" id="copy-link-btn" style="padding:9px 16px; font-size:14px;">کپی لینک اختصاصی مشتری</button>
+        </div>
+        <form id="edit-customer-form">
+          <div class="form-grid">
+            <div class="field"><label>نام</label><input type="text" name="first_name" required /></div>
+            <div class="field"><label>نام خانوادگی</label><input type="text" name="last_name" required /></div>
+            <div class="field"><label>شماره تماس</label><input type="text" name="phone" /></div>
+          </div>
+          <div style="margin-top:12px;"><button type="submit" class="btn btn-ghost">ذخیره تغییرات</button></div>
+        </form>
+      </div>
+
+      <!-- افزودن خودرو -->
+      <div class="panel-card">
+        <div class="panel-card__head"><h3>افزودن خودرو</h3></div>
+        <form id="new-car-form">
+          <div class="form-grid">
+            <div class="field combo">
+              <label>برند</label>
+              <input type="text" id="car-brand-input" autocomplete="off" required />
+              <div class="combo-list" id="car-brand-list"></div>
+            </div>
+            <div class="field combo">
+              <label>مدل</label>
+              <input type="text" id="car-model-input" autocomplete="off" required />
+              <div class="combo-list" id="car-model-list"></div>
+            </div>
+            <div class="field"><label>سال تولید</label><input type="text" name="year" placeholder="مثلاً ۱۴۰۱" /></div>
+            <div class="field"><label>پلاک (اختیاری)</label><input type="text" name="plate" /></div>
+          </div>
+          <div style="margin-top:14px;"><button type="submit" class="btn btn-primary">افزودن خودرو</button></div>
+        </form>
+      </div>
+
+      <!-- لیست خودروها و سوابق -->
+      <div id="cars-container"></div>
+    </div>
+
+    <!-- مودال افزودن مراجعه جدید -->
+    <div class="modal-overlay" id="visit-modal">
+      <div class="modal-box">
+        <h3>ثبت مراجعه جدید</h3>
+        <form id="new-visit-form">
+          <input type="hidden" name="car_id" />
+          <div class="form-grid form-grid--full">
+            <div class="field">
+              <label>تاریخ مراجعه (شمسی)</label>
+              <input type="text" name="visit_date" placeholder="۱۴۰۵/۰۴/۲۸" required />
+            </div>
+            <div class="field">
+              <label>ایرادات اعلام‌شده توسط مشتری</label>
+              <textarea name="complaints"></textarea>
+            </div>
+            <div class="field">
+              <label>ایرادات رفع‌شده</label>
+              <textarea name="resolved"></textarea>
+            </div>
+            <div class="field">
+              <label>یادداشت آزاد</label>
+              <textarea name="notes"></textarea>
+            </div>
+          </div>
+
+          <div class="panel-card__head" style="margin-top:16px; margin-bottom:8px;">
+            <h3 style="font-size:16px;">قطعات تعویض‌شده</h3>
+            <button type="button" class="btn btn-ghost" id="add-part-row-btn" style="padding:6px 14px; font-size:14px;">+ افزودن قطعه</button>
+          </div>
+          <div id="parts-rows"></div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="close-visit-modal">انصراف</button>
+            <button type="submit" class="btn btn-primary">ثبت مراجعه</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/jalali.js"></script>
+    <script src="js/panel-data.js"></script>
+    <script src="js/combobox.js"></script>
+    <script src="js/panel-api.js"></script>
+    <script src="js/panel-customer.js"></script>
+  </body>
+</html>

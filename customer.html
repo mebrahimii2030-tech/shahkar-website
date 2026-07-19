@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>پرونده خودروی من | تعمیرگاه تخصصی شاهکار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+    <style>
+      .hero-callout {
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: var(--white);
+        border-radius: var(--radius-md);
+        padding: 26px 24px;
+        margin-bottom: 20px;
+      }
+      .hero-callout__label {
+        color: var(--secondary);
+        font-weight: 800;
+        font-size: var(--fs-sm);
+        margin-bottom: 6px;
+      }
+      .hero-callout__main {
+        font-size: var(--fs-xl);
+        font-weight: 800;
+      }
+      .hero-callout__sub {
+        color: var(--gray-300);
+        font-size: var(--fs-sm);
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body class="panel-body">
+    <div class="panel-topbar">
+      <div class="panel-topbar__brand">
+        <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
+        <div class="panel-topbar__title">پرونده خودروی <span>من</span></div>
+      </div>
+      <a href="index.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">صفحه اصلی تعمیرگاه</a>
+    </div>
+
+    <div class="panel-wrap">
+      <div id="hero-callout"></div>
+
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h2 id="customer-title">در حال بارگذاری...</h2>
+        </div>
+        <p style="color:var(--gray-500); font-size:var(--fs-sm); margin:0;">
+          این صفحه، پرونده اختصاصی شما در تعمیرگاه تخصصی شاهکار است و سوابق خودرو و تاریخ تعویض قطعات‌تان را نشان می‌دهد.
+        </p>
+      </div>
+
+      <div id="cars-container"></div>
+    </div>
+
+    <script src="js/jalali.js"></script>
+    <script src="js/panel-api.js"></script>
+    <script src="js/customer-view.js"></script>
+  </body>
+</html>
