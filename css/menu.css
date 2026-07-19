@@ -1,0 +1,363 @@
+/*==============================
+   SIDE MENU (perperook-style)
+==============================*/
+
+:root {
+  --side-collapsed: 76px;
+  --side-expanded: 264px;
+  --side-bg: var(--primary);
+  --side-bg-soft: var(--primary-light);
+  --side-border: rgba(255, 255, 255, 0.08);
+  --side-text: #cbd5e1;
+  --side-text-strong: #ffffff;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: var(--side-collapsed);
+  z-index: 9999;
+  transition: width 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.side-menu-inner {
+  height: 100%;
+  background: linear-gradient(180deg, var(--side-bg) 0%, #0b1222 100%);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.side-menu.expanded {
+  width: var(--side-expanded);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .side-menu:hover {
+    width: var(--side-expanded);
+  }
+
+  .side-menu:hover .side-label {
+    opacity: 1;
+  }
+
+  .side-menu:focus-within {
+    width: var(--side-expanded);
+  }
+
+  .side-menu:focus-within .side-label {
+    opacity: 1;
+  }
+
+  /* hide the manual toggle button on hover-capable devices */
+  .menu-toggle {
+    display: none;
+  }
+
+  /* explicit close via the arrow overrides hover until the
+     mouse actually leaves the sidebar */
+  .side-menu.force-collapsed,
+  .side-menu.force-collapsed:hover,
+  .side-menu.force-collapsed:focus-within {
+    width: var(--side-collapsed) !important;
+  }
+
+  .side-menu.force-collapsed .side-label {
+    opacity: 0 !important;
+  }
+
+  .side-menu.force-collapsed .side-logo {
+    height: 34px !important;
+  }
+
+  .side-menu.force-collapsed .side-logo-img {
+    max-width: 56px !important;
+  }
+
+  .side-menu.force-collapsed .side-menu-arrow i {
+    transform: none !important;
+  }
+}
+
+/* ---------- Top: logo + toggle ---------- */
+
+.side-menu-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 26px 0 20px;
+  border-bottom: 1px solid var(--side-border);
+  flex-shrink: 0;
+}
+
+.side-logo {
+  position: relative;
+  flex-shrink: 0;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  transition: height 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.side-logo-img {
+  height: 100%;
+  width: auto;
+  max-width: 56px;
+  object-fit: contain;
+  /* the source file has a solid black backdrop; screen-blend
+     against the navy sidebar makes the black disappear so only
+     the metal/orange emblem is visible, with no boxed edges */
+  mix-blend-mode: screen;
+  transition: 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.side-menu.expanded .side-logo,
+.side-menu:hover .side-logo,
+.side-menu:focus-within .side-logo {
+  height: 64px;
+}
+
+.side-menu.expanded .side-logo-img,
+.side-menu:hover .side-logo-img,
+.side-menu:focus-within .side-logo-img {
+  max-width: 210px;
+}
+
+.side-logo:hover .side-logo-img {
+  filter: drop-shadow(0 4px 14px rgba(245, 158, 11, 0.45));
+}
+
+.menu-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--side-text-strong);
+  font-size: 17px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.menu-toggle:hover {
+  background: var(--secondary);
+  color: var(--primary);
+}
+
+/* ---------- Nav ---------- */
+
+.side-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 0;
+}
+
+.side-group {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--side-border);
+}
+
+.side-group:last-child {
+  border-bottom: none;
+}
+
+.side-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 60px;
+  padding: 0 16px;
+  text-decoration: none;
+  color: var(--side-text);
+  font-weight: 700;
+  font-size: var(--fs-md);
+  white-space: nowrap;
+  transition: var(--transition);
+  position: relative;
+}
+
+.side-item:hover,
+.side-item.active {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--secondary);
+}
+
+.side-item.active::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+.side-icon {
+  flex-shrink: 0;
+  width: var(--side-collapsed);
+  margin: 0 -16px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+}
+
+.side-label {
+  opacity: 0;
+  transition: opacity 0.25s ease 0.05s;
+}
+
+.side-menu.expanded .side-label {
+  opacity: 1;
+}
+
+.side-group-cta {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--side-border);
+}
+
+.side-item-cta {
+  background: var(--secondary);
+  color: var(--primary);
+  border-radius: var(--radius-md);
+  height: 52px;
+  padding: 0;
+}
+
+.side-item-cta .side-icon {
+  width: var(--side-collapsed);
+  margin: 0;
+  height: 52px;
+}
+
+.side-item-cta:hover {
+  background: var(--secondary-dark);
+  color: var(--white);
+}
+
+/* ---------- Edge arrow toggle ---------- */
+
+.side-menu-arrow {
+  position: absolute;
+  top: 50%;
+  left: -16px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--secondary);
+  background: var(--primary);
+  color: var(--secondary);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: 0.3s;
+}
+
+.side-menu-arrow:hover {
+  background: var(--secondary);
+  color: var(--primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.side-menu-arrow i {
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.side-menu.expanded .side-menu-arrow i {
+  transform: rotate(180deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .side-menu:hover .side-menu-arrow i,
+  .side-menu:focus-within .side-menu-arrow i {
+    transform: rotate(180deg);
+  }
+}
+
+/* ---------- Overlay (mobile) ---------- */
+
+.side-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.35s;
+  z-index: 9998;
+}
+
+.side-menu-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ---------- Push page content ---------- */
+
+body {
+  padding-right: var(--side-collapsed);
+}
+
+/*==============================
+       RESPONSIVE
+==============================*/
+
+@media (max-width: 640px) {
+  :root {
+    --side-collapsed: 60px;
+    --side-expanded: 230px;
+  }
+
+  .side-logo {
+    height: 28px;
+  }
+
+  .side-logo-img {
+    max-width: 46px;
+  }
+
+  .side-menu.expanded .side-logo,
+  .side-menu:hover .side-logo,
+  .side-menu:focus-within .side-logo {
+    height: 50px;
+  }
+
+  .side-menu.expanded .side-logo-img,
+  .side-menu:hover .side-logo-img,
+  .side-menu:focus-within .side-logo-img {
+    max-width: 170px;
+  }
+
+  .menu-toggle {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+
+  .side-item {
+    height: 54px;
+    font-size: var(--fs-sm);
+  }
+
+  .side-icon {
+    height: 54px;
+  }
+}

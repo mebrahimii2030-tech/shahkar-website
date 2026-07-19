@@ -1,0 +1,65 @@
+/*==============================
+   SCROLL UP/DOWN HELPER
+==============================*/
+
+.scroll-nav {
+  position: fixed;
+  left: 20px;
+  bottom: 24px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: 0.35s;
+}
+
+.scroll-nav.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.scroll-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: var(--secondary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35);
+  transition: 0.3s;
+}
+
+.scroll-nav-btn:hover {
+  background: var(--secondary);
+  color: var(--primary);
+  transform: translateY(-3px);
+}
+
+.scroll-nav-btn.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .scroll-nav {
+    left: 14px;
+    bottom: 18px;
+    gap: 8px;
+  }
+
+  .scroll-nav-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+}

@@ -3,20 +3,12 @@ async function loadComponent(id, file) {
 
   if (!element) return;
 
-  try {
-    const response = await fetch(file);
+  const response = await fetch(file);
 
-    if (!response.ok) return;
+  element.innerHTML = await response.text();
 
-    element.innerHTML = await response.text();
-
-    if (id === "header") {
-      const script = document.createElement("script");
-      script.src = "js/menu.js";
-      document.body.appendChild(script);
-    }
-  } catch (err) {
-    console.error(err);
+  if (id === "header") {
+    initMenu();
   }
 }
 
