@@ -30,8 +30,19 @@ function initMenu() {
     sideMenu.classList.remove("force-collapsed");
   });
 
+  // On hover-capable devices the menu can already be visually open
+  // purely via CSS :hover, without the "expanded" class ever being
+  // added. Checking classList alone would get out of sync with what
+  // the user actually sees, so we check the real rendered width instead.
+  function isVisuallyOpen() {
+    const collapsed = parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue("--side-collapsed")
+    );
+    return sideMenu.getBoundingClientRect().width > collapsed + 5;
+  }
+
   function toggleMenu() {
-    if (sideMenu.classList.contains("expanded")) {
+    if (isVisuallyOpen()) {
       closeMenu();
     } else {
       openMenu();

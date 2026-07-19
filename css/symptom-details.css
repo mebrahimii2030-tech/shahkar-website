@@ -1,0 +1,111 @@
+/*==============================
+   SYMPTOM DETAILS ACCORDION
+   (service pages - full explanations)
+==============================*/
+
+.symptom-details {
+  padding: 120px 0;
+  background: #ffffff;
+}
+
+.symptom-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 60px;
+}
+
+.symptom-detail-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+  transition: 0.3s;
+}
+
+.symptom-detail-item[open] {
+  border-color: var(--secondary);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+}
+
+.symptom-detail-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 26px;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.symptom-detail-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.symptom-detail-item summary::marker {
+  content: "";
+}
+
+.symptom-detail-number {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--secondary);
+  background: rgba(245, 158, 11, 0.12);
+  transition: 0.3s;
+}
+
+.symptom-detail-item[open] .symptom-detail-number {
+  background: var(--secondary);
+  color: #ffffff;
+}
+
+.symptom-detail-item summary .symptom-detail-title {
+  flex: 1;
+}
+
+.symptom-detail-chevron {
+  flex-shrink: 0;
+  color: #94a3b8;
+  transition: transform 0.3s ease;
+}
+
+.symptom-detail-item[open] .symptom-detail-chevron {
+  transform: rotate(180deg);
+  color: var(--secondary);
+}
+
+.symptom-detail-body {
+  padding: 0 26px 26px 26px;
+  margin-right: 58px;
+  color: #475569;
+  font-size: var(--fs-md);
+  line-height: 2;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 18px;
+}
+
+@media (max-width: 640px) {
+  .symptom-details {
+    padding: 70px 0;
+  }
+
+  .symptom-detail-item summary {
+    padding: 18px;
+    font-size: var(--fs-md);
+  }
+
+  .symptom-detail-body {
+    margin-right: 0;
+    padding: 16px 18px 18px;
+  }
+}

@@ -21,6 +21,7 @@
 
     <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/menu.css" />
+<link rel="stylesheet" href="css/symptom-details.css" />
     <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/responsive-fix.css" />
 <link rel="stylesheet" href="css/scroll-nav.css" />
@@ -152,7 +153,7 @@
     </section>
 
     <!-- WARNING -->
-    <section class="engine-warning">
+    <section class="engine-warning" id="symptoms">
       <div class="container">
         <div class="section-title">
           <span class="section-badge">علائم خرابی جلوبندی</span>
@@ -200,6 +201,138 @@
         </div>
       </div>
     </section>
+
+    <section class="symptom-details">
+      <div class="container">
+        <div class="section-title">
+          <span class="section-badge">توضیحات تخصصی</span>
+          <h2>هر علامت دقیقاً به چه معنیه؟</h2>
+          <p>
+            برای اینکه قبل از مراجعه هم یه تصویر کلی از مشکل احتمالی داشته
+            باشید، هر کدوم از علائم بالا رو با جزئیات بیشتر توضیح دادیم.
+          </p>
+        </div>
+
+        <div class="symptom-accordion">
+          <details class="symptom-detail-item" open>
+            <summary>
+              <span class="symptom-detail-number">۱</span>
+              <span class="symptom-detail-title">لرزش فرمان در سرعت بالا</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              لرزش فرمان که فقط در سرعت‌های بالا احساس می‌شه معمولاً به
+              عدم بالانس چرخ‌ها، تاب برداشتن رینگ، یا ساییدگی طبق و
+              میل‌موج‌گیر برمی‌گرده. اگه لرزش موقع ترمز گرفتن بیشتر بشه،
+              احتمال گرد شدن دیسک ترمز هم هست. این علامت روی کنترل خودرو
+              در سرعت اثر می‌ذاره و بهتره زودتر بررسی بشه.
+            </div>
+          </details>
+
+          <details class="symptom-detail-item">
+            <summary>
+              <span class="symptom-detail-number">۲</span>
+              <span class="symptom-detail-title">کشیدن خودرو به یک سمت</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              اگه فرمان رو رها کنید و خودرو خودش به یه طرف بکشه، معمولاً
+              دلیلش به‌هم خوردن زاویه فرمان‌بندی (frontend alignment)،
+              فشار نامساوی باد لاستیک‌ها، یا خرابی یه‌طرفه در کمک‌فنر یا
+              طبقه. این مشکل باعث سایش نامتقارن و سریع‌تر لاستیک‌ها هم
+              می‌شه، پس بی‌توجهی بهش هزینه لاستیک رو هم بالا می‌بره.
+            </div>
+          </details>
+
+          <details class="symptom-detail-item">
+            <summary>
+              <span class="symptom-detail-number">۳</span>
+              <span class="symptom-detail-title">صداهای تق‌تق از جلوبندی</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              صدای تق‌تق موقع دنده‌سرعت‌گیر یا دور زدن معمولاً از ساییدگی
+              میل‌موج‌گیر، سربند فرمان، یا بوش‌های طبق میاد. این قطعات
+              نگه‌دارنده اجزای جلوبندی هستن و خرابی‌شون در بلندمدت روی
+              همراستایی و ایمنی فرمان‌پذیری خودرو اثر می‌ذاره.
+            </div>
+          </details>
+
+          <details class="symptom-detail-item">
+            <summary>
+              <span class="symptom-detail-number">۴</span>
+              <span class="symptom-detail-title">سایش غیرعادی لاستیک‌ها</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              اگه آج لاستیک فقط از یه لبه یا به‌صورت خال‌خال ساییده شده،
+              نشونه به‌هم خوردن زاویه چرخ‌ها (کمبر یا تویین) یا خرابی
+              کمک‌فنرهاست. سایش نامتقارن هم روی چسبندگی خودرو به جاده اثر
+              منفی می‌ذاره و هم عمر لاستیک رو به شدت کم می‌کنه.
+            </div>
+          </details>
+
+          <details class="symptom-detail-item">
+            <summary>
+              <span class="symptom-detail-number">۵</span>
+              <span class="symptom-detail-title">عدم تعادل خودرو در دست‌انداز</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              اگه بعد از عبور از دست‌انداز خودرو چند بار بالا و پایین
+              تکون بخوره و دیر آروم بشه، معمولاً کمک‌فنرها ضعیف شدن و دیگه
+              نمی‌تونن نوسان فنرها رو به‌درستی کنترل کنن. این حالت هم روی
+              راحتی سواری تأثیر می‌ذاره و هم فاصله ترمز خودرو رو در
+              شرایط اضطراری افزایش می‌ده.
+            </div>
+          </details>
+
+          <details class="symptom-detail-item">
+            <summary>
+              <span class="symptom-detail-number">۶</span>
+              <span class="symptom-detail-title">سفت یا شل شدن فرمان</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              سفت شدن ناگهانی فرمان معمولاً به افت روغن هیدرولیک فرمان یا
+              خرابی پمپ آن برمی‌گرده (یا در فرمان برقی، خرابی موتور
+              کمکی). شل یا بی‌جواب شدن بیش‌ازحد فرمان هم می‌تونه نشونه
+              ساییدگی در جعبه فرمان یا اتصالات مربوطه باشه؛ در هر دو حالت
+              کنترل دقیق خودرو تحت تأثیر قرار می‌گیره.
+            </div>
+          </details>
+
+          <details class="symptom-detail-item">
+            <summary>
+              <span class="symptom-detail-number">۷</span>
+              <span class="symptom-detail-title">کاهش کنترل خودرو در پیچ‌ها</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              اگه در پیچ‌ها احساس کنید خودرو بیش از حد معمول کج می‌شه یا
+              دیر به فرمان واکنش نشون می‌ده، معمولاً کمک‌فنرها یا میل‌
+              تعادل (استابلایزر) ضعیف شدن. این علامت مستقیماً روی ایمنی
+              خودرو در سرعت و پیچ‌های تند اثر می‌ذاره.
+            </div>
+          </details>
+
+          <details class="symptom-detail-item">
+            <summary>
+              <span class="symptom-detail-number">۸</span>
+              <span class="symptom-detail-title">صدای ضربه هنگام عبور از دست‌انداز</span>
+              <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+            </summary>
+            <div class="symptom-detail-body">
+              صدای ضربه یا کوبش موقع عبور از دست‌انداز معمولاً از ساییدگی
+              کمک‌فنر، بوش‌های فرسوده، یا شل شدن اتصالات جلوبندی میاد.
+              این صدا معمولاً نشونه‌ی اینه که یکی از قطعات دیگه به‌درستی
+              ضربه‌گیری نمی‌کنه و نیاز به بررسی و تعویض داره.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
     <script>
       const backBtn = document.getElementById("backToTop");
 

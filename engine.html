@@ -35,6 +35,7 @@
 
     <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/menu.css" />
+<link rel="stylesheet" href="css/symptom-details.css" />
 
     <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/responsive-fix.css" />
@@ -192,7 +193,7 @@
           </div>
         </div>
       </section>
-      <section class="engine-warning">
+      <section class="engine-warning" id="symptoms">
         <div class="container">
           <div class="section-title">
             <span class="section-badge"> علائم خرابی موتور </span>
@@ -235,6 +236,120 @@
               <i class="fa-solid fa-triangle-exclamation"></i>
               لرزش یا صدای غیرعادی موتور
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="symptom-details">
+        <div class="container">
+          <div class="section-title">
+            <span class="section-badge">توضیحات تخصصی</span>
+            <h2>هر علامت دقیقاً به چه معنیه؟</h2>
+            <p>
+              برای اینکه قبل از مراجعه هم یه تصویر کلی از مشکل احتمالی داشته
+              باشید، هر کدوم از علائم بالا رو با جزئیات بیشتر توضیح دادیم.
+            </p>
+          </div>
+
+          <div class="symptom-accordion">
+            <details class="symptom-detail-item" open>
+              <summary>
+                <span class="symptom-detail-number">۱</span>
+                <span class="symptom-detail-title">روشن شدن چراغ چک موتور</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                چراغ چک موتور معمولاً وقتی روشن می‌شه که ECU خودرو یه خطا در
+                یکی از سنسورها یا سیستم‌های موتور (مثل سنسور اکسیژن، کویل
+                جرقه، یا سیستم سوخت‌رسانی) ثبت کرده. گاهی علت ساده‌ست، مثل
+                شل بودن درب باک بنزین، ولی گاهی نشونه مشکلی جدی‌تره. تنها
+                راه مطمئن برای فهمیدن دلیل واقعی، خوندن کد خطا با دستگاه
+                دیاگ و بررسی تخصصیه؛ نادیده گرفتنش می‌تونه منجر به آسیب
+                بیشتر به موتور بشه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۲</span>
+                <span class="symptom-detail-title">خروج دود آبی یا سفید از اگزوز</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                دود آبی‌رنگ معمولاً نشونه سوختن روغن موتور در محفظه احتراق
+                است که می‌تونه به دلیل ساییدگی رینگ‌پیستون یا خرابی
+                واشرسرسیلندر باشه. دود سفید غلیظ هم اغلب نشونه ورود مایع
+                خنک‌کننده به داخل سیلندرهاست که مشکل جدی‌تری محسوب می‌شه و
+                معمولاً به واشرسرسیلندر یا ترک در سرسیلندر مربوطه. در هر دو
+                حالت، ادامه رانندگی بدون بررسی می‌تونه خسارت موتور رو چند
+                برابر کنه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۳</span>
+                <span class="symptom-detail-title">افزایش مصرف سوخت</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                اگر متوجه شدید مصرف بنزین خودروتون بدون تغییر در نحوه
+                رانندگی بالا رفته، احتمالاً یکی از اجزای موتور مثل شمع‌ها،
+                فیلتر هوا، سنسور اکسیژن یا انژکتورها به‌درستی کار نمی‌کنه و
+                نسبت سوخت به هوا به هم خورده. این مشکل معمولاً با علائم
+                دیگه‌ای مثل افت شتاب یا صدای نامنظم موتور همراهه و هرچه
+                زودتر بررسی بشه، هم هزینه سوخت کمتر می‌شه و هم از آسیب بیشتر
+                جلوگیری می‌شه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۴</span>
+                <span class="symptom-detail-title">کاهش شتاب خودرو</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                افت شتاب یا احساس «بی‌جون» شدن موتور موقع گاز دادن می‌تونه
+                چند دلیل داشته باشه: کثیف بودن فیلتر هوا یا سوخت، ضعیف شدن
+                شمع‌ها و کویل‌ها، افت فشار سوخت، یا حتی مشکل در سیستم
+                دریچه گاز برقی. چون این علامت روی ایمنی سبقت گرفتن و ورود به
+                بزرگراه هم تأثیر می‌ذاره، بهتره زودتر از موتور و سیستم
+                سوخت‌رسانی معاینه بشه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۵</span>
+                <span class="symptom-detail-title">داغ شدن موتور</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                بالا رفتن دمای موتور از حد نرمال معمولاً به خاطر مشکل در
+                سیستم خنک‌کاری اتفاق می‌افته؛ نشتی آب‌ رادیاتور، خرابی
+                ترموستات، ضعیف کار کردن فن یا کم بودن مایع خنک‌کننده از
+                دلایل رایج هستن. داغ کردن موتور اگه ادامه پیدا کنه می‌تونه
+                باعث تاب برداشتن سرسیلندر یا آسیب دائمی به موتور بشه، پس
+                جزو علائمی‌ست که نباید حتی چند روز به تعویق بیفته.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۶</span>
+                <span class="symptom-detail-title">لرزش یا صدای غیرعادی موتور</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                لرزش روی دنده خلاص یا صدای تق‌تق و فلزی از داخل موتور معمولاً
+                نشونه‌ی ساییدگی قطعات داخلی، مشکل در سیستم جرقه‌زنی، یا کم
+                شدن روغن موتوره. بعضی وقت‌ها این صدا از یاتاقان‌ها یا زنجیر
+                تایم میاد که در صورت بی‌توجهی می‌تونه به تعمیر اساسی و
+                پرهزینه موتور منجر بشه. تشخیص دقیق منبع صدا فقط با گوش دادن
+                تخصصی و بازبینی موتور امکان‌پذیره.
+              </div>
+            </details>
           </div>
         </div>
       </section>

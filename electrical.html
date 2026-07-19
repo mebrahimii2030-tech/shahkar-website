@@ -33,6 +33,7 @@
 
     <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/menu.css" />
+<link rel="stylesheet" href="css/symptom-details.css" />
     <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/responsive-fix.css" />
 <link rel="stylesheet" href="css/scroll-nav.css" />
@@ -180,7 +181,7 @@
           </div>
         </div>
       </section>
-      <section class="engine-warning">
+      <section class="engine-warning" id="symptoms">
         <div class="container">
           <div class="section-title">
             <span class="section-badge"> علائم خرابی برق خودرو </span>
@@ -243,6 +244,169 @@
               <i class="fa-solid fa-triangle-exclamation"></i>
               خطاهای مکرر ECU
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="symptom-details">
+        <div class="container">
+          <div class="section-title">
+            <span class="section-badge">توضیحات تخصصی</span>
+            <h2>هر علامت دقیقاً به چه معنیه؟</h2>
+            <p>
+              برای اینکه قبل از مراجعه هم یه تصویر کلی از مشکل احتمالی داشته
+              باشید، هر کدوم از علائم بالا رو با جزئیات بیشتر توضیح دادیم.
+            </p>
+          </div>
+
+          <div class="symptom-accordion">
+            <details class="symptom-detail-item" open>
+              <summary>
+                <span class="symptom-detail-number">۱</span>
+                <span class="symptom-detail-title">روشن نشدن خودرو یا استارت نخوردن</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                وقتی با چرخوندن سوییچ فقط صدای «تیک‌تیک» می‌شنوید یا اصلاً
+                هیچ واکنشی نیست، معمولاً باتری خالی، اتصالات خورده‌شده
+                باتری، یا خرابی استارت و رله مقصره. گاهی هم مشکل از سوییچ
+                استارت یا ایموبیلایزر خودروئه. چون این علامت خودرو رو کاملاً
+                از حرکت می‌ندازه، معمولاً اولین قدم تست ولتاژ باتری و سیستم
+                شارژه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۲</span>
+                <span class="symptom-detail-title">ضعیف شدن یا خالی شدن سریع باتری</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                اگه باتری با وجود شارژ کامل، در عرض چند روز خالی می‌شه، یا
+                خودرو زودتر از حد معمول به کمک باتری نیاز پیدا می‌کنه،
+                احتمالاً دینام به‌درستی شارژ نمی‌کنه یا یه مصرف‌کننده مخفی
+                (مثل چراغی که خاموش نمی‌شه) باتری رو تخلیه می‌کنه. عمر
+                طبیعی باتری هم معمولاً حدود ۲ تا ۳ ساله و بعد از اون افت
+                ظرفیتش طبیعیه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۳</span>
+                <span class="symptom-detail-title">خاموش شدن ناگهانی خودرو</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                خاموش شدن ناگهانی موتور در حین رانندگی می‌تونه از قطع
+                لحظه‌ای برق (اتصالی یا خرابی رله اصلی)، افت ولتاژ باتری، یا
+                خرابی سنسورهای حیاتی موتور باشه. این علامت چون می‌تونه در
+                حال حرکت و در ترافیک هم اتفاق بیفته، از نظر ایمنی جدی‌ترین
+                علامت این لیسته و نیاز به بررسی فوری داره.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۴</span>
+                <span class="symptom-detail-title">کار نکردن شیشه‌بالابرها</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                از کار افتادن شیشه‌بالابر معمولاً یا به فیوز سوخته، یا خرابی
+                موتورچه شیشه‌بالابر، یا کلید مربوطه برمی‌گرده. اگه فقط یه
+                شیشه مشکل داره احتمال خرابی موضعی بیشتره، ولی اگه همه با هم
+                از کار افتادن، بهتره سیم‌کشی و فیوز اصلی درب‌ها چک بشه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۵</span>
+                <span class="symptom-detail-title">از کار افتادن چراغ‌ها</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                خاموش موندن یا چشمک زدن چراغ‌های جلو، عقب یا راهنما معمولاً
+                نشونه سوختن لامپ، خرابی فیوز، یا اتصالی در سیم‌کشیه. چون
+                چراغ‌ها مستقیماً روی دید شب و دیده‌شدن توسط سایر رانندگان
+                تأثیر می‌ذارن، این علامت رو نباید حتی برای یک روز به تعویق
+                انداخت.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۶</span>
+                <span class="symptom-detail-title">روشن شدن چراغ چک</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                چراغ چک وقتی روشن می‌شه که ماژول کنترل موتور یه خطای
+                الکتریکی یا سنسوری ثبت کرده باشه. علت می‌تونه از یه سنسور
+                ساده تا مشکل در سیم‌کشی اصلی موتور باشه. تنها راه دقیق
+                فهمیدن دلیل، اتصال دستگاه دیاگ و خوندن کد خطاست.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۷</span>
+                <span class="symptom-detail-title">خرابی قفل مرکزی یا ریموت</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                کار نکردن قفل مرکزی معمولاً یا از باتری ریموت، یا از موتورچه
+                قفل درب‌ها، یا از ماژول کنترل مرکزیه. اگه فقط از فاصله
+                نزدیک کار می‌کنه احتمالاً مشکل از آنتن یا ماژول گیرنده‌ست،
+                نه خود باتری ریموت.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۸</span>
+                <span class="symptom-detail-title">عمل نکردن فن یا کولر</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                خاموش موندن فن خنک‌کننده رادیاتور می‌تونه به داغ کردن سریع
+                موتور منجر بشه و معمولاً به رله فن، سنسور دمای آب، یا
+                موتورچه فن مربوطه. عمل نکردن کولر هم گاهی برقی‌ه (کلاچ
+                کمپرسور، سنسور فشار) و گاهی مکانیکی، به همین دلیل بررسی
+                تخصصی برای تشخیص دقیق لازمه.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۹</span>
+                <span class="symptom-detail-title">بوی سوختگی سیم‌کشی</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                بوی پلاستیک یا سیم سوخته از جدی‌ترین علائم این لیسته و
+                معمولاً نشونه اتصالی یا گرم شدن بیش‌ازحد یه سیم یا رله در
+                اثر جریان زیاده. ادامه رانندگی با این وضعیت ریسک آتش‌سوزی
+                داره، پس در صورت مشاهده این بو بهتره فوراً خودرو رو خاموش و
+                برای بررسی اقدام کنید.
+              </div>
+            </details>
+
+            <details class="symptom-detail-item">
+              <summary>
+                <span class="symptom-detail-number">۱۰</span>
+                <span class="symptom-detail-title">خطاهای مکرر ECU</span>
+                <i class="fa-solid fa-chevron-down symptom-detail-chevron"></i>
+              </summary>
+              <div class="symptom-detail-body">
+                اگه بعد از پاک کردن خطا با دستگاه دیاگ، همون کد خطا دوباره
+                و دوباره ثبت بشه، یعنی مشکل واقعی هنوز رفع نشده و صرفاً
+                علامت هشدار پاک شده. این حالت معمولاً نیاز به بررسی عمیق‌تر
+                سیم‌کشی، سنسورها یا حتی خود واحد کنترل الکترونیکی داره.
+              </div>
+            </details>
           </div>
         </div>
       </section>
