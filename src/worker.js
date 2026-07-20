@@ -1,0 +1,263 @@
+// =====================================================
+// شماکار | ورکر اصلی سایت (Cloudflare Workers + Static Assets)
+// این فایل جایگزین پوشه‌ی قدیمی functions/ شده، چون آن ساختار
+// فقط برای Cloudflare Pages کار می‌کند، نه برای Cloudflare Workers.
+// طبق wrangler.jsonc، فقط درخواست‌های /api/* و صفحات پنل مدیریت
+// از همین فایل عبور می‌کنند؛ بقیه فایل‌های سایت مستقیم و رایگان
+// از لایه Static Assets سرو می‌شوند.
+// =====================================================
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+  });
+}
+
+function errorResponse(message, status = 400) {
+  return json({ error: message }, status);
+}
+
+function generateCustomerCode() {
+  const chars = "abcdefghijkmnpqrstuvwxyz23456789";
+  let code = "";
+  const bytes = new Uint8Array(10);
+  crypto.getRandomValues(bytes);
+  for (let i = 0; i < bytes.length; i++) code += chars[bytes[i] % chars.length];
+  return code;
+}
+
+// ---------- بررسی رمز عبور مدیر (Basic Auth) ----------
+function isAuthorized(request, env) {
+  const expected = env.ADMIN_PASSWORD;
+  if (!expected) return false;
+  const authHeader = request.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Basic ")) return false;
+  const decoded = atob(authHeader.slice(6));
+  const sep = decoded.indexOf(":");
+  const password = sep >= 0 ? decoded.slice(sep + 1) : "";
+  return password === expected;
+}
+
+function unauthorizedResponse(hasPasswordConfigured) {
+  if (!hasPasswordConfigured) {
+    return new Response(
+      "دسترسی به پنل مدیریت پیکربندی نشده است. متغیر ADMIN_PASSWORD را در Settings پروژه Worker تعریف کنید.",
+      { status: 503 }
+    );
+  }
+  return new Response("برای ورود به پنل مدیریت، رمز عبور لازم است.", {
+    status: 401,
+    headers: { "WWW-Authenticate": 'Basic realm="پنل مدیریت شاهکار"' },
+  });
+}
+
+// ---------- منطق هر endpoint ----------
+
+async function listCustomers(env) {
+  const { results } = await env.DB.prepare(
+    `
+    SELECT
+      c.id, c.code, c.first_name, c.last_name, c.phone,
+      MIN(p.next_due_date) AS nearest_due_date,
+      COUNT(DISTINCT car.id) AS car_count
+    FROM customers c
+    LEFT JOIN cars car ON car.customer_id = c.id
+    LEFT JOIN visits v ON v.car_id = car.id
+    LEFT JOIN parts_replaced p ON p.visit_id = v.id AND p.next_due_date IS NOT NULL
+    GROUP BY c.id
+    ORDER BY CASE WHEN nearest_due_date IS NULL THEN 1 ELSE 0 END, nearest_due_date ASC
+  `
+  ).all();
+  return json({ customers: results });
+}
+
+async function createCustomer(request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body || !body.first_name || !body.last_name) {
+    return errorResponse("نام و نام خانوادگی الزامی است");
+  }
+  let code = generateCustomerCode();
+  for (let i = 0; i < 5; i++) {
+    const existing = await env.DB.prepare("SELECT id FROM customers WHERE code = ?").bind(code).first();
+    if (!existing) break;
+    code = generateCustomerCode();
+  }
+  const result = await env.DB.prepare(
+    "INSERT INTO customers (code, first_name, last_name, phone) VALUES (?, ?, ?, ?)"
+  )
+    .bind(code, body.first_name, body.last_name, body.phone || null)
+    .run();
+  return json({ id: result.meta.last_row_id, code, first_name: body.first_name, last_name: body.last_name, phone: body.phone || null });
+}
+
+async function getCustomer(code, env) {
+  const customer = await env.DB.prepare("SELECT * FROM customers WHERE code = ?").bind(code).first();
+  if (!customer) return errorResponse("مشتری یافت نشد", 404);
+
+  const { results: cars } = await env.DB.prepare("SELECT * FROM cars WHERE customer_id = ? ORDER BY created_at DESC").bind(customer.id).all();
+  for (const car of cars) {
+    const { results: visits } = await env.DB.prepare("SELECT * FROM visits WHERE car_id = ? ORDER BY visit_date DESC").bind(car.id).all();
+    for (const visit of visits) {
+      const { results: parts } = await env.DB.prepare("SELECT * FROM parts_replaced WHERE visit_id = ? ORDER BY id").bind(visit.id).all();
+      visit.parts = parts;
+    }
+    car.visits = visits;
+  }
+  customer.cars = cars;
+  return json({ customer });
+}
+
+async function updateCustomer(code, request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body) return errorResponse("داده نامعتبر است");
+  const customer = await env.DB.prepare("SELECT id FROM customers WHERE code = ?").bind(code).first();
+  if (!customer) return errorResponse("مشتری یافت نشد", 404);
+  await env.DB.prepare("UPDATE customers SET first_name = ?, last_name = ?, phone = ? WHERE id = ?")
+    .bind(body.first_name, body.last_name, body.phone || null, customer.id)
+    .run();
+  return json({ ok: true });
+}
+
+async function addCar(request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body || !body.customer_code || !body.brand || !body.model) {
+    return errorResponse("مشتری، برند و مدل خودرو الزامی است");
+  }
+  const customer = await env.DB.prepare("SELECT id FROM customers WHERE code = ?").bind(body.customer_code).first();
+  if (!customer) return errorResponse("مشتری یافت نشد", 404);
+  const result = await env.DB.prepare("INSERT INTO cars (customer_id, brand, model, year, plate) VALUES (?, ?, ?, ?, ?)")
+    .bind(customer.id, body.brand, body.model, body.year || null, body.plate || null)
+    .run();
+  return json({ id: result.meta.last_row_id });
+}
+
+async function updateCar(id, request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body) return errorResponse("داده نامعتبر است");
+  await env.DB.prepare("UPDATE cars SET brand = ?, model = ?, year = ?, plate = ? WHERE id = ?")
+    .bind(body.brand, body.model, body.year || null, body.plate || null, id)
+    .run();
+  return json({ ok: true });
+}
+
+async function deleteCar(id, env) {
+  await env.DB.prepare("DELETE FROM cars WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
+async function addVisit(request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body || !body.car_id || !body.visit_date) return errorResponse("خودرو و تاریخ مراجعه الزامی است");
+  const visitResult = await env.DB.prepare(
+    "INSERT INTO visits (car_id, visit_date, complaints, resolved, notes) VALUES (?, ?, ?, ?, ?)"
+  )
+    .bind(body.car_id, body.visit_date, body.complaints || null, body.resolved || null, body.notes || null)
+    .run();
+  const visitId = visitResult.meta.last_row_id;
+  const parts = Array.isArray(body.parts) ? body.parts : [];
+  for (const part of parts) {
+    if (!part.part_name) continue;
+    await env.DB.prepare("INSERT INTO parts_replaced (visit_id, part_name, next_due_date, notes) VALUES (?, ?, ?, ?)")
+      .bind(visitId, part.part_name, part.next_due_date || null, part.notes || null)
+      .run();
+  }
+  return json({ id: visitId });
+}
+
+async function updateVisit(id, request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body) return errorResponse("داده نامعتبر است");
+  await env.DB.prepare("UPDATE visits SET visit_date = ?, complaints = ?, resolved = ?, notes = ? WHERE id = ?")
+    .bind(body.visit_date, body.complaints || null, body.resolved || null, body.notes || null, id)
+    .run();
+  return json({ ok: true });
+}
+
+async function deleteVisit(id, env) {
+  await env.DB.prepare("DELETE FROM visits WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
+async function addPart(request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body || !body.visit_id || !body.part_name) return errorResponse("مراجعه و نام قطعه الزامی است");
+  const result = await env.DB.prepare("INSERT INTO parts_replaced (visit_id, part_name, next_due_date, notes) VALUES (?, ?, ?, ?)")
+    .bind(body.visit_id, body.part_name, body.next_due_date || null, body.notes || null)
+    .run();
+  return json({ id: result.meta.last_row_id });
+}
+
+async function updatePart(id, request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body) return errorResponse("داده نامعتبر است");
+  await env.DB.prepare("UPDATE parts_replaced SET part_name = ?, next_due_date = ?, notes = ? WHERE id = ?")
+    .bind(body.part_name, body.next_due_date || null, body.notes || null, id)
+    .run();
+  return json({ ok: true });
+}
+
+async function deletePart(id, env) {
+  await env.DB.prepare("DELETE FROM parts_replaced WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
+// ---------- روتر اصلی ----------
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+
+    // صفحات پنل مدیریت: نیاز به رمز عبور دارند، بعد فایل استاتیک اصلی سرو می‌شود
+    if (path === "/panel-admin.html" || path === "/panel-customer.html") {
+      if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
+      return env.ASSETS.fetch(request);
+    }
+
+    if (!path.startsWith("/api/")) {
+      return env.ASSETS.fetch(request);
+    }
+
+    if (method === "OPTIONS") {
+      return new Response(null, { headers: { "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS", "Access-Control-Allow-Headers": "Content-Type" } });
+    }
+
+    // مسیرهایی که فقط مدیر (با رمز عبور) اجازه دارد
+    const isPublicRead = path.match(/^\/api\/customers\/[^/]+$/) && method === "GET";
+    if (!isPublicRead) {
+      if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
+    }
+
+    let m;
+
+    if (path === "/api/customers" && method === "GET") return listCustomers(env);
+    if (path === "/api/customers" && method === "POST") return createCustomer(request, env);
+
+    if ((m = path.match(/^\/api\/customers\/([^/]+)$/))) {
+      if (method === "GET") return getCustomer(decodeURIComponent(m[1]), env);
+      if (method === "PUT") return updateCustomer(decodeURIComponent(m[1]), request, env);
+    }
+
+    if (path === "/api/cars" && method === "POST") return addCar(request, env);
+    if ((m = path.match(/^\/api\/cars\/(\d+)$/))) {
+      if (method === "PUT") return updateCar(m[1], request, env);
+      if (method === "DELETE") return deleteCar(m[1], env);
+    }
+
+    if (path === "/api/visits" && method === "POST") return addVisit(request, env);
+    if ((m = path.match(/^\/api\/visits\/(\d+)$/))) {
+      if (method === "PUT") return updateVisit(m[1], request, env);
+      if (method === "DELETE") return deleteVisit(m[1], env);
+    }
+
+    if (path === "/api/parts" && method === "POST") return addPart(request, env);
+    if ((m = path.match(/^\/api\/parts\/(\d+)$/))) {
+      if (method === "PUT") return updatePart(m[1], request, env);
+      if (method === "DELETE") return deletePart(m[1], env);
+    }
+
+    return errorResponse("مسیر یافت نشد", 404);
+  },
+};
