@@ -118,40 +118,6 @@ console.log("JS Loaded");
 window.addEventListener("scroll", () => {
   console.log(window.scrollY);
 });
-// ==============================
-//   SHAHKAR FOOTER VIP SCRIPT
-// ==============================
-
-function updateShopStatus() {
-  const status = document.getElementById("shopStatus");
-  if (!status) return;
-
-  const now = new Date();
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-  const time = hour + minute / 60;
-
-  const openHour = 8;
-  const closeHour = 20;
-
-  let isOpen = time >= openHour && time < closeHour;
-
-  if (isOpen) {
-    status.classList.add("open");
-    status.classList.remove("closed");
-    status.innerHTML = "🟢 اکنون تعمیرگاه باز است";
-  } else {
-    status.classList.add("closed");
-    status.classList.remove("open");
-    status.innerHTML = "🔴 در حال حاضر تعمیرگاه تعطیل است";
-  }
-}
-
-// اجرا
-updateShopStatus();
-
-// هر دقیقه آپدیت شود
-setInterval(updateShopStatus, 60000);
 
 // ==============================
 //   MAP MODAL CONTROL

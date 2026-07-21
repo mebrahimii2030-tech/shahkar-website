@@ -129,30 +129,6 @@
   height: 40px;
 }
 
-/* working hours */
-.working-hours {
-  margin-top: 20px;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-}
-
-.shop-status {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.shop-status.open {
-  background: #22c55e;
-}
-
-.shop-status.closed {
-  background: #ef4444;
-}
-
 /* bottom */
 .footer-bottom {
   text-align: center;
@@ -218,12 +194,6 @@
 
 .navigation-card:hover::before {
   right: 100%;
-}
-
-/* شیشه‌ای کردن ساعت کاری */
-.working-hours {
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* انیمیشن ورود */
@@ -375,11 +345,5 @@
 
   .navigation-card {
     justify-content: center;
-  }
-
-  .working-hours {
-    max-width: 320px;
-
-    margin: 25px auto 0;
   }
 }
