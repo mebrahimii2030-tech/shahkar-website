@@ -1,0 +1,196 @@
+/*==============================
+   QUICK SERVICES (Home)
+==============================*/
+
+.quick-services {
+  padding: var(--space-10) 0;
+  position: relative;
+}
+
+.quick-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.quick-service-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-6);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--white);
+  background: linear-gradient(155deg, var(--primary-light) 0%, var(--primary) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.quick-service-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: radial-gradient(160px circle at 85% 0%, rgba(245, 158, 11, 0.18), transparent 70%);
+  transition: opacity 0.35s ease;
+}
+
+.quick-service-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--secondary);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s ease;
+}
+
+.quick-service-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: var(--shadow-lg);
+}
+
+.quick-service-card:hover::before {
+  opacity: 1;
+}
+
+.quick-service-card:hover::after {
+  transform: scaleX(1);
+}
+
+.qs-index {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-5);
+  font-size: 42px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.06);
+  line-height: 1;
+  user-select: none;
+}
+
+.qs-icon {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: var(--secondary);
+  background: rgba(245, 158, 11, 0.12);
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+.quick-service-card:hover .qs-icon {
+  background: var(--secondary);
+  color: var(--primary);
+}
+
+.qs-title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  margin-top: var(--space-2);
+}
+
+.qs-desc {
+  color: var(--gray-400);
+  line-height: 1.9;
+  font-size: var(--fs-md);
+  flex-grow: 1;
+}
+
+.qs-link {
+  margin-top: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  transition: gap 0.3s ease;
+}
+
+.quick-service-card:hover .qs-link {
+  gap: 14px;
+}
+
+/* ---------- micro-animation per icon on hover ---------- */
+
+.quick-service-card:hover .qs-icon i {
+  animation-duration: 0.7s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.qs-anim-wrench:hover .qs-icon i { animation-name: qs-wrench; }
+.qs-anim-spin:hover .qs-icon i   { animation-name: qs-spin; animation-duration: 1.3s; animation-timing-function: linear; }
+.qs-anim-blink:hover .qs-icon i  { animation-name: qs-blink; }
+.qs-anim-shake:hover .qs-icon i  { animation-name: qs-shake; }
+.qs-anim-drip:hover .qs-icon i   { animation-name: qs-drip; }
+.qs-anim-pulse:hover .qs-icon i  { animation-name: qs-pulse; }
+
+@keyframes qs-wrench {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-18deg); }
+}
+
+@keyframes qs-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes qs-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.25; }
+}
+
+@keyframes qs-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
+}
+
+@keyframes qs-drip {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(3px); }
+}
+
+@keyframes qs-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.15); }
+}
+
+/*==============================
+       RESPONSIVE
+==============================*/
+
+@media (max-width: 992px) {
+  .quick-services-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .quick-services-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .quick-service-card {
+    padding: var(--space-6) var(--space-5);
+  }
+}
