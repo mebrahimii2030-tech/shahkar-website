@@ -1,5 +1,26 @@
 let allCustomers = [];
 
+function escapeHtml(str) {
+  return String(str == null ? "" : str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function formatAdminDate(raw) {
+  if (!raw) return "—";
+  const datePart = String(raw).split(" ")[0];
+  try {
+    const display = isoToJalaliDisplay(datePart);
+    if (display) return display;
+  } catch (_) {
+    // در صورت خطا از مقدار خام استفاده می‌شود
+  }
+  return datePart;
+}
+
 function dueStatusClient(nextDueDate) {
   if (!nextDueDate) return "none";
   const today = new Date();
@@ -79,6 +100,84 @@ async function loadCustomers() {
   renderTable(allCustomers);
 }
 
+// ---------- دیدگاه‌های مشتریان ----------
+
+function renderReviewsTable(list) {
+  const tbody = document.getElementById("reviews-tbody");
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">هنوز دیدگاهی ثبت نشده است</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list
+    .map(
+      (r) => `
+        <tr>
+          <td class="customer-name">${escapeHtml(r.name)}</td>
+          <td>${escapeHtml(r.phone)}</td>
+          <td>${escapeHtml(r.comment)}</td>
+          <td>${formatAdminDate(r.created_at)}</td>
+          <td>
+            <button class="copy-link-btn" onclick="handleDeleteReview(${r.id})">حذف</button>
+          </td>
+        </tr>`
+    )
+    .join("");
+}
+
+async function loadReviews() {
+  const data = await PanelAPI.listReviewsAdmin();
+  renderReviewsTable(data.reviews || []);
+}
+
+async function handleDeleteReview(id) {
+  if (!confirm("این دیدگاه حذف شود؟")) return;
+  await PanelAPI.deleteReview(id);
+  await loadReviews();
+}
+
+// ---------- پیام‌های فرم تماس با ما ----------
+
+function renderMessagesTable(list) {
+  const tbody = document.getElementById("messages-tbody");
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">هنوز پیامی دریافت نشده است</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list
+    .map((m) => {
+      const subject = m.subject ? `${escapeHtml(m.subject)}: ` : "";
+      return `
+        <tr>
+          <td class="customer-name">${escapeHtml(m.name)}</td>
+          <td>${escapeHtml(m.phone || m.email || "—")}</td>
+          <td>${subject}${escapeHtml(m.body)}</td>
+          <td>${formatAdminDate(m.created_at)}</td>
+          <td><span class="due-pill due-pill--${m.is_read ? "ok" : "soon"}">${m.is_read ? "خوانده‌شده" : "خوانده‌نشده"}</span></td>
+          <td>
+            ${m.is_read ? "" : `<button class="copy-link-btn" onclick="handleMarkMessageRead(${m.id})">خواندم</button>`}
+            <button class="copy-link-btn" onclick="handleDeleteMessage(${m.id})">حذف</button>
+          </td>
+        </tr>`;
+    })
+    .join("");
+}
+
+async function loadMessages() {
+  const data = await PanelAPI.listMessages();
+  renderMessagesTable(data.messages || []);
+}
+
+async function handleMarkMessageRead(id) {
+  await PanelAPI.markMessageRead(id);
+  await loadMessages();
+}
+
+async function handleDeleteMessage(id) {
+  if (!confirm("این پیام حذف شود؟")) return;
+  await PanelAPI.deleteMessage(id);
+  await loadMessages();
+}
+
 document.getElementById("search-box").addEventListener("input", (e) => {
   const q = e.target.value.trim().toLowerCase();
   const filtered = allCustomers.filter((c) =>
@@ -108,3 +207,5 @@ document.getElementById("new-customer-form").addEventListener("submit", async (e
 });
 
 loadCustomers();
+loadReviews();
+loadMessages();

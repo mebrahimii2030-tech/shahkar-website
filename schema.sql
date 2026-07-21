@@ -7,6 +7,8 @@ DROP TABLE IF EXISTS parts_replaced;
 DROP TABLE IF EXISTS visits;
 DROP TABLE IF EXISTS cars;
 DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS reviews;
 
 -- مشتری‌ها
 CREATE TABLE customers (
@@ -49,8 +51,32 @@ CREATE TABLE parts_replaced (
   notes TEXT
 );
 
+-- پیام‌های ارسالی از فرم تماس با ما
+CREATE TABLE messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  phone TEXT,
+  email TEXT,
+  subject TEXT,
+  body TEXT NOT NULL,
+  is_read INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- دیدگاه‌های عمومی مشتریان (نام و متن دیدگاه عمومی نمایش داده می‌شود؛
+-- شماره تماس فقط برای مدیر سایت قابل مشاهده است)
+CREATE TABLE reviews (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  comment TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE INDEX idx_cars_customer ON cars(customer_id);
 CREATE INDEX idx_visits_car ON visits(car_id);
 CREATE INDEX idx_parts_visit ON parts_replaced(visit_id);
 CREATE INDEX idx_parts_due ON parts_replaced(next_due_date);
 CREATE INDEX idx_customers_code ON customers(code);
+CREATE INDEX idx_messages_created ON messages(created_at);
+CREATE INDEX idx_reviews_created ON reviews(created_at);

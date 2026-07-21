@@ -9,16 +9,17 @@
 
 <title>تماس با ما | تعمیرگاه تخصصی شاهکار</title>
 
-<meta name="description" content="ارتباط با تعمیرگاه تخصصی شاهکار">
+<meta name="description" content="راه‌های ارتباط مستقیم با تعمیرگاه تخصصی شاهکار؛ تماس تلفنی، واتساپ، ایتا و فرم پیام آنلاین.">
 
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/menu.css" />
 <link rel="stylesheet" href="css/contact.css">
+<link rel="stylesheet" href="css/reviews.css">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
@@ -36,33 +37,142 @@
 
 <section class="contact-hero">
 
-<div class="hero-overlay"></div>
+<div class="contact-hero__grid" aria-hidden="true"></div>
+<div class="contact-hero__glow" aria-hidden="true"></div>
 
-<div class="container">
+<div class="container hero-inner">
 
-<div class="hero-content">
+<span class="hero-eyebrow"><i class="fa-solid fa-gauge-high"></i> واحد پاسخگویی شاهکار</span>
 
-<span class="hero-badge">
+<h1>سریع‌ترین راه رسیدن<br><span>به کارشناسان شاهکار</span></h1>
 
-<i class="fa-solid fa-phone"></i>
+<p class="hero-lead">برای تعمیر خودرو، سرویس دوره‌ای، استعلام قیمت یا مشاوره فنی، از یکی از راه‌های زیر با ما در ارتباط باشید؛ روی هرکدام از آیکون‌ها بزنید تا مستقیم به همان گفتگو منتقل شوید.</p>
 
-ارتباط مستقیم با شاهکار
+<div class="quick-dial">
 
+<a class="dial-item" href="tel:09191389418">
+<span class="dial-btn dial-btn--call"><i class="fa-solid fa-phone"></i></span>
+<span class="dial-text">
+<strong>تماس تلفنی</strong>
+<em>09191389418</em>
 </span>
+</a>
 
-<h1>
+<a class="dial-item" href="https://api.whatsapp.com/send?phone=989191389418" target="_blank" rel="noopener">
+<span class="dial-btn dial-btn--whatsapp"><i class="fa-brands fa-whatsapp"></i></span>
+<span class="dial-text">
+<strong>واتساپ</strong>
+<em>گفتگوی فوری</em>
+</span>
+</a>
 
-تماس با
+<a class="dial-item" href="https://eitaa.com/shahkar_auto" target="_blank" rel="noopener">
+<span class="dial-btn dial-btn--eitaa"><i class="fa-solid fa-paper-plane"></i></span>
+<span class="dial-text">
+<strong>ایتا</strong>
+<em>پیام‌رسان ایرانی</em>
+</span>
+</a>
 
-<span>شاهکار</span>
+</div>
 
-</h1>
+<div class="hero-status"><span class="status-dot"></span> در هر زمان از شبانه‌روز در خدمت شما هستیم</div>
 
-<p>
+</div>
 
-اگر برای تعمیر خودرو، سرویس دوره‌ای، استعلام قیمت یا دریافت مشاوره نیاز به راهنمایی دارید، کارشناسان شاهکار آماده پاسخگویی به شما هستند.
+</section>
 
-</p>
+<section class="contact-body">
+
+<div class="container contact-body-grid">
+
+<aside class="info-panel">
+
+<h2>اطلاعات تماس</h2>
+
+<div class="info-row">
+<span class="info-icon"><i class="fa-solid fa-phone"></i></span>
+<div>
+<h3>تلفن تماس</h3>
+<p class="mono ltr">09191389418</p>
+</div>
+</div>
+
+<div class="info-row">
+<span class="info-icon"><i class="fa-solid fa-location-dot"></i></span>
+<div>
+<h3>آدرس</h3>
+<p>تهران - تعمیرگاه تخصصی شاهکار</p>
+</div>
+</div>
+
+<div class="info-row">
+<span class="info-icon"><i class="fa-solid fa-clock"></i></span>
+<div>
+<h3>پاسخگویی</h3>
+<p>در هر زمان از شبانه‌روز در خدمت شما هستیم</p>
+</div>
+</div>
+
+<div class="info-row">
+<span class="info-icon"><i class="fa-solid fa-envelope"></i></span>
+<div>
+<h3>ایمیل</h3>
+<p class="mono ltr">info@shahkar-auto.ir</p>
+</div>
+</div>
+
+<a href="tel:09191389418" class="info-cta">
+<i class="fa-solid fa-phone"></i>
+همین حالا تماس بگیرید
+</a>
+
+</aside>
+
+<div class="form-panel">
+
+<h2>ارسال پیام</h2>
+<p class="form-panel-lead">فرم زیر رو پر کنید، کارشناسان شاهکار در سریع‌ترین زمان ممکن باهاتون تماس می‌گیرن.</p>
+
+<form id="contact-form">
+
+<div class="input-row">
+
+<div class="input-box">
+<label for="cf-name">نام و نام خانوادگی</label>
+<input type="text" id="cf-name" name="name" placeholder="مثلاً: علی ابراهیمی" required>
+</div>
+
+<div class="input-box">
+<label for="cf-phone">شماره تماس</label>
+<input type="tel" id="cf-phone" name="phone" placeholder="0912*******">
+</div>
+
+</div>
+
+<div class="input-box">
+<label for="cf-email">ایمیل</label>
+<input type="email" id="cf-email" name="email" placeholder="example@email.com">
+</div>
+
+<div class="input-box">
+<label for="cf-subject">موضوع</label>
+<input type="text" id="cf-subject" name="subject" placeholder="موضوع پیام">
+</div>
+
+<div class="input-box">
+<label for="cf-body">متن پیام</label>
+<textarea rows="6" id="cf-body" name="body" placeholder="پیام خود را بنویسید..." required></textarea>
+</div>
+
+<p id="contact-form-status" class="form-status" role="status" aria-live="polite"></p>
+
+<button type="submit" class="send-btn">
+<i class="fa-solid fa-paper-plane"></i>
+ارسال پیام
+</button>
+
+</form>
 
 </div>
 
@@ -70,163 +180,56 @@
 
 </section>
 
-<section class="contact-section">
+<section class="reviews-section">
 
 <div class="container">
 
-<div class="contact-grid">
+<div class="reviews-header">
 
-<div class="contact-info">
+<h2>دیدگاه مشتریان</h2>
 
-<h2>
-
-اطلاعات تماس
-
-</h2>
-
-<div class="info-card">
-
-<i class="fa-solid fa-phone"></i>
-
-<div>
-
-<h3>تلفن تماس</h3>
-
-<p>09191039418</p>
+<p>تجربه‌تون از تعمیرگاه شاهکار رو با ما و سایر مشتریان به اشتراک بذارید.</p>
 
 </div>
 
-</div>
+<div class="reviews-grid">
 
-<div class="info-card">
+<div class="reviews-list" id="reviews-list">
 
-<i class="fa-solid fa-location-dot"></i>
-
-<div>
-
-<h3>آدرس</h3>
-
-<p>
-
-تهران - تعمیرگاه تخصصی شاهکار
-
-</p>
+<p class="reviews-empty" id="reviews-empty">در حال بارگذاری دیدگاه‌ها...</p>
 
 </div>
 
+<div class="review-form-box">
+
+<h3>ثبت دیدگاه</h3>
+
+<form id="review-form">
+
+<div class="input-box">
+<label for="rv-name">نام شما</label>
+<input type="text" id="rv-name" name="name" placeholder="مثلاً: علی محمدی" required maxlength="100">
 </div>
 
-<div class="info-card">
-
-<i class="fa-solid fa-clock"></i>
-
-<div>
-
-<h3>ساعات کاری</h3>
-
-<p>
-
-شنبه تا پنجشنبه
-
-08:00 الی 18:00
-
-</p>
-
+<div class="input-box">
+<label for="rv-phone">شماره تماس</label>
+<input type="tel" id="rv-phone" name="phone" placeholder="0912*******" required maxlength="30">
+<small class="field-note">شماره شما فقط برای مدیریت شاهکار قابل مشاهده است و در سایت نمایش داده نمی‌شود.</small>
 </div>
 
+<div class="input-box">
+<label for="rv-comment">متن دیدگاه</label>
+<textarea id="rv-comment" name="comment" rows="4" placeholder="نظر خود را بنویسید..." required maxlength="2000"></textarea>
 </div>
 
-<div class="info-card">
+<p id="review-form-status" class="form-status" role="status" aria-live="polite"></p>
 
-<i class="fa-solid fa-envelope"></i>
+<button type="submit" class="send-btn">
+<i class="fa-solid fa-comment-dots"></i>
+ثبت دیدگاه
+</button>
 
-<div>
-
-<h3>ایمیل</h3>
-
-<p>
-
-info@shahkar-auto.ir
-
-</p>
-
-</div>
-
-</div>
-
-<div class="contact-buttons">
-
-<a href="tel:09191039418" class="call-btn">
-
-<i class="fa-solid fa-phone"></i>
-
-تماس مستقیم
-
-</a>
-
-<a href="https://wa.me/989191039418" class="whatsapp-btn">
-
-<i class="fa-brands fa-whatsapp"></i>
-
-واتساپ
-
-</a>
-
-</div>
-
-</div>
-<div class="contact-form">
-
-    <h2>ارسال پیام</h2>
-
-    <form>
-
-        <div class="input-row">
-
-            <div class="input-box">
-                <label>نام و نام خانوادگی</label>
-                <input type="text" placeholder="با مدیریت ابراهیمی">             </div>
-
-            <div class="input-box">
-                <label>شماره تماس</label>
-                <input type="tel" placeholder="0912*******">
-            </div>
-
-        </div>
-
-        <div class="input-box">
-
-            <label>ایمیل</label>
-
-            <input type="email" placeholder="example@email.com">
-
-        </div>
-
-        <div class="input-box">
-
-            <label>موضوع</label>
-
-            <input type="text" placeholder="موضوع پیام">
-
-        </div>
-
-        <div class="input-box">
-
-            <label>متن پیام</label>
-
-            <textarea rows="7" placeholder="پیام خود را بنویسید..."></textarea>
-
-        </div>
-
-        <button type="submit" class="send-btn">
-
-            <i class="fa-solid fa-paper-plane"></i>
-
-            ارسال پیام
-
-        </button>
-
-    </form>
+</form>
 
 </div>
 
@@ -238,15 +241,28 @@ info@shahkar-auto.ir
 
 <section class="contact-map">
 
-    <iframe
+<div class="container">
 
-        src="https://www.google.com/maps?q=35.753389,51.159194&z=15&output=embed"
+<div class="map-frame">
 
-        loading="lazy"
+<span class="map-corner map-corner--tl" aria-hidden="true"></span>
+<span class="map-corner map-corner--tr" aria-hidden="true"></span>
+<span class="map-corner map-corner--bl" aria-hidden="true"></span>
+<span class="map-corner map-corner--br" aria-hidden="true"></span>
 
-        allowfullscreen>
+<iframe
 
-    </iframe>
+    src="https://www.google.com/maps?q=35.753389,51.159194&z=15&output=embed"
+
+    loading="lazy"
+
+    allowfullscreen>
+
+</iframe>
+
+</div>
+
+</div>
 
 </section>
 
@@ -255,6 +271,9 @@ info@shahkar-auto.ir
 
 
 <script src="js/contact.js"></script>
+
+<script src="js/jalali.js"></script>
+<script src="js/reviews.js"></script>
 
 
 <div id="footer"></div>

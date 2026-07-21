@@ -202,6 +202,83 @@ async function deletePart(id, env) {
   return json({ ok: true });
 }
 
+async function createMessage(request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body || !body.name || !body.body) {
+    return errorResponse("نام و متن پیام الزامی است");
+  }
+  if (String(body.name).length > 200 || String(body.body).length > 5000) {
+    return errorResponse("طول ورودی مجاز نیست");
+  }
+  const result = await env.DB.prepare(
+    "INSERT INTO messages (name, phone, email, subject, body) VALUES (?, ?, ?, ?, ?)"
+  )
+    .bind(body.name, body.phone || null, body.email || null, body.subject || null, body.body)
+    .run();
+  return json({ id: result.meta.last_row_id });
+}
+
+async function listMessages(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM messages ORDER BY created_at DESC"
+  ).all();
+  return json({ messages: results });
+}
+
+async function listPublicMessages(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT id, name, subject, body, created_at FROM messages ORDER BY created_at DESC LIMIT 50"
+  ).all();
+  return json({ messages: results });
+}
+
+async function markMessageRead(id, env) {
+  await env.DB.prepare("UPDATE messages SET is_read = 1 WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
+async function deleteMessage(id, env) {
+  await env.DB.prepare("DELETE FROM messages WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
+async function createReview(request, env) {
+  const body = await request.json().catch(() => null);
+  if (!body || !body.name || !body.phone || !body.comment) {
+    return errorResponse("نام، شماره تماس و متن دیدگاه الزامی است");
+  }
+  if (String(body.name).length > 100 || String(body.phone).length > 30 || String(body.comment).length > 2000) {
+    return errorResponse("طول ورودی مجاز نیست");
+  }
+  const result = await env.DB.prepare(
+    "INSERT INTO reviews (name, phone, comment) VALUES (?, ?, ?)"
+  )
+    .bind(body.name, body.phone, body.comment)
+    .run();
+  return json({ id: result.meta.last_row_id });
+}
+
+// نسخه عمومی: فقط نام و متن دیدگاه؛ شماره تماس هرگز به این مسیر برنمی‌گردد
+async function listReviewsPublic(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT id, name, comment, created_at FROM reviews ORDER BY created_at DESC LIMIT 100"
+  ).all();
+  return json({ reviews: results });
+}
+
+// نسخه مدیریتی: شامل شماره تماس، فقط با رمز عبور مدیر
+async function listReviewsAdmin(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM reviews ORDER BY created_at DESC"
+  ).all();
+  return json({ reviews: results });
+}
+
+async function deleteReview(id, env) {
+  await env.DB.prepare("DELETE FROM reviews WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
 // ---------- روتر اصلی ----------
 
 export default {
@@ -226,7 +303,9 @@ export default {
 
     // مسیرهایی که فقط مدیر (با رمز عبور) اجازه دارد
     const isPublicRead = path.match(/^\/api\/customers\/[^/]+$/) && method === "GET";
-    if (!isPublicRead) {
+    const isPublicContact = path === "/api/contact" && method === "POST";
+    const isPublicReviews = path === "/api/reviews" && (method === "GET" || method === "POST");
+    if (!isPublicRead && !isPublicContact && !isPublicReviews) {
       if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
     }
 
@@ -256,6 +335,20 @@ export default {
     if ((m = path.match(/^\/api\/parts\/(\d+)$/))) {
       if (method === "PUT") return updatePart(m[1], request, env);
       if (method === "DELETE") return deletePart(m[1], env);
+    }
+
+    if (path === "/api/contact" && method === "POST") return createMessage(request, env);
+    if (path === "/api/contact" && method === "GET") return listMessages(env);
+    if ((m = path.match(/^\/api\/contact\/(\d+)$/))) {
+      if (method === "PUT") return markMessageRead(m[1], env);
+      if (method === "DELETE") return deleteMessage(m[1], env);
+    }
+
+    if (path === "/api/reviews" && method === "POST") return createReview(request, env);
+    if (path === "/api/reviews" && method === "GET") return listReviewsPublic(env);
+    if (path === "/api/reviews/admin" && method === "GET") return listReviewsAdmin(env);
+    if ((m = path.match(/^\/api\/reviews\/(\d+)$/))) {
+      if (method === "DELETE") return deleteReview(m[1], env);
     }
 
     return errorResponse("مسیر یافت نشد", 404);

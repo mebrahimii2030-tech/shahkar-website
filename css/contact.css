@@ -1,228 +1,325 @@
-/* ===========================
-   CONTACT PAGE
-=========================== */
+/* =====================================================
+   CONTACT PAGE — شاهکار
+   مفهوم طراحی: صفحه تماس مثل یک "پنل ابزار خودرو" —
+   دکمه‌های ارتباطی به‌شکل گیج‌های دور موتور، اعداد و
+   داده‌های فنی با فونت مونو (مثل صفحه‌کیلومتر دیجیتال)
+===================================================== */
+
+.mono {
+  font-family: "JetBrains Mono", "Vazirmatn", monospace;
+  letter-spacing: 0.02em;
+}
+.ltr {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  text-align: right;
+}
+
+/* ---------- HERO ---------- */
 
 .contact-hero {
   position: relative;
-  min-height: 420px;
-  display: flex;
-  align-items: center;
-  background:
-    linear-gradient(rgba(8, 12, 18, 0.82), rgba(8, 12, 18, 0.82)),
-    url("../assets/images/hero-banner.webp") center/cover no-repeat;
+  overflow: hidden;
+  padding: 130px 0 90px;
+  background: radial-gradient(120% 140% at 15% 0%, #16223d 0%, #0b1120 45%, #060910 100%);
+  isolation: isolate;
 }
 
-.contact-hero .hero-overlay {
+.contact-hero__grid {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(10, 15, 25, 0.88) 0%,
-    rgba(10, 15, 25, 0.55) 50%,
-    rgba(10, 15, 25, 0.2) 100%
-  );
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(245, 158, 11, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.07) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(70% 70% at 20% 20%, #000 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(70% 70% at 20% 20%, #000 0%, transparent 75%);
 }
 
-.contact-hero .hero-content {
+.contact-hero__glow {
+  position: absolute;
+  z-index: 0;
+  width: 640px;
+  height: 640px;
+  right: -220px;
+  top: -260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%);
+  filter: blur(10px);
+}
+
+.hero-inner {
   position: relative;
-  z-index: 5;
-  max-width: 700px;
+  z-index: 2;
+  max-width: 760px;
 }
 
-.hero-badge {
+.hero-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 18px;
+  padding: 9px 18px;
   border-radius: 50px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffae00;
-  margin-bottom: 25px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  margin-bottom: 26px;
 }
 
 .contact-hero h1 {
   color: #ffffff;
-
-  font-size: 60px;
-
+  font-size: 50px;
+  font-weight: 800;
+  line-height: 1.28;
   margin-bottom: 20px;
-
-  line-height: 1.2;
 }
 
 .contact-hero h1 span {
-  color: #ffae00;
+  color: #fbbf24;
 }
 
-.contact-hero p {
-  color: #f3f4f6;
-
+.hero-lead {
+  color: #cbd5e1;
   line-height: 2;
-
-  font-size: 18px;
+  font-size: var(--fs-lg);
+  max-width: 620px;
+  margin-bottom: 46px;
 }
 
-/* ===========================
-GRID
-=========================== */
+/* ---------- QUICK DIAL (signature element) ---------- */
 
-.contact-section {
-  padding: 120px 0 90px;
-}
-
-.contact-grid {
-  display: grid;
-
-  grid-template-columns: 380px 1fr;
-
-  gap: 35px;
-}
-
-/* ===========================
-INFO
-=========================== */
-
-.contact-info {
+.quick-dial {
   display: flex;
-
-  flex-direction: column;
-
-  gap: 22px;
+  flex-wrap: wrap;
+  gap: 34px;
+  margin-bottom: 40px;
 }
 
-.contact-info h2,
-.contact-form h2 {
-  color: #111827;
-
-  font-size: 32px;
-
-  font-weight: 800;
-}
-
-.info-card {
+.dial-item {
   display: flex;
-
-  gap: 18px;
-
   align-items: center;
-
-  padding: 22px;
-
-  border-radius: 22px;
-
-  background: #1f2937;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  backdrop-filter: blur(20px);
-
-  transition: 0.3s;
-}
-
-.info-card:hover {
-  border-color: #ffae00;
-
-  transform: translateY(-6px);
-}
-
-.info-card i {
-  width: 60px;
-
-  height: 60px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  border-radius: 18px;
-
-  background: #ffae00;
-
-  color: #111;
-
-  font-size: 24px;
-}
-
-.info-card h3 {
-  color: #ffffff;
-
-  margin-bottom: 8px;
-}
-
-.info-card p {
-  color: #374151;
-
-  line-height: 1.8;
-}
-
-/* ===========================
-BUTTONS
-=========================== */
-
-.contact-buttons {
-  display: flex;
-
-  gap: 15px;
-
-  margin-top: 10px;
-}
-
-.call-btn,
-.whatsapp-btn {
-  flex: 1;
-
-  text-align: center;
-
-  padding: 16px;
-
-  border-radius: 18px;
-
+  gap: 16px;
   text-decoration: none;
+}
 
+.dial-btn {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #fde68a;
+  background: radial-gradient(circle at 42% 36%, #1c2a48 0%, #0b1220 72%);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.02);
+  transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.dial-btn::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    rgba(245, 158, 11, 0.65) 0deg 2deg,
+    transparent 2deg 9deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  opacity: 0.45;
+  transition: opacity 0.4s ease, transform 0.7s ease;
+}
+
+.dial-btn--whatsapp {
+  color: #6ee7b7;
+}
+
+.dial-btn--eitaa {
+  color: #7dd3fc;
+}
+
+.dial-item:hover .dial-btn {
+  transform: translateY(-5px);
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 7px rgba(245, 158, 11, 0.1), 0 18px 34px -12px rgba(245, 158, 11, 0.55);
+}
+
+.dial-item:hover .dial-btn::before {
+  opacity: 1;
+  transform: rotate(30deg);
+}
+
+.dial-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dial-text strong {
+  color: #f8fafc;
+  font-size: var(--fs-md);
   font-weight: 700;
+}
 
+.dial-text em {
+  font-style: normal;
+  font-family: "JetBrains Mono", monospace;
+  direction: ltr;
+  text-align: right;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #a3b0c2;
+  font-size: var(--fs-sm);
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+  animation: statusPulse 2.2s infinite;
+}
+
+@keyframes statusPulse {
+  0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+  70% { box-shadow: 0 0 0 9px rgba(52, 211, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot { animation: none; }
+  .dial-btn, .dial-btn::before { transition: none; }
+}
+
+/* ---------- BODY: INFO + FORM ---------- */
+
+.contact-body {
+  padding: 90px 0;
+  background: var(--gray-50);
+}
+
+.contact-body-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.info-panel,
+.form-panel {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.info-panel {
+  padding: 32px;
+  position: sticky;
+  top: 100px;
+}
+
+.info-panel h2,
+.form-panel h2 {
+  color: var(--gray-900);
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.form-panel {
+  padding: 36px;
+}
+
+.form-panel-lead {
+  color: var(--gray-500);
+  margin-bottom: 26px;
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+}
+
+.info-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 18px 0;
+  border-bottom: 1px dashed var(--gray-200);
+}
+
+.info-panel h2 {
+  margin-bottom: 22px;
+}
+
+.info-row:last-of-type {
+  border-bottom: none;
+}
+
+.info-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  flex-shrink: 0;
+  background: var(--primary);
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.info-row h3 {
+  color: var(--gray-500);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.info-row p {
+  color: var(--gray-900);
+  font-size: var(--fs-md);
+  line-height: 1.7;
+}
+
+.info-cta {
+  margin-top: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  border-radius: 14px;
+  background: var(--secondary);
+  color: #111827;
+  font-weight: 700;
+  text-decoration: none;
   transition: 0.3s;
 }
 
-.call-btn {
-  background: #ffae00;
-
-  color: #111;
+.info-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(245, 158, 11, 0.3);
 }
 
-.whatsapp-btn {
-  background: #25d366;
-
-  color: #fff;
-}
-
-.call-btn:hover,
-.whatsapp-btn:hover {
-  transform: translateY(-5px);
-}
-
-/* ===========================
-FORM
-=========================== */
-
-.contact-form {
-  padding: 35px;
-
-  border-radius: 28px;
-
-  background: rgba(255, 255, 255, 0.05);
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  backdrop-filter: blur(20px);
-}
+/* ---------- SHARED FORM FIELDS (also used by reviews.css) ---------- */
 
 .input-row {
   display: grid;
-
   grid-template-columns: 1fr 1fr;
-
   gap: 18px;
 }
 
@@ -232,110 +329,144 @@ FORM
 
 .input-box label {
   display: block;
-
-  color: #fff;
-
-  margin-bottom: 10px;
+  color: var(--gray-700);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  margin-bottom: 9px;
 }
 
 .input-box input,
 .input-box textarea {
   width: 100%;
-
   border: none;
-
   outline: none;
-
-  padding: 16px 18px;
-
-  border-radius: 16px;
-
-  background: #ffffff;
-
-  border: 1px solid #d1d5db;
-
-  color: #111827;
-
+  border-bottom: 2px solid var(--gray-200);
+  border-radius: 4px 4px 0 0;
+  background: var(--gray-50);
+  padding: 13px 14px;
+  color: var(--gray-900);
   font-family: inherit;
-
   font-size: 15px;
-
   resize: none;
+  transition: border-color 0.25s, background 0.25s;
 }
 
 .input-box input:focus,
 .input-box textarea:focus {
-  border: 1px solid #ffae00;
+  border-color: var(--secondary);
+  background: #fffdf5;
+}
+
+.input-box input::placeholder,
+.input-box textarea::placeholder {
+  color: var(--gray-400);
 }
 
 .send-btn {
   border: none;
-
   cursor: pointer;
-
   width: 100%;
-
-  height: 60px;
-
-  border-radius: 18px;
-
-  background: #ffae00;
-
-  color: #111;
-
-  font-size: 17px;
-
+  height: 58px;
+  border-radius: 14px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 16px;
   font-weight: 700;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   transition: 0.3s;
 }
 
 .send-btn:hover {
-  transform: translateY(-5px);
-
-  box-shadow: 0 15px 35px rgba(255, 174, 0, 0.35);
+  background: var(--secondary);
+  color: #111827;
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(15, 23, 42, 0.18);
 }
 
-/* ===========================
-MAP
-=========================== */
+.send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-status {
+  min-height: 1.4em;
+  margin: -0.5rem 0 0.5rem;
+  font-size: 0.9rem;
+}
+.form-status.is-success {
+  color: #16a34a;
+}
+.form-status.is-error {
+  color: #dc2626;
+}
+
+/* ---------- MAP ---------- */
 
 .contact-map {
-  padding: 0 0 80px;
+  padding: 0 0 90px;
+  background: var(--gray-50);
 }
 
-.contact-map iframe {
+.map-frame {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.map-frame iframe {
   width: 100%;
-
-  height: 500px;
-
+  height: 460px;
   border: none;
-
-  border-radius: 30px;
+  display: block;
+  filter: grayscale(0.15) contrast(1.02);
 }
 
-/* ===========================
-RESPONSIVE
-=========================== */
+.map-corner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--secondary);
+  z-index: 3;
+  pointer-events: none;
+}
+.map-corner--tl { top: 14px; right: 14px; border-bottom: none; border-left: none; }
+.map-corner--tr { top: 14px; left: 14px; border-bottom: none; border-right: none; }
+.map-corner--bl { bottom: 14px; right: 14px; border-top: none; border-left: none; }
+.map-corner--br { bottom: 14px; left: 14px; border-top: none; border-right: none; }
+
+/* ---------- RESPONSIVE ---------- */
 
 @media (max-width: 992px) {
-  .contact-grid {
+  .contact-body-grid {
     grid-template-columns: 1fr;
   }
-
+  .info-panel {
+    position: static;
+  }
   .input-row {
     grid-template-columns: 1fr;
   }
-
   .contact-hero h1 {
-    font-size: 42px;
+    font-size: 36px;
   }
-
-  .contact-buttons {
-    flex-direction: column;
+  .quick-dial {
+    gap: 24px;
   }
 }
-.input-box input::placeholder,
-.input-box textarea::placeholder {
-  color: #111827;
+
+@media (max-width: 560px) {
+  .contact-hero {
+    padding: 110px 0 70px;
+  }
+  .quick-dial {
+    flex-direction: column;
+    gap: 22px;
+  }
+  .map-frame iframe {
+    height: 320px;
+  }
 }
