@@ -16,5 +16,9 @@
       "database_name": "shamkar-db",
       "database_id": "b3e72150-6858-4a63-ba8d-957a8808af01"
     }
-  ]
+  ],
+
+  "ai": {
+    "binding": "AI"
+  }
 }

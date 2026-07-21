@@ -279,6 +279,59 @@ async function deleteReview(id, env) {
   return json({ ok: true });
 }
 
+// ---------- دستیار هوشمند (چت متصل به هوش مصنوعی) ----------
+
+const CHAT_SYSTEM_PROMPT = `شما دستیار هوشمند سایت «تعمیرگاه تخصصی شاهکار» هستید.
+وظیفه شما پاسخ‌گویی دقیق و کوتاه (حداکثر چند جمله) به فارسی محاوره‌ای مؤدبانه است.
+موضوعاتی که باید پوشش بدهید: خدمات تعمیرگاه (تعمیر موتور، گیربکس، برق خودرو، جلوبندی، دیاگ و عیب‌یابی، سرویس دوره‌ای)، سوالات عمومی درباره خودرو و نگهداری آن، و راهنمایی درباره نحوه تماس با شاهکار.
+قوانین مهم:
+- اگر کاربر مشکل فنی یا خرابی واقعی خودرو را توضیح داد، راهنمایی کلی و مفید بده و در پایان پیشنهاد بده برای تعمیر و عیب‌یابی دقیق به تعمیرگاه شاهکار مراجعه کند یا با شماره 09191389418 تماس بگیرد.
+- برای سوالات عمومی و ساده (مثل ساعات کاری، آدرس، نحوه ثبت پیام) مستقیم و کوتاه جواب بده، نیازی به تکرار شماره تماس در هر پاسخ نیست.
+- قیمت دقیق تعمیرات را اعلام نکن (چون به مدل خودرو و نوع خرابی بستگی دارد)؛ کاربر را به تماس با تعمیرگاه برای اعلام قیمت دقیق ارجاع بده.
+- هرگز خودت را به‌عنوان مکانیک یا جایگزین معاینه‌ی حضوری معرفی نکن؛ همیشه روشن کن که تشخیص قطعی نیازمند بازدید حضوری در شاهکار است.
+- اگر سوال کاملاً بی‌ربط به خودرو و تعمیرگاه بود، مؤدبانه بگو که فقط می‌توانی درباره‌ی خدمات شاهکار کمک کنی.`;
+
+async function handleChat(request, env) {
+  if (!env.AI) {
+    return errorResponse(
+      "دستیار هوشمند هنوز فعال نشده است. لطفاً مستقیم با شماره 09191389418 تماس بگیرید.",
+      503
+    );
+  }
+
+  const body = await request.json().catch(() => null);
+  const message = body && typeof body.message === "string" ? body.message.trim() : "";
+  if (!message) return errorResponse("متن پیام الزامی است");
+  if (message.length > 1000) return errorResponse("متن پیام خیلی طولانی است");
+
+  const rawHistory = Array.isArray(body.history) ? body.history : [];
+  const history = rawHistory
+    .filter((h) => h && (h.role === "user" || h.role === "assistant") && typeof h.content === "string")
+    .slice(-10)
+    .map((h) => ({ role: h.role, content: h.content.slice(0, 1000) }));
+
+  const conversation = history.length ? history : [{ role: "user", content: message }];
+  const messages = [{ role: "system", content: CHAT_SYSTEM_PROMPT }, ...conversation];
+
+  try {
+    // Cloudflare Workers AI — رایگان تا سقف روزانه، بدون نیاز به کلید یا حساب جداگانه
+    const aiResult = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+      messages,
+      max_tokens: 400,
+    });
+
+    const reply = (aiResult && aiResult.response ? String(aiResult.response) : "").trim();
+
+    if (!reply) {
+      return errorResponse("پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.", 502);
+    }
+
+    return json({ reply });
+  } catch (err) {
+    return errorResponse("خطا در ارتباط با دستیار هوشمند. لطفاً دوباره تلاش کنید.", 502);
+  }
+}
+
 // ---------- روتر اصلی ----------
 
 export default {
@@ -305,7 +358,8 @@ export default {
     const isPublicRead = path.match(/^\/api\/customers\/[^/]+$/) && method === "GET";
     const isPublicContact = path === "/api/contact" && method === "POST";
     const isPublicReviews = path === "/api/reviews" && (method === "GET" || method === "POST");
-    if (!isPublicRead && !isPublicContact && !isPublicReviews) {
+    const isPublicChat = path === "/api/chat" && method === "POST";
+    if (!isPublicRead && !isPublicContact && !isPublicReviews && !isPublicChat) {
       if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
     }
 
@@ -350,6 +404,8 @@ export default {
     if ((m = path.match(/^\/api\/reviews\/(\d+)$/))) {
       if (method === "DELETE") return deleteReview(m[1], env);
     }
+
+    if (path === "/api/chat" && method === "POST") return handleChat(request, env);
 
     return errorResponse("مسیر یافت نشد", 404);
   },
