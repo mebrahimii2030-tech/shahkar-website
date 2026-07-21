@@ -53,9 +53,19 @@ function renderCars(cars) {
             .map((p) => {
               const status = dueStatusClient(p.next_due_date);
               const dueText = p.next_due_date ? `موعد بعدی: ${isoToJalaliDisplay(p.next_due_date)}` : "بدون موعد";
-              return `<span class="part-chip due-pill--${status}">${p.part_name} · ${dueText}
-                <a href="#" onclick="event.preventDefault(); deletePart(${p.id})" style="color:inherit;">✕</a>
-              </span>`;
+              const mileageBits = [];
+              if (p.replaced_at_mileage) mileageBits.push(`کارکرد تعویض: ${formatMileageDisplay(p.replaced_at_mileage)} کیلومتر`);
+              if (p.next_due_mileage) mileageBits.push(`موعد بعدی: ${formatMileageDisplay(p.next_due_mileage)} کیلومتر`);
+              const mileageHtml = mileageBits.length
+                ? `<div class="part-entry__mileage">${mileageBits.join(" · ")}</div>`
+                : "";
+              return `
+                <div class="part-entry">
+                  <span class="part-chip due-pill--${status}">${p.part_name} · ${dueText}
+                    <a href="#" onclick="event.preventDefault(); deletePart(${p.id})" style="color:inherit;">✕</a>
+                  </span>
+                  ${mileageHtml}
+                </div>`;
             })
             .join("");
 
@@ -213,8 +223,16 @@ function addPartRow() {
       <div class="combo-list part-name-list"></div>
     </div>
     <div class="field">
+      <label>کارکرد هنگام تعویض (کیلومتر)</label>
+      <input type="text" inputmode="numeric" class="part-mileage-input" placeholder="مثلاً ۸۵۰۰۰ (اختیاری)" />
+    </div>
+    <div class="field">
       <label>موعد تعویض بعدی (شمسی)</label>
       <input type="text" class="part-due-input" placeholder="۱۴۰۵/۰۷/۱۰ (اختیاری)" />
+    </div>
+    <div class="field">
+      <label>کارکرد موعد تعویض بعدی (کیلومتر)</label>
+      <input type="text" inputmode="numeric" class="part-next-mileage-input" placeholder="مثلاً ۱۰۵۰۰۰ (اختیاری)" />
     </div>
   `;
   document.getElementById("parts-rows").appendChild(wrap);
@@ -239,10 +257,14 @@ document.getElementById("new-visit-form").addEventListener("submit", async (e) =
   document.querySelectorAll("#parts-rows > div").forEach((row) => {
     const name = row.querySelector(".part-name-input").value.trim();
     const dueRaw = row.querySelector(".part-due-input").value.trim();
+    const mileageRaw = row.querySelector(".part-mileage-input").value.trim();
+    const nextMileageRaw = row.querySelector(".part-next-mileage-input").value.trim();
     if (!name) return;
     parts.push({
       part_name: name,
       next_due_date: dueRaw ? jalaliInputToIso(dueRaw) : null,
+      replaced_at_mileage: parseMileageInput(mileageRaw),
+      next_due_mileage: parseMileageInput(nextMileageRaw),
     });
   });
 

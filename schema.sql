@@ -48,6 +48,8 @@ CREATE TABLE parts_replaced (
   visit_id INTEGER NOT NULL REFERENCES visits(id) ON DELETE CASCADE,
   part_name TEXT NOT NULL,
   next_due_date TEXT,                 -- تاریخ موعد تعویض بعدی این قطعه
+  replaced_at_mileage INTEGER,        -- کارکرد خودرو (کیلومتر) در لحظه تعویض این قطعه
+  next_due_mileage INTEGER,           -- کارکردی که باید تا آن، مجدداً برای تعویض مراجعه شود
   notes TEXT
 );
 

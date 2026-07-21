@@ -104,3 +104,33 @@ function todayIso() {
   const now = new Date();
   return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
 }
+
+// تبدیل ارقام فارسی/عربی به انگلیسی، برای فیلدهایی مثل کارکرد (کیلومتر)
+// که کاربر ممکن است با صفحه‌کلید فارسی وارد کند
+function normalizeDigits(input) {
+  if (input === null || input === undefined) return "";
+  const persian = "۰۱۲۳۴۵۶۷۸۹";
+  const arabic = "٠١٢٣٤٥٦٧٨٩";
+  return String(input).replace(/[۰-۹٠-٩]/g, (ch) => {
+    const pIndex = persian.indexOf(ch);
+    if (pIndex > -1) return String(pIndex);
+    const aIndex = arabic.indexOf(ch);
+    return aIndex > -1 ? String(aIndex) : ch;
+  });
+}
+
+// ورودی آزاد کارکرد (مثلاً "۸۵٬۰۰۰" یا "85000 کیلومتر") -> عدد صحیح یا null
+function parseMileageInput(input) {
+  if (!input) return null;
+  const digitsOnly = normalizeDigits(input).replace(/[^\d]/g, "");
+  if (!digitsOnly) return null;
+  return parseInt(digitsOnly, 10);
+}
+
+// عدد کارکرد -> رشته نمایشی با جداکننده هزارگان، مثلاً 85,000
+function formatMileageDisplay(value) {
+  if (value === null || value === undefined || value === "") return "";
+  const num = Number(value);
+  if (Number.isNaN(num)) return "";
+  return num.toLocaleString("en-US");
+}

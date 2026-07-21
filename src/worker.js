@@ -158,8 +158,10 @@ async function addVisit(request, env) {
   const parts = Array.isArray(body.parts) ? body.parts : [];
   for (const part of parts) {
     if (!part.part_name) continue;
-    await env.DB.prepare("INSERT INTO parts_replaced (visit_id, part_name, next_due_date, notes) VALUES (?, ?, ?, ?)")
-      .bind(visitId, part.part_name, part.next_due_date || null, part.notes || null)
+    await env.DB.prepare(
+      "INSERT INTO parts_replaced (visit_id, part_name, next_due_date, replaced_at_mileage, next_due_mileage, notes) VALUES (?, ?, ?, ?, ?, ?)"
+    )
+      .bind(visitId, part.part_name, part.next_due_date || null, part.replaced_at_mileage ?? null, part.next_due_mileage ?? null, part.notes || null)
       .run();
   }
   return json({ id: visitId });
@@ -182,8 +184,10 @@ async function deleteVisit(id, env) {
 async function addPart(request, env) {
   const body = await request.json().catch(() => null);
   if (!body || !body.visit_id || !body.part_name) return errorResponse("مراجعه و نام قطعه الزامی است");
-  const result = await env.DB.prepare("INSERT INTO parts_replaced (visit_id, part_name, next_due_date, notes) VALUES (?, ?, ?, ?)")
-    .bind(body.visit_id, body.part_name, body.next_due_date || null, body.notes || null)
+  const result = await env.DB.prepare(
+    "INSERT INTO parts_replaced (visit_id, part_name, next_due_date, replaced_at_mileage, next_due_mileage, notes) VALUES (?, ?, ?, ?, ?, ?)"
+  )
+    .bind(body.visit_id, body.part_name, body.next_due_date || null, body.replaced_at_mileage ?? null, body.next_due_mileage ?? null, body.notes || null)
     .run();
   return json({ id: result.meta.last_row_id });
 }
@@ -191,8 +195,10 @@ async function addPart(request, env) {
 async function updatePart(id, request, env) {
   const body = await request.json().catch(() => null);
   if (!body) return errorResponse("داده نامعتبر است");
-  await env.DB.prepare("UPDATE parts_replaced SET part_name = ?, next_due_date = ?, notes = ? WHERE id = ?")
-    .bind(body.part_name, body.next_due_date || null, body.notes || null, id)
+  await env.DB.prepare(
+    "UPDATE parts_replaced SET part_name = ?, next_due_date = ?, replaced_at_mileage = ?, next_due_mileage = ?, notes = ? WHERE id = ?"
+  )
+    .bind(body.part_name, body.next_due_date || null, body.replaced_at_mileage ?? null, body.next_due_mileage ?? null, body.notes || null, id)
     .run();
   return json({ ok: true });
 }

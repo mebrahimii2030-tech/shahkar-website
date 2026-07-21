@@ -47,11 +47,15 @@ function render(customer) {
       status === "overdue" ? "موعد این قطعه گذشته — لطفاً هرچه زودتر مراجعه کنید"
       : status === "soon" ? "موعد این قطعه نزدیک است"
       : "نزدیک‌ترین موعد تعویض شما";
+    const mileageSub = nearest.next_due_mileage
+      ? `<div class="hero-callout__sub">کارکرد موعد: ${formatMileageDisplay(nearest.next_due_mileage)} کیلومتر</div>`
+      : "";
     heroEl.innerHTML = `
       <div class="hero-callout">
         <div class="hero-callout__label">${statusText}</div>
         <div class="hero-callout__main">${nearest.part_name} · ${nearest.carLabel}</div>
         <div class="hero-callout__sub">تاریخ موعد: ${isoToJalaliDisplay(nearest.next_due_date)}</div>
+        ${mileageSub}
       </div>`;
   } else {
     heroEl.innerHTML = "";
@@ -75,7 +79,17 @@ function renderCars(cars) {
             .map((p) => {
               const status = dueStatusClient(p.next_due_date);
               const dueText = p.next_due_date ? `موعد بعدی: ${isoToJalaliDisplay(p.next_due_date)}` : "بدون موعد مشخص";
-              return `<span class="part-chip due-pill--${status}">${p.part_name} · ${dueText}</span>`;
+              const mileageBits = [];
+              if (p.replaced_at_mileage) mileageBits.push(`کارکرد تعویض: ${formatMileageDisplay(p.replaced_at_mileage)} کیلومتر`);
+              if (p.next_due_mileage) mileageBits.push(`موعد بعدی: ${formatMileageDisplay(p.next_due_mileage)} کیلومتر`);
+              const mileageHtml = mileageBits.length
+                ? `<div class="part-entry__mileage">${mileageBits.join(" · ")}</div>`
+                : "";
+              return `
+                <div class="part-entry">
+                  <span class="part-chip due-pill--${status}">${p.part_name} · ${dueText}</span>
+                  ${mileageHtml}
+                </div>`;
             })
             .join("");
 

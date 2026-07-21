@@ -382,8 +382,21 @@
 .parts-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin-top: 8px;
+}
+
+.part-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.part-entry__mileage {
+  font-size: var(--fs-xs);
+  color: var(--gray-500);
+  padding: 0 4px;
 }
 
 .part-chip {
