@@ -328,7 +328,10 @@ async function handleChat(request, env) {
 
     return json({ reply });
   } catch (err) {
-    return errorResponse("خطا در ارتباط با دستیار هوشمند. لطفاً دوباره تلاش کنید.", 502);
+    return errorResponse(
+      "خطا در ارتباط با دستیار هوشمند: " + (err && err.message ? err.message : String(err)),
+      502
+    );
   }
 }
 
