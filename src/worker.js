@@ -315,7 +315,7 @@ async function handleChat(request, env) {
 
   try {
     // Cloudflare Workers AI — رایگان تا سقف روزانه، بدون نیاز به کلید یا حساب جداگانه
-    const aiResult = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+    const aiResult = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
       messages,
       max_tokens: 400,
     });
@@ -328,10 +328,7 @@ async function handleChat(request, env) {
 
     return json({ reply });
   } catch (err) {
-    return errorResponse(
-      "خطا در ارتباط با دستیار هوشمند: " + (err && err.message ? err.message : String(err)),
-      502
-    );
+    return errorResponse("خطا در ارتباط با دستیار هوشمند. لطفاً دوباره تلاش کنید.", 502);
   }
 }
 
