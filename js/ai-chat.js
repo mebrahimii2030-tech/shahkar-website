@@ -28,6 +28,52 @@
   launcher.addEventListener("click", openChat);
   closeBtn.addEventListener("click", closeChat);
 
+  // ---------- قابلیت جابه‌جایی چت (کشیدن از هدر) ----------
+  const headEl = windowEl.querySelector(".ai-chat-head");
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
+  let startLeft = 0;
+  let startTop = 0;
+
+  function onDragStart(e) {
+    if (e.target.closest(".ai-chat-close")) return; // کلیک روی دکمه بستن نباید درگ حساب شود
+    dragging = true;
+    const rect = windowEl.getBoundingClientRect();
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft = rect.left;
+    startTop = rect.top;
+    windowEl.style.left = startLeft + "px";
+    windowEl.style.top = startTop + "px";
+    windowEl.style.right = "auto";
+    windowEl.style.bottom = "auto";
+    headEl.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }
+
+  function onDragMove(e) {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const margin = 8;
+    const maxLeft = window.innerWidth - windowEl.offsetWidth - margin;
+    const maxTop = window.innerHeight - windowEl.offsetHeight - margin;
+    const newLeft = Math.min(Math.max(margin, startLeft + dx), Math.max(margin, maxLeft));
+    const newTop = Math.min(Math.max(margin, startTop + dy), Math.max(margin, maxTop));
+    windowEl.style.left = newLeft + "px";
+    windowEl.style.top = newTop + "px";
+  }
+
+  function onDragEnd() {
+    dragging = false;
+  }
+
+  headEl.addEventListener("pointerdown", onDragStart);
+  headEl.addEventListener("pointermove", onDragMove);
+  headEl.addEventListener("pointerup", onDragEnd);
+  headEl.addEventListener("pointercancel", onDragEnd);
+
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, "&amp;")
