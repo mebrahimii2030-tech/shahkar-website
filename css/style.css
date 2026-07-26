@@ -25,6 +25,15 @@ body {
   color: var(--gray-800);
   line-height: 1.8;
   overflow-x: hidden;
+  opacity: 0;
+}
+
+/* هدر و فوتر با جاوااسکریپت (fetch) جداگانه توی صفحه تزریق می‌شوند؛ تا
+   وقتی این تزریق کامل نشده صفحه مخفی می‌ماند تا آن چشمک سفید/نارنجی
+   موقع بالا آمدن سایت دیده نشود، و بعد یک‌جا و با یک محو ملایم ظاهر می‌شود */
+html.app-ready body {
+  opacity: 1;
+  transition: opacity 0.25s ease;
 }
 
 img {

@@ -315,14 +315,47 @@ function armVisitHighlightClear() {
   document.addEventListener("wheel", handler, opts);
 }
 
-// ---------- مودال ثبت مراجعه ----------
+// ---------- مودال ثبت/ویرایش مراجعه ----------
 function openVisitModal(carId) {
   const modal = document.getElementById("visit-modal");
   const form = document.getElementById("new-visit-form");
   form.reset();
   form.car_id.value = carId;
+  form.visit_id.value = "";
+  document.getElementById("visit-modal-title").textContent = "ثبت مراجعه جدید";
+  document.getElementById("visit-submit-btn").textContent = "ثبت مراجعه";
   document.getElementById("parts-rows").innerHTML = "";
   addPartRow();
+  modal.classList.add("open");
+}
+
+function openEditVisitModal(visitId) {
+  const found = findVisitAndCar(visitId);
+  if (!found) return;
+  const { visit, car } = found;
+
+  const modal = document.getElementById("visit-modal");
+  const form = document.getElementById("new-visit-form");
+  form.reset();
+  form.car_id.value = car.id;
+  form.visit_id.value = visit.id;
+  form.visit_date.value = isoToJalaliDisplay(visit.visit_date);
+  form.current_mileage.value = car.current_mileage || "";
+  form.complaints.value = visit.complaints || "";
+  form.resolved.value = visit.resolved || "";
+  form.notes.value = visit.notes || "";
+
+  document.getElementById("visit-modal-title").textContent = "ویرایش مراجعه";
+  document.getElementById("visit-submit-btn").textContent = "ذخیره تغییرات";
+
+  document.getElementById("parts-rows").innerHTML = "";
+  const parts = visit.parts || [];
+  if (parts.length) {
+    parts.forEach((p) => addPartRow(p));
+  } else {
+    addPartRow();
+  }
+
   modal.classList.add("open");
 }
 
@@ -331,26 +364,32 @@ document.getElementById("close-visit-modal").addEventListener("click", () => {
 });
 
 let partRowCounter = 0;
-function addPartRow() {
+function addPartRow(existingPart) {
   partRowCounter += 1;
   const rowId = `part-row-${partRowCounter}`;
   const wrap = document.createElement("div");
   wrap.className = "form-grid";
   wrap.style.marginBottom = "10px";
   wrap.id = rowId;
+  if (existingPart && existingPart.id) {
+    wrap.dataset.partId = existingPart.id;
+  }
+  const nameVal = existingPart ? escapeHtml(existingPart.part_name || "") : "";
+  const mileageVal = existingPart && existingPart.replaced_at_mileage ? existingPart.replaced_at_mileage : "";
+  const nextMileageVal = existingPart && existingPart.next_due_mileage ? existingPart.next_due_mileage : "";
   wrap.innerHTML = `
     <div class="field combo">
       <label>نام قطعه</label>
-      <input type="text" class="part-name-input" autocomplete="off" />
+      <input type="text" class="part-name-input" autocomplete="off" value="${nameVal}" />
       <div class="combo-list part-name-list"></div>
     </div>
     <div class="field">
       <label>کارکرد هنگام تعویض (کیلومتر)</label>
-      <input type="text" inputmode="numeric" class="part-mileage-input" placeholder="مثلاً ۸۵۰۰۰ (اختیاری)" />
+      <input type="text" inputmode="numeric" class="part-mileage-input" placeholder="مثلاً ۸۵۰۰۰ (اختیاری)" value="${mileageVal}" />
     </div>
     <div class="field">
       <label>کارکرد موعد تعویض بعدی (کیلومتر)</label>
-      <input type="text" inputmode="numeric" class="part-next-mileage-input" placeholder="مثلاً ۱۰۵۰۰۰ (اختیاری)" />
+      <input type="text" inputmode="numeric" class="part-next-mileage-input" placeholder="مثلاً ۱۰۵۰۰۰ (اختیاری)" value="${nextMileageVal}" />
     </div>
   `;
   document.getElementById("parts-rows").appendChild(wrap);
@@ -371,38 +410,79 @@ document.getElementById("new-visit-form").addEventListener("submit", async (e) =
     return;
   }
 
-  const parts = [];
-  document.querySelectorAll("#parts-rows > div").forEach((row) => {
-    const name = row.querySelector(".part-name-input").value.trim();
-    const mileageRaw = row.querySelector(".part-mileage-input").value.trim();
-    const nextMileageRaw = row.querySelector(".part-next-mileage-input").value.trim();
-    if (!name) return;
-    parts.push({
-      part_name: name,
-      replaced_at_mileage: parseMileageInput(mileageRaw),
-      next_due_mileage: parseMileageInput(nextMileageRaw),
-    });
-  });
+  const partRows = Array.from(document.querySelectorAll("#parts-rows > div")).map((row) => ({
+    partId: row.dataset.partId || null,
+    name: row.querySelector(".part-name-input").value.trim(),
+    replaced_at_mileage: parseMileageInput(row.querySelector(".part-mileage-input").value.trim()),
+    next_due_mileage: parseMileageInput(row.querySelector(".part-next-mileage-input").value.trim()),
+  }));
 
   const currentMileageRaw = form.current_mileage.value.trim();
+  const visitId = form.visit_id.value;
+  const isEditMode = Boolean(visitId);
 
-  const submitBtn = form.querySelector('button[type="submit"]');
+  const submitBtn = document.getElementById("visit-submit-btn");
   const originalBtnText = submitBtn.textContent;
   submitBtn.disabled = true;
   submitBtn.classList.add("btn-loading");
-  submitBtn.textContent = "در حال ثبت...";
+  submitBtn.textContent = isEditMode ? "در حال ذخیره..." : "در حال ثبت...";
 
   let result;
   try {
-    result = await PanelAPI.addVisit({
-      car_id: form.car_id.value,
-      visit_date: visitIso,
-      current_mileage: parseMileageInput(currentMileageRaw),
-      complaints: form.complaints.value.trim(),
-      resolved: form.resolved.value.trim(),
-      notes: form.notes.value.trim(),
-      parts,
-    });
+    if (isEditMode) {
+      result = await PanelAPI.updateVisit(visitId, {
+        car_id: form.car_id.value,
+        visit_date: visitIso,
+        current_mileage: parseMileageInput(currentMileageRaw),
+        complaints: form.complaints.value.trim(),
+        resolved: form.resolved.value.trim(),
+        notes: form.notes.value.trim(),
+      });
+
+      if (!result.error) {
+        const partResults = await Promise.all(
+          partRows
+            .filter((p) => p.name || p.partId)
+            .map((p) => {
+              if (p.partId) {
+                return PanelAPI.updatePart(p.partId, {
+                  part_name: p.name,
+                  replaced_at_mileage: p.replaced_at_mileage,
+                  next_due_mileage: p.next_due_mileage,
+                  notes: "",
+                });
+              }
+              if (!p.name) return Promise.resolve({});
+              return PanelAPI.addPart({
+                visit_id: visitId,
+                part_name: p.name,
+                replaced_at_mileage: p.replaced_at_mileage,
+                next_due_mileage: p.next_due_mileage,
+              });
+            })
+        );
+        const failedPart = partResults.find((r) => r && r.error);
+        if (failedPart) result = failedPart;
+      }
+    } else {
+      const parts = partRows
+        .filter((p) => p.name)
+        .map((p) => ({
+          part_name: p.name,
+          replaced_at_mileage: p.replaced_at_mileage,
+          next_due_mileage: p.next_due_mileage,
+        }));
+
+      result = await PanelAPI.addVisit({
+        car_id: form.car_id.value,
+        visit_date: visitIso,
+        current_mileage: parseMileageInput(currentMileageRaw),
+        complaints: form.complaints.value.trim(),
+        resolved: form.resolved.value.trim(),
+        notes: form.notes.value.trim(),
+        parts,
+      });
+    }
   } finally {
     submitBtn.disabled = false;
     submitBtn.classList.remove("btn-loading");
@@ -416,7 +496,7 @@ document.getElementById("new-visit-form").addEventListener("submit", async (e) =
 
   document.getElementById("visit-modal").classList.remove("open");
 
-  highlightVisitId = result.id;
+  highlightVisitId = isEditMode ? Number(visitId) : result.id;
   await loadCustomer();
 
   const row = document.getElementById(`visit-row-${highlightVisitId}`);
