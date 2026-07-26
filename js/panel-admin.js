@@ -21,28 +21,20 @@ function formatAdminDate(raw) {
   return datePart;
 }
 
-function dueStatusClient(nextDueDate) {
-  if (!nextDueDate) return "none";
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const due = new Date(nextDueDate);
-  const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) return "overdue";
-  if (diffDays <= 14) return "soon";
+// وضعیت موعد از روی کیلومتر باقیمانده‌ای که سرور محاسبه کرده (nearest_remaining_km)
+function dueStatusFromRemaining(remainingKm) {
+  if (remainingKm === null || remainingKm === undefined) return "none";
+  if (remainingKm <= 0) return "overdue";
+  if (remainingKm <= MILEAGE_DUE_SOON_KM) return "soon";
   return "ok";
 }
 
-const STATUS_LABEL = {
-  overdue: "موعد گذشته",
-  soon: "نزدیک است",
-  ok: "بدون نگرانی",
-  none: "بدون قطعه ثبت‌شده",
-};
+const STATUS_LABEL = MILEAGE_STATUS_LABEL;
 
 function renderSummary() {
   const counts = { overdue: 0, soon: 0, ok: 0 };
   allCustomers.forEach((c) => {
-    const s = dueStatusClient(c.nearest_due_date);
+    const s = dueStatusFromRemaining(c.nearest_remaining_km);
     if (counts[s] !== undefined) counts[s] += 1;
   });
 
@@ -66,24 +58,71 @@ function renderTable(list) {
 
   tbody.innerHTML = list
     .map((c) => {
-      const status = dueStatusClient(c.nearest_due_date);
-      const dueDisplay = c.nearest_due_date ? isoToJalaliDisplay(c.nearest_due_date) : "—";
+      const status = dueStatusFromRemaining(c.nearest_remaining_km);
+      const remaining = c.nearest_remaining_km;
+      let dueDisplay;
+      if (remaining === null || remaining === undefined) {
+        dueDisplay = STATUS_LABEL.none;
+      } else if (remaining <= 0) {
+        dueDisplay = `${formatMileageDisplay(Math.abs(remaining))} کیلومتر گذشته`;
+      } else {
+        dueDisplay = `${formatMileageDisplay(remaining)} کیلومتر مانده`;
+      }
       const link = `${location.origin}/customer.html?code=${c.code}`;
       return `
         <tr onclick="location.href='panel-customer.html?code=${c.code}'">
-          <td class="customer-name">${c.first_name} ${c.last_name}</td>
-          <td>${c.phone || "—"}</td>
+          <td class="customer-name">${escapeHtml(c.first_name)} ${escapeHtml(c.last_name)}</td>
+          <td>${escapeHtml(c.phone) || "—"}</td>
           <td>${c.car_count || 0}</td>
-          <td><span class="due-pill due-pill--${status}">${dueDisplay !== "—" ? dueDisplay : STATUS_LABEL[status]}</span></td>
+          <td><span class="due-pill due-pill--${dueStatusCssClass(status)}">${dueDisplay}</span></td>
           <td>
             <button class="copy-link-btn" onclick="event.stopPropagation(); copyCustomerLink('${link}', this)">
               کپی لینک
+            </button>
+            <button class="copy-link-btn" onclick="event.stopPropagation(); openEditCustomerModal('${c.code}')">
+              ویرایش
             </button>
           </td>
         </tr>`;
     })
     .join("");
 }
+
+// ---------- ویرایش مشتری از داخل جدول اصلی پنل ----------
+function openEditCustomerModal(code) {
+  const c = allCustomers.find((x) => x.code === code);
+  if (!c) return;
+  const form = document.getElementById("edit-customer-form");
+  form.code.value = c.code;
+  form.first_name.value = c.first_name;
+  form.last_name.value = c.last_name;
+  form.phone.value = c.phone || "";
+  document.getElementById("edit-customer-modal").classList.add("open");
+}
+
+document.getElementById("close-edit-customer-modal").addEventListener("click", () => {
+  document.getElementById("edit-customer-modal").classList.remove("open");
+});
+
+document.getElementById("edit-customer-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const code = form.code.value;
+  const data = {
+    first_name: form.first_name.value.trim(),
+    last_name: form.last_name.value.trim(),
+    phone: form.phone.value.trim(),
+  };
+  if (!data.first_name || !data.last_name) return;
+
+  const updated = await PanelAPI.updateCustomer(code, data);
+  if (updated.error) {
+    alert(updated.error);
+    return;
+  }
+  document.getElementById("edit-customer-modal").classList.remove("open");
+  await loadCustomers();
+});
 
 function copyCustomerLink(link, btn) {
   navigator.clipboard.writeText(link).then(() => {

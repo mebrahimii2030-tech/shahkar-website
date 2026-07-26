@@ -28,6 +28,7 @@ CREATE TABLE cars (
   model TEXT NOT NULL,
   year INTEGER,
   plate TEXT,
+  current_mileage INTEGER,             -- آخرین کارکرد ثبت‌شده خودرو (کیلومتر)، از آخرین مراجعه به‌روزرسانی می‌شود
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -43,11 +44,11 @@ CREATE TABLE visits (
 );
 
 -- قطعات تعویض‌شده در هر مراجعه (هر قطعه موعد بعدی جداگانه دارد)
+-- موعد تعویض فقط بر اساس کارکرد (کیلومتر) سنجیده می‌شود، نه تاریخ
 CREATE TABLE parts_replaced (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   visit_id INTEGER NOT NULL REFERENCES visits(id) ON DELETE CASCADE,
   part_name TEXT NOT NULL,
-  next_due_date TEXT,                 -- تاریخ موعد تعویض بعدی این قطعه
   replaced_at_mileage INTEGER,        -- کارکرد خودرو (کیلومتر) در لحظه تعویض این قطعه
   next_due_mileage INTEGER,           -- کارکردی که باید تا آن، مجدداً برای تعویض مراجعه شود
   notes TEXT
@@ -78,7 +79,7 @@ CREATE TABLE reviews (
 CREATE INDEX idx_cars_customer ON cars(customer_id);
 CREATE INDEX idx_visits_car ON visits(car_id);
 CREATE INDEX idx_parts_visit ON parts_replaced(visit_id);
-CREATE INDEX idx_parts_due ON parts_replaced(next_due_date);
+CREATE INDEX idx_parts_next_mileage ON parts_replaced(next_due_mileage);
 CREATE INDEX idx_customers_code ON customers(code);
 CREATE INDEX idx_messages_created ON messages(created_at);
 CREATE INDEX idx_reviews_created ON reviews(created_at);

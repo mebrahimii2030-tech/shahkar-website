@@ -77,7 +77,7 @@
               <th>تماس</th>
               <th>تعداد خودرو</th>
               <th>نزدیک‌ترین موعد</th>
-              <th>لینک اختصاصی</th>
+              <th>عملیات</th>
             </tr>
           </thead>
           <tbody id="customers-tbody">
@@ -127,6 +127,25 @@
             <tr><td colspan="6" class="empty-state">در حال بارگذاری...</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- مودال ویرایش مشتری -->
+    <div class="modal-overlay" id="edit-customer-modal">
+      <div class="modal-box">
+        <h3>ویرایش اطلاعات مشتری</h3>
+        <form id="edit-customer-form">
+          <input type="hidden" name="code" />
+          <div class="form-grid">
+            <div class="field"><label>نام</label><input type="text" name="first_name" required /></div>
+            <div class="field"><label>نام خانوادگی</label><input type="text" name="last_name" required /></div>
+            <div class="field"><label>شماره تماس</label><input type="text" name="phone" /></div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="close-edit-customer-modal">انصراف</button>
+            <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+          </div>
+        </form>
       </div>
     </div>
 

@@ -91,9 +91,15 @@ function isoToJalaliDisplay(iso) {
 }
 
 // ورودی شمسی "YYYY/MM/DD" یا "YYYY-MM-DD" -> ISO میلادی "YYYY-MM-DD"
+// نکته مهم: کاربر ممکن است تاریخ را با ارقام فارسی/عربی وارد کند (مثلاً با
+// صفحه‌کلید گوشی). قبلاً این تابع فقط ارقام انگلیسی را می‌فهمید و برای ارقام
+// فارسی مقدار NaN تولید می‌کرد و null برمی‌گرداند؛ همین باعث می‌شد فرم «ثبت
+// مراجعه» با خطای «تاریخ را به‌درستی وارد کنید» رد شود و مراجعه اصلاً ثبت
+// نشود. با نرمال‌سازی ارقام قبل از تبدیل، این باگ رفع می‌شود.
 function jalaliInputToIso(input) {
   if (!input) return null;
-  const parts = input.trim().split(/[\/\-]/).map(Number);
+  const normalized = normalizeDigits(input);
+  const parts = normalized.trim().split(/[\/\-]/).map(Number);
   if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return null;
   const [jy, jm, jd] = parts;
   const [gy, gm, gd] = jalaliToGregorian(jy, jm, jd);
@@ -133,4 +139,38 @@ function formatMileageDisplay(value) {
   const num = Number(value);
   if (Number.isNaN(num)) return "";
   return num.toLocaleString("en-US");
+}
+
+// ---------- وضعیت موعد بر اساس کارکرد (کیلومتر) ----------
+// منطق موعد قبلاً بر اساس تاریخ شمسی بود؛ طبق تصمیم جدید، موعد فقط بر اساس
+// کارکرد خودرو (next_due_mileage در برابر کارکرد فعلی خودرو) محاسبه می‌شود.
+const MILEAGE_DUE_SOON_KM = 1500; // اگر کمتر از این مقدار به موعد مانده باشد، «نزدیک است»
+
+// currentMileage: کارکرد فعلی خودرو (از آخرین مراجعه ثبت‌شده)
+// nextDueMileage: کارکردی که قطعه باید تا آن دوباره تعویض شود
+// خروجی یکی از: "none" (موعدی ثبت نشده) | "unknown" (موعد ثبت شده ولی کارکرد فعلی خودرو نامشخص است)
+// "overdue" | "soon" | "ok"
+function dueStatusByMileage(currentMileage, nextDueMileage) {
+  if (nextDueMileage === null || nextDueMileage === undefined || nextDueMileage === "") return "none";
+  if (currentMileage === null || currentMileage === undefined || currentMileage === "") return "unknown";
+  const remaining = Number(nextDueMileage) - Number(currentMileage);
+  if (Number.isNaN(remaining)) return "unknown";
+  if (remaining <= 0) return "overdue";
+  if (remaining <= MILEAGE_DUE_SOON_KM) return "soon";
+  return "ok";
+}
+
+// برچسب فارسی هر وضعیت، برای استفاده مشترک در پنل مدیریت/پرونده مشتری/صفحه عمومی
+const MILEAGE_STATUS_LABEL = {
+  overdue: "موعد گذشته",
+  soon: "نزدیک است",
+  ok: "بدون نگرانی",
+  none: "بدون قطعه ثبت‌شده",
+  unknown: "کارکرد فعلی ثبت نشده",
+};
+
+// کلاس CSS متناظر با هر وضعیت (کلاس due-pill--unknown در استایل تعریف نشده،
+// پس همان ظاهر خنثای «none» برایش استفاده می‌شود)
+function dueStatusCssClass(status) {
+  return status === "unknown" ? "none" : status;
 }

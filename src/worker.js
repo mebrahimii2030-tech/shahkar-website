@@ -55,18 +55,24 @@ function unauthorizedResponse(hasPasswordConfigured) {
 // ---------- منطق هر endpoint ----------
 
 async function listCustomers(env) {
+  // موعد فقط بر اساس کارکرد (کیلومتر) سنجیده می‌شود:
+  // باقیمانده = next_due_mileage قطعه - current_mileage خودرو
+  // هرچه این عدد کمتر (یا منفی‌تر) باشد، فوریت بیشتر است.
   const { results } = await env.DB.prepare(
     `
     SELECT
       c.id, c.code, c.first_name, c.last_name, c.phone,
-      MIN(p.next_due_date) AS nearest_due_date,
+      MIN(p.next_due_mileage - car.current_mileage) AS nearest_remaining_km,
       COUNT(DISTINCT car.id) AS car_count
     FROM customers c
     LEFT JOIN cars car ON car.customer_id = c.id
     LEFT JOIN visits v ON v.car_id = car.id
-    LEFT JOIN parts_replaced p ON p.visit_id = v.id AND p.next_due_date IS NOT NULL
+    LEFT JOIN parts_replaced p
+      ON p.visit_id = v.id
+      AND p.next_due_mileage IS NOT NULL
+      AND car.current_mileage IS NOT NULL
     GROUP BY c.id
-    ORDER BY CASE WHEN nearest_due_date IS NULL THEN 1 ELSE 0 END, nearest_due_date ASC
+    ORDER BY CASE WHEN nearest_remaining_km IS NULL THEN 1 ELSE 0 END, nearest_remaining_km ASC
   `
   ).all();
   return json({ customers: results });
@@ -135,8 +141,11 @@ async function addCar(request, env) {
 async function updateCar(id, request, env) {
   const body = await request.json().catch(() => null);
   if (!body) return errorResponse("داده نامعتبر است");
-  await env.DB.prepare("UPDATE cars SET brand = ?, model = ?, year = ?, plate = ? WHERE id = ?")
-    .bind(body.brand, body.model, body.year || null, body.plate || null, id)
+  const hasMileage = body.current_mileage !== undefined && body.current_mileage !== null && body.current_mileage !== "";
+  await env.DB.prepare(
+    "UPDATE cars SET brand = ?, model = ?, year = ?, plate = ?, current_mileage = COALESCE(?, current_mileage) WHERE id = ?"
+  )
+    .bind(body.brand, body.model, body.year || null, body.plate || null, hasMileage ? body.current_mileage : null, id)
     .run();
   return json({ ok: true });
 }
@@ -155,13 +164,22 @@ async function addVisit(request, env) {
     .bind(body.car_id, body.visit_date, body.complaints || null, body.resolved || null, body.notes || null)
     .run();
   const visitId = visitResult.meta.last_row_id;
+
+  // ثبت کارکرد فعلی خودرو در لحظه این مراجعه؛ همین مقدار بعداً برای محاسبه
+  // موعد تعویض بر اساس کیلومتر (به‌جای تاریخ) استفاده می‌شود
+  if (body.current_mileage !== undefined && body.current_mileage !== null && body.current_mileage !== "") {
+    await env.DB.prepare("UPDATE cars SET current_mileage = ? WHERE id = ?")
+      .bind(body.current_mileage, body.car_id)
+      .run();
+  }
+
   const parts = Array.isArray(body.parts) ? body.parts : [];
   for (const part of parts) {
     if (!part.part_name) continue;
     await env.DB.prepare(
-      "INSERT INTO parts_replaced (visit_id, part_name, next_due_date, replaced_at_mileage, next_due_mileage, notes) VALUES (?, ?, ?, ?, ?, ?)"
+      "INSERT INTO parts_replaced (visit_id, part_name, replaced_at_mileage, next_due_mileage, notes) VALUES (?, ?, ?, ?, ?)"
     )
-      .bind(visitId, part.part_name, part.next_due_date || null, part.replaced_at_mileage ?? null, part.next_due_mileage ?? null, part.notes || null)
+      .bind(visitId, part.part_name, part.replaced_at_mileage ?? null, part.next_due_mileage ?? null, part.notes || null)
       .run();
   }
   return json({ id: visitId });
@@ -185,9 +203,9 @@ async function addPart(request, env) {
   const body = await request.json().catch(() => null);
   if (!body || !body.visit_id || !body.part_name) return errorResponse("مراجعه و نام قطعه الزامی است");
   const result = await env.DB.prepare(
-    "INSERT INTO parts_replaced (visit_id, part_name, next_due_date, replaced_at_mileage, next_due_mileage, notes) VALUES (?, ?, ?, ?, ?, ?)"
+    "INSERT INTO parts_replaced (visit_id, part_name, replaced_at_mileage, next_due_mileage, notes) VALUES (?, ?, ?, ?, ?)"
   )
-    .bind(body.visit_id, body.part_name, body.next_due_date || null, body.replaced_at_mileage ?? null, body.next_due_mileage ?? null, body.notes || null)
+    .bind(body.visit_id, body.part_name, body.replaced_at_mileage ?? null, body.next_due_mileage ?? null, body.notes || null)
     .run();
   return json({ id: result.meta.last_row_id });
 }
@@ -196,9 +214,9 @@ async function updatePart(id, request, env) {
   const body = await request.json().catch(() => null);
   if (!body) return errorResponse("داده نامعتبر است");
   await env.DB.prepare(
-    "UPDATE parts_replaced SET part_name = ?, next_due_date = ?, replaced_at_mileage = ?, next_due_mileage = ?, notes = ? WHERE id = ?"
+    "UPDATE parts_replaced SET part_name = ?, replaced_at_mileage = ?, next_due_mileage = ?, notes = ? WHERE id = ?"
   )
-    .bind(body.part_name, body.next_due_date || null, body.replaced_at_mileage ?? null, body.next_due_mileage ?? null, body.notes || null, id)
+    .bind(body.part_name, body.replaced_at_mileage ?? null, body.next_due_mileage ?? null, body.notes || null, id)
     .run();
   return json({ ok: true });
 }

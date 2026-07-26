@@ -1,16 +1,6 @@
 const CUSTOMER_CODE = new URLSearchParams(location.search).get("code");
 let currentCustomer = null;
-
-function dueStatusClient(nextDueDate) {
-  if (!nextDueDate) return "none";
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const due = new Date(nextDueDate);
-  const diffDays = Math.round((due - today) / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) return "overdue";
-  if (diffDays <= 14) return "soon";
-  return "ok";
-}
+// توجه: dueStatusByMileage و MILEAGE_STATUS_LABEL و dueStatusCssClass از js/jalali.js می‌آیند
 
 async function loadCustomer() {
   if (!CUSTOMER_CODE) {
@@ -51,17 +41,18 @@ function renderCars(cars) {
         .map((visit) => {
           const partsHtml = (visit.parts || [])
             .map((p) => {
-              const status = dueStatusClient(p.next_due_date);
-              const dueText = p.next_due_date ? `موعد بعدی: ${isoToJalaliDisplay(p.next_due_date)}` : "بدون موعد";
+              const status = dueStatusByMileage(car.current_mileage, p.next_due_mileage);
+              const dueText = p.next_due_mileage
+                ? `موعد بعدی: ${formatMileageDisplay(p.next_due_mileage)} کیلومتر`
+                : "بدون موعد";
               const mileageBits = [];
               if (p.replaced_at_mileage) mileageBits.push(`کارکرد تعویض: ${formatMileageDisplay(p.replaced_at_mileage)} کیلومتر`);
-              if (p.next_due_mileage) mileageBits.push(`موعد بعدی: ${formatMileageDisplay(p.next_due_mileage)} کیلومتر`);
               const mileageHtml = mileageBits.length
                 ? `<div class="part-entry__mileage">${mileageBits.join(" · ")}</div>`
                 : "";
               return `
                 <div class="part-entry">
-                  <span class="part-chip due-pill--${status}">${p.part_name} · ${dueText}
+                  <span class="part-chip due-pill--${dueStatusCssClass(status)}">${p.part_name} · ${dueText}
                     <a href="#" onclick="event.preventDefault(); deletePart(${p.id})" style="color:inherit;">✕</a>
                   </span>
                   ${mileageHtml}
@@ -87,7 +78,7 @@ function renderCars(cars) {
           <div class="panel-card__head">
             <div>
               <div class="car-card__title">${car.brand} ${car.model}</div>
-              <div class="car-card__sub">${car.year ? "سال " + car.year : ""} ${car.plate ? "· پلاک " + car.plate : ""}</div>
+              <div class="car-card__sub">${car.year ? "سال " + car.year : ""} ${car.plate ? "· پلاک " + car.plate : ""} ${car.current_mileage ? "· کارکرد فعلی: " + formatMileageDisplay(car.current_mileage) + " کیلومتر" : ""}</div>
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-primary" style="padding:8px 16px; font-size:14px;" onclick="openVisitModal(${car.id})">+ ثبت مراجعه</button>
@@ -227,10 +218,6 @@ function addPartRow() {
       <input type="text" inputmode="numeric" class="part-mileage-input" placeholder="مثلاً ۸۵۰۰۰ (اختیاری)" />
     </div>
     <div class="field">
-      <label>موعد تعویض بعدی (شمسی)</label>
-      <input type="text" class="part-due-input" placeholder="۱۴۰۵/۰۷/۱۰ (اختیاری)" />
-    </div>
-    <div class="field">
       <label>کارکرد موعد تعویض بعدی (کیلومتر)</label>
       <input type="text" inputmode="numeric" class="part-next-mileage-input" placeholder="مثلاً ۱۰۵۰۰۰ (اختیاری)" />
     </div>
@@ -256,21 +243,22 @@ document.getElementById("new-visit-form").addEventListener("submit", async (e) =
   const parts = [];
   document.querySelectorAll("#parts-rows > div").forEach((row) => {
     const name = row.querySelector(".part-name-input").value.trim();
-    const dueRaw = row.querySelector(".part-due-input").value.trim();
     const mileageRaw = row.querySelector(".part-mileage-input").value.trim();
     const nextMileageRaw = row.querySelector(".part-next-mileage-input").value.trim();
     if (!name) return;
     parts.push({
       part_name: name,
-      next_due_date: dueRaw ? jalaliInputToIso(dueRaw) : null,
       replaced_at_mileage: parseMileageInput(mileageRaw),
       next_due_mileage: parseMileageInput(nextMileageRaw),
     });
   });
 
+  const currentMileageRaw = form.current_mileage.value.trim();
+
   const result = await PanelAPI.addVisit({
     car_id: form.car_id.value,
     visit_date: visitIso,
+    current_mileage: parseMileageInput(currentMileageRaw),
     complaints: form.complaints.value.trim(),
     resolved: form.resolved.value.trim(),
     notes: form.notes.value.trim(),
