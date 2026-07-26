@@ -110,6 +110,38 @@
       </div>
     </div>
 
+    <!-- مودال ویرایش قطعه تعویض‌شده -->
+    <div class="modal-overlay" id="edit-part-modal">
+      <div class="modal-box">
+        <h3>ویرایش قطعه تعویض‌شده</h3>
+        <form id="edit-part-form">
+          <input type="hidden" name="part_id" />
+          <div class="form-grid form-grid--full">
+            <div class="field">
+              <label>نام قطعه</label>
+              <input type="text" name="part_name" required />
+            </div>
+            <div class="field">
+              <label>کارکرد هنگام تعویض (کیلومتر)</label>
+              <input type="text" inputmode="numeric" name="replaced_at_mileage" placeholder="اختیاری" />
+            </div>
+            <div class="field">
+              <label>کارکرد موعد تعویض بعدی (کیلومتر)</label>
+              <input type="text" inputmode="numeric" name="next_due_mileage" placeholder="اختیاری" />
+            </div>
+            <div class="field">
+              <label>یادداشت</label>
+              <textarea name="notes"></textarea>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="close-edit-part-modal">انصراف</button>
+            <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script src="js/jalali.js"></script>
     <script src="js/panel-data.js"></script>
     <script src="js/combobox.js"></script>

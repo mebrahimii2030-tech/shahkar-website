@@ -1,6 +1,7 @@
 const CUSTOMER_CODE = new URLSearchParams(location.search).get("code");
 let currentCustomer = null;
 let highlightVisitId = null; // شناسه آخرین مراجعه‌ی تازه ثبت‌شده، برای نشانه‌گذاری سبز موقت
+let highlightPartId = null; // شناسه آخرین قطعه‌ی تازه ویرایش‌شده، برای نشانه‌گذاری سبز موقت
 // توجه: dueStatusByMileage و MILEAGE_STATUS_LABEL و dueStatusCssClass از js/jalali.js می‌آیند
 
 async function loadCustomer() {
@@ -51,10 +52,12 @@ function renderCars(cars) {
               const mileageHtml = mileageBits.length
                 ? `<div class="part-entry__mileage">${mileageBits.join(" · ")}</div>`
                 : "";
+              const isPartEdited = highlightPartId !== null && Number(highlightPartId) === Number(p.id);
               return `
                 <div class="part-entry">
-                  <span class="part-chip due-pill--${dueStatusCssClass(status)}">${p.part_name} · ${dueText}
-                    <a href="#" onclick="event.preventDefault(); deletePart(${p.id})" style="color:inherit;">✕</a>
+                  <span class="part-chip due-pill--${dueStatusCssClass(status)}${isPartEdited ? " part-chip--updated" : ""}" id="part-chip-${p.id}">${p.part_name} · ${dueText}
+                    <a href="#" onclick="event.preventDefault(); openEditPartModal(${p.id})" style="color:inherit; margin-left:8px;" title="ویرایش قطعه">✎</a>
+                    <a href="#" onclick="event.preventDefault(); deletePart(${p.id})" style="color:inherit;" title="حذف قطعه">✕</a>
                   </span>
                   ${mileageHtml}
                 </div>`;
@@ -185,6 +188,98 @@ async function deletePart(id) {
   await PanelAPI.deletePart(id);
   await loadCustomer();
 }
+
+// ---------- ویرایش قطعه تعویض‌شده ----------
+function findPart(partId) {
+  const cars = (currentCustomer && currentCustomer.cars) || [];
+  for (const car of cars) {
+    for (const visit of car.visits || []) {
+      for (const part of visit.parts || []) {
+        if (Number(part.id) === Number(partId)) return part;
+      }
+    }
+  }
+  return null;
+}
+
+function openEditPartModal(partId) {
+  const part = findPart(partId);
+  if (!part) return;
+  const form = document.getElementById("edit-part-form");
+  form.part_id.value = part.id;
+  form.part_name.value = part.part_name || "";
+  form.replaced_at_mileage.value = part.replaced_at_mileage ?? "";
+  form.next_due_mileage.value = part.next_due_mileage ?? "";
+  form.notes.value = part.notes || "";
+  document.getElementById("edit-part-modal").classList.add("open");
+}
+
+document.getElementById("close-edit-part-modal").addEventListener("click", () => {
+  document.getElementById("edit-part-modal").classList.remove("open");
+});
+
+function clearPartHighlight() {
+  if (highlightPartId === null) return;
+  const el = document.getElementById(`part-chip-${highlightPartId}`);
+  if (el) el.classList.remove("part-chip--updated");
+  highlightPartId = null;
+}
+
+function armPartHighlightClear() {
+  const controller = new AbortController();
+  const handler = () => {
+    controller.abort();
+    clearPartHighlight();
+  };
+  const opts = { signal: controller.signal, passive: true };
+  document.addEventListener("click", handler, opts);
+  document.addEventListener("mousemove", handler, opts);
+  document.addEventListener("keydown", handler, opts);
+  document.addEventListener("touchstart", handler, opts);
+  document.addEventListener("wheel", handler, opts);
+}
+
+document.getElementById("edit-part-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const partId = form.part_id.value;
+  const name = form.part_name.value.trim();
+  if (!name) return;
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.classList.add("btn-loading");
+  submitBtn.textContent = "در حال ذخیره...";
+
+  let result;
+  try {
+    result = await PanelAPI.updatePart(partId, {
+      part_name: name,
+      replaced_at_mileage: parseMileageInput(form.replaced_at_mileage.value.trim()),
+      next_due_mileage: parseMileageInput(form.next_due_mileage.value.trim()),
+      notes: form.notes.value.trim(),
+    });
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove("btn-loading");
+    submitBtn.textContent = originalBtnText;
+  }
+
+  if (result.error) {
+    alert(result.error);
+    return;
+  }
+
+  document.getElementById("edit-part-modal").classList.remove("open");
+
+  highlightPartId = Number(partId);
+  await loadCustomer();
+
+  const chip = document.getElementById(`part-chip-${highlightPartId}`);
+  if (chip) chip.scrollIntoView({ behavior: "smooth", block: "center" });
+  armPartHighlightClear();
+});
 
 // حذف نشانه‌گذاری سبز رنگ ردیف تازه ثبت‌شده
 function clearVisitHighlight() {
