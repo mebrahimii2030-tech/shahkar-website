@@ -125,6 +125,30 @@ async function updateCustomer(code, request, env) {
   return json({ ok: true });
 }
 
+// حذف کامل مشتری و تمام سوابق وابسته (خودروها، مراجعات، قطعات تعویض‌شده)
+// به‌صورت صریح و در قالب یک تراکنش، تا مستقل از تنظیم فعال بودن FOREIGN KEYS
+// در D1، هیچ ردی از اطلاعات این مشتری در هیچ‌کدام از جدول‌ها باقی نماند
+async function deleteCustomer(code, env) {
+  const customer = await env.DB.prepare("SELECT id FROM customers WHERE code = ?").bind(code).first();
+  if (!customer) return errorResponse("مشتری یافت نشد", 404);
+  const customerId = customer.id;
+
+  await env.DB.batch([
+    env.DB.prepare(
+      `DELETE FROM parts_replaced WHERE visit_id IN (
+         SELECT v.id FROM visits v JOIN cars c ON c.id = v.car_id WHERE c.customer_id = ?
+       )`
+    ).bind(customerId),
+    env.DB.prepare(
+      `DELETE FROM visits WHERE car_id IN (SELECT id FROM cars WHERE customer_id = ?)`
+    ).bind(customerId),
+    env.DB.prepare(`DELETE FROM cars WHERE customer_id = ?`).bind(customerId),
+    env.DB.prepare(`DELETE FROM customers WHERE id = ?`).bind(customerId),
+  ]);
+
+  return json({ ok: true });
+}
+
 async function addCar(request, env) {
   const body = await request.json().catch(() => null);
   if (!body || !body.customer_code || !body.brand || !body.model) {
@@ -395,6 +419,7 @@ export default {
     if ((m = path.match(/^\/api\/customers\/([^/]+)$/))) {
       if (method === "GET") return getCustomer(decodeURIComponent(m[1]), env);
       if (method === "PUT") return updateCustomer(decodeURIComponent(m[1]), request, env);
+      if (method === "DELETE") return deleteCustomer(decodeURIComponent(m[1]), env);
     }
 
     if (path === "/api/cars" && method === "POST") return addCar(request, env);

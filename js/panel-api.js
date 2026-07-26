@@ -25,6 +25,10 @@ const PanelAPI = {
     });
     return res.json();
   },
+  async deleteCustomer(code) {
+    const res = await fetch(`/api/customers/${encodeURIComponent(code)}`, { method: "DELETE" });
+    return res.json();
+  },
   async addCar(data) {
     const res = await fetch("/api/cars", {
       method: "POST",

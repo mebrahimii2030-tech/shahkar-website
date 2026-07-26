@@ -176,6 +176,15 @@
   color: var(--secondary-dark);
 }
 
+.copy-link-btn--danger {
+  color: var(--danger);
+}
+.copy-link-btn--danger:hover {
+  border-color: var(--danger);
+  background: #fef2f2;
+  color: var(--danger);
+}
+
 /* ---------- فرم‌ها ---------- */
 .form-grid {
   display: grid;
@@ -348,6 +357,54 @@
 .visit-item {
   position: relative;
   margin-bottom: 22px;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+/* ---------- نشانه‌گذاری موقت ردیف تازه ثبت‌شده ---------- */
+.visit-item--new {
+  background-color: rgba(22, 163, 74, 0.12);
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.4);
+  animation: visitNewPulse 1.4s ease-in-out;
+}
+
+@keyframes visitNewPulse {
+  0% {
+    background-color: rgba(22, 163, 74, 0.32);
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.6);
+  }
+  100% {
+    background-color: rgba(22, 163, 74, 0.12);
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.4);
+  }
+}
+
+/* ---------- دکمه در حالت در حال ذخیره ---------- */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  cursor: default;
+  opacity: 0.85;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(15, 23, 42, 0.35);
+  border-top-color: var(--primary);
+  animation: btnSpin 0.7s linear infinite;
+}
+
+@keyframes btnSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .visit-item::before {

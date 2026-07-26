@@ -82,6 +82,9 @@ function renderTable(list) {
             <button class="copy-link-btn" onclick="event.stopPropagation(); openEditCustomerModal('${c.code}')">
               ویرایش
             </button>
+            <button class="copy-link-btn copy-link-btn--danger" onclick="event.stopPropagation(); handleDeleteCustomer('${c.code}')">
+              حذف
+            </button>
           </td>
         </tr>`;
     })
@@ -123,6 +126,22 @@ document.getElementById("edit-customer-form").addEventListener("submit", async (
   document.getElementById("edit-customer-modal").classList.remove("open");
   await loadCustomers();
 });
+
+async function handleDeleteCustomer(code) {
+  const c = allCustomers.find((x) => x.code === code);
+  const name = c ? `${c.first_name} ${c.last_name}` : "این مشتری";
+  const sure = confirm(
+    `آیا مطمئن هستید می‌خواهید «${name}» را حذف کنید؟\nتمام اطلاعات این مشتری شامل خودروها، مراجعات و قطعات ثبت‌شده به‌طور کامل و غیرقابل‌بازگشت پاک می‌شود.`
+  );
+  if (!sure) return;
+
+  const result = await PanelAPI.deleteCustomer(code);
+  if (result && result.error) {
+    alert(result.error);
+    return;
+  }
+  await loadCustomers();
+}
 
 function copyCustomerLink(link, btn) {
   navigator.clipboard.writeText(link).then(() => {

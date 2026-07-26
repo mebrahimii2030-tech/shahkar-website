@@ -1,5 +1,6 @@
 const CUSTOMER_CODE = new URLSearchParams(location.search).get("code");
 let currentCustomer = null;
+let highlightVisitId = null; // شناسه آخرین مراجعه‌ی تازه ثبت‌شده، برای نشانه‌گذاری سبز موقت
 // توجه: dueStatusByMileage و MILEAGE_STATUS_LABEL و dueStatusCssClass از js/jalali.js می‌آیند
 
 async function loadCustomer() {
@@ -60,8 +61,9 @@ function renderCars(cars) {
             })
             .join("");
 
+          const isNewlyAdded = highlightVisitId !== null && Number(highlightVisitId) === Number(visit.id);
           return `
-            <div class="visit-item">
+            <div class="visit-item${isNewlyAdded ? " visit-item--new" : ""}" id="visit-row-${visit.id}">
               <div class="visit-item__date">${isoToJalaliDisplay(visit.visit_date)}
                 <a href="#" onclick="event.preventDefault(); deleteVisit(${visit.id})" style="font-size:12px; color:var(--danger); margin-right:10px;">حذف مراجعه</a>
               </div>
@@ -184,6 +186,29 @@ async function deletePart(id) {
   await loadCustomer();
 }
 
+// حذف نشانه‌گذاری سبز رنگ ردیف تازه ثبت‌شده
+function clearVisitHighlight() {
+  if (highlightVisitId === null) return;
+  const el = document.getElementById(`visit-row-${highlightVisitId}`);
+  if (el) el.classList.remove("visit-item--new");
+  highlightVisitId = null;
+}
+
+// از اولین حرکت/کلیک/فشردن کلید بعدی کاربر، نشانه‌گذاری سبز رنگ حذف شود
+function armVisitHighlightClear() {
+  const controller = new AbortController();
+  const handler = () => {
+    controller.abort();
+    clearVisitHighlight();
+  };
+  const opts = { signal: controller.signal, passive: true };
+  document.addEventListener("click", handler, opts);
+  document.addEventListener("mousemove", handler, opts);
+  document.addEventListener("keydown", handler, opts);
+  document.addEventListener("touchstart", handler, opts);
+  document.addEventListener("wheel", handler, opts);
+}
+
 // ---------- مودال ثبت مراجعه ----------
 function openVisitModal(carId) {
   const modal = document.getElementById("visit-modal");
@@ -255,15 +280,28 @@ document.getElementById("new-visit-form").addEventListener("submit", async (e) =
 
   const currentMileageRaw = form.current_mileage.value.trim();
 
-  const result = await PanelAPI.addVisit({
-    car_id: form.car_id.value,
-    visit_date: visitIso,
-    current_mileage: parseMileageInput(currentMileageRaw),
-    complaints: form.complaints.value.trim(),
-    resolved: form.resolved.value.trim(),
-    notes: form.notes.value.trim(),
-    parts,
-  });
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.classList.add("btn-loading");
+  submitBtn.textContent = "در حال ثبت...";
+
+  let result;
+  try {
+    result = await PanelAPI.addVisit({
+      car_id: form.car_id.value,
+      visit_date: visitIso,
+      current_mileage: parseMileageInput(currentMileageRaw),
+      complaints: form.complaints.value.trim(),
+      resolved: form.resolved.value.trim(),
+      notes: form.notes.value.trim(),
+      parts,
+    });
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove("btn-loading");
+    submitBtn.textContent = originalBtnText;
+  }
 
   if (result.error) {
     alert(result.error);
@@ -271,7 +309,13 @@ document.getElementById("new-visit-form").addEventListener("submit", async (e) =
   }
 
   document.getElementById("visit-modal").classList.remove("open");
+
+  highlightVisitId = result.id;
   await loadCustomer();
+
+  const row = document.getElementById(`visit-row-${highlightVisitId}`);
+  if (row) row.scrollIntoView({ behavior: "smooth", block: "center" });
+  armVisitHighlightClear();
 });
 
 loadCustomer();
