@@ -89,6 +89,14 @@ const PanelAPI = {
     const res = await fetch(`/api/parts/${id}`, { method: "DELETE" });
     return readPanelResponse(res);
   },
+  async addPart(data) {
+    const res = await fetch("/api/parts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return readPanelResponse(res);
+  },
   async updatePart(id, data) {
     const res = await fetch(`/api/parts/${id}`, {
       method: "PUT",

@@ -3,8 +3,11 @@
    Version: 1.0
 ===================================== */
 
-/* Google Font */
-@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap");
+/* توجه: فونت Vazirmatn دیگر اینجا با @import لود نمی‌شود، چون همین
+   فونت با <link rel="preconnect"> + <link rel="stylesheet"> در <head>
+   هر صفحه لود می‌شود. @import یک فایل خارجی داخل CSS، لود کل صفحه را
+   تا رسیدن پاسخ آن فونت متوقف می‌کند و باعث چشمک سفید/نارنجی موقع
+   بالا آمدن صفحه می‌شد. */
 
 :root {
   /* ========= Colors ========= */

@@ -69,6 +69,7 @@ function renderCars(cars) {
             <div class="visit-item${isNewlyAdded ? " visit-item--new" : ""}" id="visit-row-${visit.id}">
               <div class="visit-item__date">${isoToJalaliDisplay(visit.visit_date)}
                 <a href="#" onclick="event.preventDefault(); deleteVisit(${visit.id})" style="font-size:12px; color:var(--danger); margin-right:10px;">حذف مراجعه</a>
+                <a href="#" onclick="event.preventDefault(); openEditVisitModal(${visit.id})" style="font-size:12px; color:var(--primary); margin-right:10px;">ویرایش مراجعه</a>
               </div>
               ${visit.complaints ? `<div class="visit-item__row"><b>ایراد اعلامی:</b> ${visit.complaints}</div>` : ""}
               ${visit.resolved ? `<div class="visit-item__row"><b>رفع‌شده:</b> ${visit.resolved}</div>` : ""}
@@ -197,6 +198,16 @@ function findPart(partId) {
       for (const part of visit.parts || []) {
         if (Number(part.id) === Number(partId)) return part;
       }
+    }
+  }
+  return null;
+}
+
+function findVisitAndCar(visitId) {
+  const cars = (currentCustomer && currentCustomer.cars) || [];
+  for (const car of cars) {
+    for (const visit of car.visits || []) {
+      if (Number(visit.id) === Number(visitId)) return { visit, car };
     }
   }
   return null;

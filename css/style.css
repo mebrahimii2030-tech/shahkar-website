@@ -1,6 +1,7 @@
-@import url("variables.css");
-@import url("animations.css");
-@import url("utilities.css");
+/* توجه: variables.css / animations.css / utilities.css اکنون مستقیماً
+   در <head> هر صفحه با <link> جداگانه لود می‌شوند (نه با @import اینجا)،
+   تا مرورگر بتواند همه‌ی فایل‌های CSS را موازی دانلود کند و صفحه با
+   تأخیر و چشمک نارنجی/سفید در بارگذاری اولیه ظاهر نشود. */
 
 /* ==========================
    CSS RESET

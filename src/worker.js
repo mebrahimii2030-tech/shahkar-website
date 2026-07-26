@@ -215,6 +215,15 @@ async function updateVisit(id, request, env) {
   await env.DB.prepare("UPDATE visits SET visit_date = ?, complaints = ?, resolved = ?, notes = ? WHERE id = ?")
     .bind(body.visit_date, body.complaints || null, body.resolved || null, body.notes || null, id)
     .run();
+
+  // اگر هنگام ویرایش مراجعه، کارکرد خودرو هم وارد/تغییر داده شده، همان‌طور
+  // که در ثبت مراجعه جدید انجام می‌شود، کارکرد فعلی خودرو هم به‌روزرسانی شود
+  if (body.car_id && body.current_mileage !== undefined && body.current_mileage !== null && body.current_mileage !== "") {
+    await env.DB.prepare("UPDATE cars SET current_mileage = ? WHERE id = ?")
+      .bind(body.current_mileage, body.car_id)
+      .run();
+  }
+
   return json({ ok: true });
 }
 

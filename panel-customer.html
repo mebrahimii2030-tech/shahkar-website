@@ -67,12 +67,13 @@
       <div id="cars-container"></div>
     </div>
 
-    <!-- مودال افزودن مراجعه جدید -->
+    <!-- مودال افزودن/ویرایش مراجعه -->
     <div class="modal-overlay" id="visit-modal">
       <div class="modal-box">
-        <h3>ثبت مراجعه جدید</h3>
+        <h3 id="visit-modal-title">ثبت مراجعه جدید</h3>
         <form id="new-visit-form">
           <input type="hidden" name="car_id" />
+          <input type="hidden" name="visit_id" />
           <div class="form-grid form-grid--full">
             <div class="field">
               <label>تاریخ مراجعه (شمسی)</label>
@@ -104,7 +105,7 @@
 
           <div class="modal-actions">
             <button type="button" class="btn btn-ghost" id="close-visit-modal">انصراف</button>
-            <button type="submit" class="btn btn-primary">ثبت مراجعه</button>
+            <button type="submit" class="btn btn-primary" id="visit-submit-btn">ثبت مراجعه</button>
           </div>
         </form>
       </div>
