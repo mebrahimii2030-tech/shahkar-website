@@ -557,3 +557,115 @@
     padding: 14px 16px;
   }
 }
+
+/* ---------- داشبورد اصلی مدیریت (کارت‌های ورود به بخش‌ها) ---------- */
+.dashboard-intro {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.dashboard-intro h1 {
+  color: var(--primary);
+  font-size: var(--fs-2xl);
+  font-weight: 900;
+  margin: 0 0 8px;
+}
+
+.dashboard-intro p {
+  color: var(--gray-500);
+  font-size: var(--fs-md);
+  margin: 0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 26px 24px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--secondary);
+}
+
+.dashboard-card__icon {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: var(--gray-50);
+  color: var(--secondary-dark);
+  margin-bottom: 16px;
+}
+
+.dashboard-card__title {
+  color: var(--primary);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.dashboard-card__desc {
+  color: var(--gray-500);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  margin-bottom: 18px;
+  flex-grow: 1;
+}
+
+.dashboard-card__count {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--gray-500);
+  background: var(--gray-50);
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin-bottom: 14px;
+  align-self: flex-start;
+}
+
+.dashboard-card__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--secondary);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  transition: 0.15s;
+}
+
+.dashboard-card:hover .dashboard-card__btn {
+  background: var(--secondary-dark);
+  color: var(--white);
+}
+
+.dashboard-card--soon {
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+.dashboard-card--soon .dashboard-card__count {
+  color: var(--gray-400);
+}

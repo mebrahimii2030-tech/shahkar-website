@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>پنل مدیریت مشتریان | تعمیرگاه تخصصی شاهکار</title>
+    <title>داشبورد مدیریت | تعمیرگاه تخصصی شاهکار</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link rel="stylesheet" href="css/variables.css" />
     <link rel="stylesheet" href="css/panel.css" />
   </head>
@@ -19,138 +20,39 @@
     <div class="panel-topbar">
       <div class="panel-topbar__brand">
         <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
-        <div class="panel-topbar__title">پنل مدیریت <span>مشتریان</span></div>
+        <div class="panel-topbar__title">داشبورد <span>مدیریت</span></div>
       </div>
       <a href="index.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">بازگشت به سایت</a>
     </div>
 
     <div class="panel-wrap">
-      <!-- خلاصه وضعیت -->
-      <div class="panel-card">
-        <div class="panel-card__head">
-          <h2>وضعیت کلی موعدها</h2>
-        </div>
-        <div id="summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
+      <div class="dashboard-intro">
+        <h1>پنل مدیریت شاهکار</h1>
+        <p>یکی از بخش‌های زیر را برای مدیریت انتخاب کنید.</p>
       </div>
 
-      <!-- افزودن مشتری جدید -->
-      <div class="panel-card">
-        <div class="panel-card__head">
-          <h3>افزودن مشتری جدید</h3>
-        </div>
-        <form id="new-customer-form">
-          <div class="form-grid">
-            <div class="field">
-              <label>نام</label>
-              <input type="text" name="first_name" required />
-            </div>
-            <div class="field">
-              <label>نام خانوادگی</label>
-              <input type="text" name="last_name" required />
-            </div>
-            <div class="field">
-              <label>شماره تماس</label>
-              <input type="text" name="phone" placeholder="09xxxxxxxxx" />
-            </div>
-          </div>
-          <div style="margin-top:14px;">
-            <button type="submit" class="btn btn-primary">ثبت مشتری</button>
-          </div>
-        </form>
-      </div>
+      <div class="dashboard-grid">
+        <a href="panel-customers.html" class="dashboard-card">
+          <div class="dashboard-card__icon"><i class="fa-solid fa-users"></i></div>
+          <div class="dashboard-card__title">مدیریت مشتریان</div>
+          <div class="dashboard-card__desc">ثبت مشتری جدید، مشاهده و ویرایش پرونده خودرو، ثبت مراجعات و قطعات تعویض‌شده، و بررسی دیدگاه‌ها و پیام‌های تماس با ما.</div>
+          <span class="dashboard-card__btn">ورود به پنل <i class="fa-solid fa-arrow-left"></i></span>
+        </a>
 
-      <!-- لیست مشتری‌ها -->
-      <div class="panel-card">
-        <div class="panel-card__head">
-          <h3>همه مشتری‌ها</h3>
-          <input
-            id="search-box"
-            type="text"
-            placeholder="جستجوی نام مشتری..."
-            style="border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 14px; font-family:var(--font-family);"
-          />
-        </div>
-        <table class="customers-table">
-          <thead>
-            <tr>
-              <th>مشتری</th>
-              <th>تماس</th>
-              <th>تعداد خودرو</th>
-              <th>نزدیک‌ترین موعد</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody id="customers-tbody">
-            <tr><td colspan="5" class="empty-state">در حال بارگذاری...</td></tr>
-          </tbody>
-        </table>
-      </div>
+        <a href="panel-blog.html" class="dashboard-card">
+          <div class="dashboard-card__icon"><i class="fa-solid fa-newspaper"></i></div>
+          <div class="dashboard-card__title">مدیریت وبلاگ</div>
+          <div class="dashboard-card__desc">افزودن، ویرایش و حذف مقالات وبلاگ، تعیین دسته‌بندی و آیکون، و مشخص‌کردن مطالب ویژه و منتشرشده.</div>
+          <span class="dashboard-card__btn">ورود به پنل <i class="fa-solid fa-arrow-left"></i></span>
+        </a>
 
-      <!-- دیدگاه‌های ثبت‌شده در سایت -->
-      <div class="panel-card">
-        <div class="panel-card__head">
-          <h3>دیدگاه‌های مشتریان</h3>
+        <div class="dashboard-card dashboard-card--soon">
+          <div class="dashboard-card__icon"><i class="fa-solid fa-gear"></i></div>
+          <div class="dashboard-card__title">تنظیمات سایت</div>
+          <div class="dashboard-card__desc">مدیریت اطلاعات تماس، آدرس و سایر تنظیمات عمومی سایت.</div>
+          <span class="dashboard-card__count">به‌زودی</span>
         </div>
-        <table class="customers-table">
-          <thead>
-            <tr>
-              <th>نام</th>
-              <th>شماره تماس</th>
-              <th>متن دیدگاه</th>
-              <th>تاریخ</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody id="reviews-tbody">
-            <tr><td colspan="5" class="empty-state">در حال بارگذاری...</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- پیام‌های فرم تماس با ما -->
-      <div class="panel-card">
-        <div class="panel-card__head">
-          <h3>پیام‌های تماس با ما</h3>
-        </div>
-        <table class="customers-table">
-          <thead>
-            <tr>
-              <th>نام</th>
-              <th>تماس</th>
-              <th>موضوع / متن پیام</th>
-              <th>تاریخ</th>
-              <th>وضعیت</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody id="messages-tbody">
-            <tr><td colspan="6" class="empty-state">در حال بارگذاری...</td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
-
-    <!-- مودال ویرایش مشتری -->
-    <div class="modal-overlay" id="edit-customer-modal">
-      <div class="modal-box">
-        <h3>ویرایش اطلاعات مشتری</h3>
-        <form id="edit-customer-form">
-          <input type="hidden" name="code" />
-          <div class="form-grid">
-            <div class="field"><label>نام</label><input type="text" name="first_name" required /></div>
-            <div class="field"><label>نام خانوادگی</label><input type="text" name="last_name" required /></div>
-            <div class="field"><label>شماره تماس</label><input type="text" name="phone" /></div>
-          </div>
-          <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" id="close-edit-customer-modal">انصراف</button>
-            <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <script src="js/jalali.js"></script>
-    <script src="js/panel-api.js"></script>
-    <script src="js/panel-admin.js"></script>
   </body>
 </html>

@@ -509,7 +509,7 @@ export default {
     const method = request.method;
 
     // صفحات پنل مدیریت: نیاز به رمز عبور دارند، بعد فایل استاتیک اصلی سرو می‌شود
-    if (path === "/panel-admin.html" || path === "/panel-customer.html" || path === "/panel-blog.html") {
+    if (path === "/panel-admin.html" || path === "/panel-customers.html" || path === "/panel-customer.html" || path === "/panel-blog.html") {
       if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
       return env.ASSETS.fetch(request);
     }
