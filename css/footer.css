@@ -202,16 +202,18 @@
 
 .admin-access-link {
   display: inline-block;
-  margin-top: 10px;
-  color: #64748b;
-  opacity: 0.5;
-  font-size: 13px;
-  transition: opacity 0.2s, color 0.2s;
+  margin-top: 0;
+  color: inherit;
+  opacity: 1;
+  font-size: inherit;
+  text-decoration: none;
+  cursor: default;
 }
 
-.admin-access-link:hover {
+.admin-access-link:hover,
+.admin-access-link:focus {
+  color: inherit;
   opacity: 1;
-  color: #f59e0b;
 }
 /* ==============================
       FINAL VIP POLISH
