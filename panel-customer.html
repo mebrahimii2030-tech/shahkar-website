@@ -21,7 +21,10 @@
         <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
         <div class="panel-topbar__title">مدیریت پرونده <span>مشتری</span></div>
       </div>
-      <a href="panel-customers.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">بازگشت به لیست</a>
+      <div style="display:flex; gap:10px;">
+        <a href="panel-customers.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">بازگشت به لیست</a>
+        <button type="button" id="panel-logout-btn" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">خروج</button>
+      </div>
     </div>
 
     <div class="panel-wrap">
@@ -148,5 +151,6 @@
     <script src="js/combobox.js"></script>
     <script src="js/panel-api.js"></script>
     <script src="js/panel-customer.js"></script>
+    <script src="js/panel-logout.js"></script>
   </body>
 </html>

@@ -21,7 +21,10 @@
         <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
         <div class="panel-topbar__title">مدیریت <span>مشتریان</span></div>
       </div>
-      <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">داشبورد مدیریت</a>
+      <div style="display:flex; gap:10px;">
+        <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">داشبورد مدیریت</a>
+        <button type="button" id="panel-logout-btn" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">خروج</button>
+      </div>
     </div>
 
     <div class="panel-wrap">
@@ -152,5 +155,6 @@
     <script src="js/jalali.js"></script>
     <script src="js/panel-api.js"></script>
     <script src="js/panel-admin.js"></script>
+    <script src="js/panel-logout.js"></script>
   </body>
 </html>

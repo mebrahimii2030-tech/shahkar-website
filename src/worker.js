@@ -27,29 +27,84 @@ function generateCustomerCode() {
   return code;
 }
 
-// ---------- بررسی رمز عبور مدیر (Basic Auth) ----------
-function isAuthorized(request, env) {
-  const expected = env.ADMIN_PASSWORD;
-  if (!expected) return false;
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Basic ")) return false;
-  const decoded = atob(authHeader.slice(6));
-  const sep = decoded.indexOf(":");
-  const password = sep >= 0 ? decoded.slice(sep + 1) : "";
-  return password === expected;
+// ---------- بررسی نشست ورود مدیر (کوکی امضاشده به‌جای پنجره Basic Auth مرورگر) ----------
+
+const SESSION_COOKIE_NAME = "shahkar_admin_session";
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 12; // ۱۲ ساعت
+
+async function hmacHex(message, secret) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-function unauthorizedResponse(hasPasswordConfigured) {
-  if (!hasPasswordConfigured) {
-    return new Response(
+function extractSessionCookie(request) {
+  const cookieHeader = request.headers.get("Cookie") || "";
+  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${SESSION_COOKIE_NAME}=([^;]+)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function createSessionCookieValue(env) {
+  const expiry = Date.now() + SESSION_MAX_AGE_SECONDS * 1000;
+  const sig = await hmacHex(String(expiry), env.ADMIN_PASSWORD);
+  return `${expiry}.${sig}`;
+}
+
+async function isAuthorized(request, env) {
+  const expected = env.ADMIN_PASSWORD;
+  if (!expected) return false;
+  const cookieValue = extractSessionCookie(request);
+  if (!cookieValue) return false;
+  const dot = cookieValue.indexOf(".");
+  if (dot < 0) return false;
+  const expiry = Number(cookieValue.slice(0, dot));
+  const sig = cookieValue.slice(dot + 1);
+  if (!expiry || Number.isNaN(expiry) || Date.now() > expiry) return false;
+  const expectedSig = await hmacHex(String(expiry), expected);
+  return sig === expectedSig;
+}
+
+function unauthorizedApiResponse() {
+  return errorResponse("دسترسی غیرمجاز. لطفاً دوباره وارد پنل مدیریت شوید.", 401);
+}
+
+async function handleAdminLogin(request, env) {
+  if (!env.ADMIN_PASSWORD) {
+    return errorResponse(
       "دسترسی به پنل مدیریت پیکربندی نشده است. متغیر ADMIN_PASSWORD را در Settings پروژه Worker تعریف کنید.",
-      { status: 503 }
+      503
     );
   }
-  return new Response("برای ورود به پنل مدیریت، رمز عبور لازم است.", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="پنل مدیریت شاهکار"' },
-  });
+  const body = await request.json().catch(() => null);
+  const password = body && typeof body.password === "string" ? body.password : "";
+  if (password !== env.ADMIN_PASSWORD) {
+    return errorResponse("رمز عبور اشتباه است.", 401);
+  }
+  const cookieValue = await createSessionCookieValue(env);
+  const headers = new Headers({ "Content-Type": "application/json; charset=utf-8" });
+  headers.append(
+    "Set-Cookie",
+    `${SESSION_COOKIE_NAME}=${encodeURIComponent(cookieValue)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_MAX_AGE_SECONDS}`
+  );
+  return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
+}
+
+function handleAdminLogout() {
+  const headers = new Headers({ "Content-Type": "application/json; charset=utf-8" });
+  headers.append(
+    "Set-Cookie",
+    `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`
+  );
+  return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
 }
 
 // ---------- منطق هر endpoint ----------
@@ -516,9 +571,12 @@ export default {
     const path = url.pathname;
     const method = request.method;
 
-    // صفحات پنل مدیریت: نیاز به رمز عبور دارند، بعد فایل استاتیک اصلی سرو می‌شود
+    // صفحات پنل مدیریت: نیاز به نشست ورود معتبر دارند، وگرنه به صفحه‌ی ورود اختصاصی هدایت می‌شوند
     if (path === "/panel-admin.html" || path === "/panel-customers.html" || path === "/panel-customer.html" || path === "/panel-blog.html") {
-      if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
+      if (!(await isAuthorized(request, env))) {
+        const nextParam = encodeURIComponent(path + url.search);
+        return Response.redirect(`${url.origin}/panel-login.html?next=${nextParam}`, 302);
+      }
       return env.ASSETS.fetch(request);
     }
 
@@ -541,8 +599,9 @@ export default {
     const articleSlugMatch = path.match(/^\/api\/articles\/([^/]+)$/);
     const isPublicArticleBySlug =
       !!articleSlugMatch && method === "GET" && !/^\d+$/.test(articleSlugMatch[1]) && articleSlugMatch[1] !== "admin";
-    if (!isPublicRead && !isPublicContact && !isPublicReviews && !isPublicChat && !isPublicArticlesList && !isPublicArticleBySlug) {
-      if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
+    const isPublicAdminAuth = path === "/api/admin/login" || path === "/api/admin/logout";
+    if (!isPublicRead && !isPublicContact && !isPublicReviews && !isPublicChat && !isPublicArticlesList && !isPublicArticleBySlug && !isPublicAdminAuth) {
+      if (!(await isAuthorized(request, env))) return unauthorizedApiResponse();
     }
 
     let m;
@@ -603,6 +662,9 @@ export default {
     }
 
     if (path === "/api/chat" && method === "POST") return handleChat(request, env);
+
+    if (path === "/api/admin/login" && method === "POST") return handleAdminLogin(request, env);
+    if (path === "/api/admin/logout" && method === "POST") return handleAdminLogout();
 
     return errorResponse("مسیر یافت نشد", 404);
   },

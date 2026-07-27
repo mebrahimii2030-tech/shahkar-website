@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>ورود مدیر | تعمیرگاه تخصصی شاهکار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+  </head>
+  <body class="panel-body">
+    <div class="login-wrap">
+      <form class="login-card" id="login-form" autocomplete="off">
+        <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
+        <h1>ورود به پنل مدیریت</h1>
+        <p>برای ادامه، رمز عبور مدیریت را وارد کنید.</p>
+
+        <div class="login-field">
+          <label for="login-password">رمز عبور</label>
+          <input type="password" id="login-password" name="password" required autofocus />
+        </div>
+
+        <div class="login-error" id="login-error"></div>
+
+        <button type="submit" class="btn btn-primary login-submit" id="login-submit">ورود</button>
+      </form>
+    </div>
+
+    <script>
+      (function () {
+        const form = document.getElementById("login-form");
+        const input = document.getElementById("login-password");
+        const errorEl = document.getElementById("login-error");
+        const submitBtn = document.getElementById("login-submit");
+
+        function allowedNextPath(path) {
+          const allowed = [
+            "/panel-admin.html",
+            "/panel-customers.html",
+            "/panel-customer.html",
+            "/panel-blog.html",
+          ];
+          try {
+            const url = new URL(path, window.location.origin);
+            if (url.origin !== window.location.origin) return "/panel-admin.html";
+            return allowed.includes(url.pathname) ? url.pathname + url.search : "/panel-admin.html";
+          } catch (_) {
+            return "/panel-admin.html";
+          }
+        }
+
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          errorEl.textContent = "";
+          const password = input.value;
+          if (!password) return;
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = "در حال بررسی...";
+
+          try {
+            const res = await fetch("/api/admin/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ password }),
+            });
+            const data = await res.json().catch(() => null);
+
+            if (!res.ok || !data || !data.ok) {
+              errorEl.textContent = (data && data.error) || "رمز عبور اشتباه است.";
+              submitBtn.disabled = false;
+              submitBtn.textContent = "ورود";
+              input.select();
+              return;
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const next = allowedNextPath(params.get("next") || "/panel-admin.html");
+            window.location.href = next;
+          } catch (err) {
+            errorEl.textContent = "ارتباط با سرور برقرار نشد. دوباره تلاش کنید.";
+            submitBtn.disabled = false;
+            submitBtn.textContent = "ورود";
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
