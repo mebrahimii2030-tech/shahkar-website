@@ -336,6 +336,117 @@ async function deleteReview(id, env) {
   return json({ ok: true });
 }
 
+// ---------- مقالات وبلاگ ----------
+
+function generateArticleSlug() {
+  const chars = "abcdefghijkmnpqrstuvwxyz23456789";
+  let code = "";
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  for (let i = 0; i < bytes.length; i++) code += chars[bytes[i] % chars.length];
+  return code;
+}
+
+// نسخه عمومی: فقط مقالات منتشرشده، برای صفحه وبلاگ سایت
+async function listArticlesPublic(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT id, slug, title, excerpt, content, category, icon, author, read_minutes, is_featured, published_date FROM articles WHERE is_published = 1 ORDER BY published_date DESC, id DESC"
+  ).all();
+  return json({ articles: results });
+}
+
+// نسخه مدیریتی: همه مقالات (شامل پیش‌نویس‌ها)، فقط با رمز عبور مدیر
+async function listArticlesAdmin(env) {
+  const { results } = await env.DB.prepare(
+    "SELECT * FROM articles ORDER BY published_date DESC, id DESC"
+  ).all();
+  return json({ articles: results });
+}
+
+async function getArticleById(id, env) {
+  const article = await env.DB.prepare("SELECT * FROM articles WHERE id = ?").bind(id).first();
+  if (!article) return errorResponse("مقاله یافت نشد", 404);
+  return json({ article });
+}
+
+async function getArticleBySlug(slug, env) {
+  const article = await env.DB.prepare(
+    "SELECT id, slug, title, excerpt, content, category, icon, author, read_minutes, is_featured, published_date FROM articles WHERE slug = ? AND is_published = 1"
+  )
+    .bind(slug)
+    .first();
+  if (!article) return errorResponse("مقاله یافت نشد", 404);
+  return json({ article });
+}
+
+function sanitizeArticleBody(body) {
+  const title = String(body.title || "").trim();
+  const content = String(body.content || "").trim();
+  const category = String(body.category || "").trim();
+  const published_date = String(body.published_date || "").trim();
+  if (!title || !content || !category || !published_date) return null;
+  return {
+    title,
+    excerpt: body.excerpt ? String(body.excerpt).trim().slice(0, 500) : null,
+    content,
+    category,
+    icon: body.icon ? String(body.icon).trim() : "fa-solid fa-newspaper",
+    author: body.author ? String(body.author).trim() : "تیم فنی شاهکار",
+    read_minutes: body.read_minutes ? parseInt(body.read_minutes, 10) || null : null,
+    is_featured: body.is_featured ? 1 : 0,
+    is_published: body.is_published === false || body.is_published === 0 ? 0 : 1,
+    published_date,
+  };
+}
+
+async function createArticle(request, env) {
+  const raw = await request.json().catch(() => null);
+  if (!raw) return errorResponse("داده نامعتبر است");
+  const a = sanitizeArticleBody(raw);
+  if (!a) return errorResponse("عنوان، متن، دسته‌بندی و تاریخ انتشار الزامی است");
+
+  let slug = generateArticleSlug();
+  for (let i = 0; i < 5; i++) {
+    const existing = await env.DB.prepare("SELECT id FROM articles WHERE slug = ?").bind(slug).first();
+    if (!existing) break;
+    slug = generateArticleSlug();
+  }
+
+  const result = await env.DB.prepare(
+    `INSERT INTO articles (slug, title, excerpt, content, category, icon, author, read_minutes, is_featured, is_published, published_date)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  )
+    .bind(slug, a.title, a.excerpt, a.content, a.category, a.icon, a.author, a.read_minutes, a.is_featured, a.is_published, a.published_date)
+    .run();
+
+  return json({ id: result.meta.last_row_id, slug });
+}
+
+async function updateArticle(id, request, env) {
+  const raw = await request.json().catch(() => null);
+  if (!raw) return errorResponse("داده نامعتبر است");
+  const a = sanitizeArticleBody(raw);
+  if (!a) return errorResponse("عنوان، متن، دسته‌بندی و تاریخ انتشار الزامی است");
+
+  const existing = await env.DB.prepare("SELECT id FROM articles WHERE id = ?").bind(id).first();
+  if (!existing) return errorResponse("مقاله یافت نشد", 404);
+
+  await env.DB.prepare(
+    `UPDATE articles SET title = ?, excerpt = ?, content = ?, category = ?, icon = ?, author = ?,
+       read_minutes = ?, is_featured = ?, is_published = ?, published_date = ?, updated_at = datetime('now')
+     WHERE id = ?`
+  )
+    .bind(a.title, a.excerpt, a.content, a.category, a.icon, a.author, a.read_minutes, a.is_featured, a.is_published, a.published_date, id)
+    .run();
+
+  return json({ ok: true });
+}
+
+async function deleteArticle(id, env) {
+  await env.DB.prepare("DELETE FROM articles WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
 // ---------- دستیار هوشمند (چت متصل به هوش مصنوعی) ----------
 
 const CHAT_SYSTEM_PROMPT = `شما دستیار هوشمند سایت «تعمیرگاه تخصصی شاهکار» هستید.
@@ -398,7 +509,7 @@ export default {
     const method = request.method;
 
     // صفحات پنل مدیریت: نیاز به رمز عبور دارند، بعد فایل استاتیک اصلی سرو می‌شود
-    if (path === "/panel-admin.html" || path === "/panel-customer.html") {
+    if (path === "/panel-admin.html" || path === "/panel-customer.html" || path === "/panel-blog.html") {
       if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
       return env.ASSETS.fetch(request);
     }
@@ -416,7 +527,13 @@ export default {
     const isPublicContact = path === "/api/contact" && method === "POST";
     const isPublicReviews = path === "/api/reviews" && (method === "GET" || method === "POST");
     const isPublicChat = path === "/api/chat" && method === "POST";
-    if (!isPublicRead && !isPublicContact && !isPublicReviews && !isPublicChat) {
+    // مقالات وبلاگ: لیست عمومی و خواندن تک مقاله با اسلاگ (غیر عددی) برای هر بازدیدکننده آزاد است؛
+    // لیست کامل مدیریتی (/api/articles/admin) و ساخت/ویرایش/حذف فقط با رمز عبور مدیر
+    const isPublicArticlesList = path === "/api/articles" && method === "GET";
+    const articleSlugMatch = path.match(/^\/api\/articles\/([^/]+)$/);
+    const isPublicArticleBySlug =
+      !!articleSlugMatch && method === "GET" && !/^\d+$/.test(articleSlugMatch[1]) && articleSlugMatch[1] !== "admin";
+    if (!isPublicRead && !isPublicContact && !isPublicReviews && !isPublicChat && !isPublicArticlesList && !isPublicArticleBySlug) {
       if (!isAuthorized(request, env)) return unauthorizedResponse(!!env.ADMIN_PASSWORD);
     }
 
@@ -461,6 +578,20 @@ export default {
     if (path === "/api/reviews/admin" && method === "GET") return listReviewsAdmin(env);
     if ((m = path.match(/^\/api\/reviews\/(\d+)$/))) {
       if (method === "DELETE") return deleteReview(m[1], env);
+    }
+
+    if (path === "/api/articles" && method === "GET") return listArticlesPublic(env);
+    if (path === "/api/articles" && method === "POST") return createArticle(request, env);
+    if (path === "/api/articles/admin" && method === "GET") return listArticlesAdmin(env);
+
+    if ((m = path.match(/^\/api\/articles\/(\d+)$/))) {
+      if (method === "GET") return getArticleById(m[1], env);
+      if (method === "PUT") return updateArticle(m[1], request, env);
+      if (method === "DELETE") return deleteArticle(m[1], env);
+    }
+
+    if ((m = path.match(/^\/api\/articles\/([^/]+)$/))) {
+      if (method === "GET") return getArticleBySlug(decodeURIComponent(m[1]), env);
     }
 
     if (path === "/api/chat" && method === "POST") return handleChat(request, env);

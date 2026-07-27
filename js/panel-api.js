@@ -125,4 +125,34 @@ const PanelAPI = {
     const res = await fetch(`/api/contact/${id}`, { method: "DELETE" });
     return readPanelResponse(res);
   },
+
+  // ---------- مقالات وبلاگ ----------
+  async listArticlesAdmin() {
+    const res = await fetch("/api/articles/admin");
+    return readPanelResponse(res);
+  },
+  async getArticle(id) {
+    const res = await fetch(`/api/articles/${id}`);
+    return readPanelResponse(res);
+  },
+  async createArticle(data) {
+    const res = await fetch("/api/articles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return readPanelResponse(res);
+  },
+  async updateArticle(id, data) {
+    const res = await fetch(`/api/articles/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return readPanelResponse(res);
+  },
+  async deleteArticle(id) {
+    const res = await fetch(`/api/articles/${id}`, { method: "DELETE" });
+    return readPanelResponse(res);
+  },
 };

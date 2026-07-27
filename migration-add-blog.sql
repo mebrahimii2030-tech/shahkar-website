@@ -1,109 +1,30 @@
 -- =====================================================
--- شماکار | پایگاه‌داده پنل مشتریان و سوابق سرویس خودرو
--- برای اجرا روی Cloudflare D1
+-- مهاجرت: افزودن جدول مقالات وبلاگ (articles) + انتقال ۱۰ مطلب فعلی وبلاگ به دیتابیس
+-- این فایل را در تب Console دیتابیس shamkar-db روی Cloudflare Dashboard اجرا کن
+-- (نه schema.sql کامل، چون آن فایل همه جدول‌ها را DROP می‌کند و داده‌های فعلی مشتریان/پیام‌ها/دیدگاه‌ها را پاک می‌کند).
+-- بعد از اجرای موفق این فایل، صفحه وبلاگ سایت مطالبش را از همین جدول می‌خواند
+-- و می‌توانی از «پنل مدیریت وبلاگ» (panel-blog.html) هر تغییری که خواستی روی آن‌ها اعمال کنی.
 -- =====================================================
 
-DROP TABLE IF EXISTS parts_replaced;
-DROP TABLE IF EXISTS visits;
-DROP TABLE IF EXISTS cars;
-DROP TABLE IF EXISTS customers;
-DROP TABLE IF EXISTS messages;
-DROP TABLE IF EXISTS reviews;
-DROP TABLE IF EXISTS articles;
-
--- مشتری‌ها
-CREATE TABLE customers (
+CREATE TABLE IF NOT EXISTS articles (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  code TEXT UNIQUE NOT NULL,          -- کد یکتای غیرقابل‌حدس برای لینک صفحه اختصاصی
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  phone TEXT,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
--- خودروهای هر مشتری (هر مشتری می‌تواند چند خودرو داشته باشد)
-CREATE TABLE cars (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
-  brand TEXT NOT NULL,
-  model TEXT NOT NULL,
-  year INTEGER,
-  plate TEXT,
-  current_mileage INTEGER,             -- آخرین کارکرد ثبت‌شده خودرو (کیلومتر)، از آخرین مراجعه به‌روزرسانی می‌شود
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
--- مراجعات (هر بار مراجعه مشتری برای یک خودرو، یک رکورد)
-CREATE TABLE visits (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  car_id INTEGER NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
-  visit_date TEXT NOT NULL,           -- تاریخ مراجعه فعلی (شمسی، ذخیره به‌صورت رشته YYYY-MM-DD)
-  complaints TEXT,                    -- ایرادات اعلام‌شده توسط مشتری
-  resolved TEXT,                      -- ایرادات رفع‌شده
-  notes TEXT,                         -- یادداشت آزاد
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
--- قطعات تعویض‌شده در هر مراجعه (هر قطعه موعد بعدی جداگانه دارد)
--- موعد تعویض فقط بر اساس کارکرد (کیلومتر) سنجیده می‌شود، نه تاریخ
-CREATE TABLE parts_replaced (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  visit_id INTEGER NOT NULL REFERENCES visits(id) ON DELETE CASCADE,
-  part_name TEXT NOT NULL,
-  replaced_at_mileage INTEGER,        -- کارکرد خودرو (کیلومتر) در لحظه تعویض این قطعه
-  next_due_mileage INTEGER,           -- کارکردی که باید تا آن، مجدداً برای تعویض مراجعه شود
-  notes TEXT
-);
-
--- پیام‌های ارسالی از فرم تماس با ما
-CREATE TABLE messages (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  phone TEXT,
-  email TEXT,
-  subject TEXT,
-  body TEXT NOT NULL,
-  is_read INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
--- دیدگاه‌های عمومی مشتریان (نام و متن دیدگاه عمومی نمایش داده می‌شود؛
--- شماره تماس فقط برای مدیر سایت قابل مشاهده است)
-CREATE TABLE reviews (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  comment TEXT NOT NULL,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
--- مقالات وبلاگ (قابل مدیریت کامل از پنل مدیریت وبلاگ، بدون نیاز به کدنویسی)
-CREATE TABLE articles (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  slug TEXT UNIQUE NOT NULL,           -- شناسه یکتای داخلی (خودکار تولید می‌شود، نیازی به دست‌زدن نیست)
+  slug TEXT UNIQUE NOT NULL,
   title TEXT NOT NULL,
-  excerpt TEXT,                        -- خلاصه کوتاه که در کارت لیست وبلاگ نشان داده می‌شود
-  content TEXT NOT NULL,               -- متن کامل مقاله؛ هر پاراگراف با یک خط خالی از بعدی جدا می‌شود
-  category TEXT NOT NULL,              -- نام دسته‌بندی (هر متن دلخواه؛ دسته‌بندی‌های سایدبار خودکار از این مقادیر ساخته می‌شود)
-  icon TEXT NOT NULL DEFAULT 'fa-solid fa-newspaper',  -- کلاس آیکون Font Awesome برای نمایش
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  category TEXT NOT NULL,
+  icon TEXT NOT NULL DEFAULT 'fa-solid fa-newspaper',
   author TEXT,
   read_minutes INTEGER,
-  is_featured INTEGER NOT NULL DEFAULT 0,  -- ۱ یعنی «مطلب ویژه» بالای وبلاگ
-  is_published INTEGER NOT NULL DEFAULT 1, -- ۰ یعنی پیش‌نویس؛ فقط در پنل مدیریت دیده می‌شود، نه در سایت
-  published_date TEXT NOT NULL,        -- تاریخ انتشار، ذخیره میلادی (YYYY-MM-DD)، ورودی/نمایش همیشه شمسی
+  is_featured INTEGER NOT NULL DEFAULT 0,
+  is_published INTEGER NOT NULL DEFAULT 1,
+  published_date TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
-CREATE INDEX idx_cars_customer ON cars(customer_id);
-CREATE INDEX idx_visits_car ON visits(car_id);
-CREATE INDEX idx_parts_visit ON parts_replaced(visit_id);
-CREATE INDEX idx_parts_next_mileage ON parts_replaced(next_due_mileage);
-CREATE INDEX idx_customers_code ON customers(code);
-CREATE INDEX idx_messages_created ON messages(created_at);
-CREATE INDEX idx_reviews_created ON reviews(created_at);
-CREATE INDEX idx_articles_slug ON articles(slug);
-CREATE INDEX idx_articles_published ON articles(is_published, published_date);
+CREATE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug);
+CREATE INDEX IF NOT EXISTS idx_articles_published ON articles(is_published, published_date);
 
 -- ده مطلبی که همین الان به‌صورت ثابت در blog.html نوشته شده بودند، اینجا به‌عنوان
 -- داده اولیه ثبت می‌شوند تا از همون اول در پنل مدیریت وبلاگ قابل ویرایش/حذف باشند.

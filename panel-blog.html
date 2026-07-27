@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>پنل مدیریت وبلاگ | تعمیرگاه تخصصی شاهکار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+    <link rel="stylesheet" href="css/panel-blog.css" />
+  </head>
+  <body class="panel-body">
+    <div class="panel-topbar">
+      <div class="panel-topbar__brand">
+        <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
+        <div class="panel-topbar__title">پنل مدیریت <span>وبلاگ</span></div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">پنل مشتریان</a>
+        <a href="index.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">بازگشت به سایت</a>
+      </div>
+    </div>
+
+    <div class="panel-wrap">
+      <!-- خلاصه وضعیت -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h2>وضعیت کلی وبلاگ</h2>
+        </div>
+        <div id="blog-summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
+      </div>
+
+      <!-- افزودن/ویرایش مقاله -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h3 id="form-title">افزودن مقاله جدید</h3>
+          <button type="button" class="btn btn-ghost" id="new-article-btn" hidden>+ مقاله جدید</button>
+        </div>
+
+        <form id="article-form">
+          <input type="hidden" name="id" />
+
+          <div class="form-grid form-grid--full">
+            <div class="field">
+              <label>عنوان مقاله</label>
+              <input type="text" name="title" required placeholder="مثلاً: چرا چراغ چک انجین روشن می‌شود؟" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>دسته‌بندی</label>
+              <input type="text" name="category" list="category-options" required placeholder="مثلاً: تعمیر موتور" />
+              <datalist id="category-options"></datalist>
+            </div>
+            <div class="field">
+              <label>آیکون نمایشی</label>
+              <select name="icon" id="icon-select">
+                <option value="fa-solid fa-newspaper">📰 مقاله عمومی</option>
+                <option value="fa-solid fa-lightbulb">💡 چراغ / چک انجین</option>
+                <option value="fa-solid fa-gears">⚙️ گیربکس</option>
+                <option value="fa-solid fa-car-battery">🔋 باتری خودرو</option>
+                <option value="fa-solid fa-oil-can">🛢️ روغن</option>
+                <option value="fa-solid fa-list-check">✅ چک‌لیست</option>
+                <option value="fa-solid fa-volume-high">🔊 صدا</option>
+                <option value="fa-solid fa-bolt">⚡ برق / جرقه</option>
+                <option value="fa-solid fa-magnifying-glass-dollar">🔍 راهنمای خرید</option>
+                <option value="fa-solid fa-triangle-exclamation">⚠️ هشدار</option>
+                <option value="fa-solid fa-flask">🧪 آزمایشگاهی</option>
+                <option value="fa-solid fa-car">🚗 خودرو</option>
+                <option value="fa-solid fa-wrench">🔧 تعمیر</option>
+                <option value="fa-solid fa-shield-halved">🛡️ ایمنی</option>
+                <option value="fa-solid fa-road">🛣️ جاده و سفر</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--full">
+            <div class="field">
+              <label>خلاصه مطلب (در کارت لیست وبلاگ نشان داده می‌شود)</label>
+              <textarea name="excerpt" placeholder="یک یا دو جمله کوتاه که خلاصه مطلب را نشان دهد؛ اگر خالی بگذاری، خودکار از ابتدای متن ساخته می‌شود."></textarea>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--full">
+            <div class="field">
+              <label>متن کامل مقاله</label>
+              <textarea name="content" class="tall" required placeholder="متن مقاله را اینجا بنویس. برای شروع پاراگراف جدید، فقط یک خط خالی رد کن و ادامه بده."></textarea>
+              <p class="field-hint">هر پاراگراف را با یک خط خالی از پاراگراف بعدی جدا کن؛ نیازی به کد یا تگ HTML نیست.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>نویسنده</label>
+              <input type="text" name="author" placeholder="تیم فنی شاهکار" />
+            </div>
+            <div class="field">
+              <label>زمان مطالعه (دقیقه)</label>
+              <input type="number" name="read_minutes" min="1" max="60" placeholder="مثلاً 4" />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>تاریخ انتشار (شمسی)</label>
+              <input type="text" name="published_date" required placeholder="1404/05/20" />
+            </div>
+            <div class="field">
+              <label>وضعیت</label>
+              <div class="checkbox-row">
+                <label class="checkbox-field"><input type="checkbox" name="is_published" checked /> منتشر شود (در وبلاگ سایت دیده شود)</label>
+                <label class="checkbox-field"><input type="checkbox" name="is_featured" /> به‌عنوان «مطلب ویژه» بالای وبلاگ نمایش داده شود</label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; display:flex; gap:10px;">
+            <button type="submit" class="btn btn-primary" id="article-submit-btn">ثبت مقاله</button>
+            <button type="button" class="btn btn-ghost" id="cancel-edit-btn" hidden>انصراف از ویرایش</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- لیست مقالات -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h3>همه مقالات</h3>
+          <input
+            id="search-box"
+            type="text"
+            placeholder="جستجوی عنوان یا دسته‌بندی..."
+            style="border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 14px; font-family:var(--font-family);"
+          />
+        </div>
+        <table class="customers-table">
+          <thead>
+            <tr>
+              <th>مقاله</th>
+              <th>دسته‌بندی</th>
+              <th>تاریخ انتشار</th>
+              <th>وضعیت</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="articles-tbody">
+            <tr><td colspan="5" class="empty-state">در حال بارگذاری...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="js/jalali.js"></script>
+    <script src="js/panel-api.js"></script>
+    <script src="js/panel-blog.js"></script>
+  </body>
+</html>

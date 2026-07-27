@@ -1,0 +1,64 @@
+/* =====================================================
+   شماکار | استایل‌های اختصاصی پنل مدیریت وبلاگ
+   مکمل panel.css؛ فقط موارد خاص همین صفحه اینجا اضافه شده
+===================================================== */
+
+.field textarea.tall {
+  min-height: 220px;
+}
+
+.field-hint {
+  margin: 6px 2px 0;
+  font-size: var(--fs-xs);
+  color: var(--gray-400);
+}
+
+.checkbox-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--gray-700);
+  cursor: pointer;
+}
+
+.checkbox-field input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--secondary);
+  cursor: pointer;
+}
+
+.status-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.article-title-cell {
+  max-width: 320px;
+}
+
+.article-title-cell .article-excerpt {
+  display: block;
+  color: var(--gray-400);
+  font-size: var(--fs-xs);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .article-title-cell {
+    max-width: 180px;
+  }
+}

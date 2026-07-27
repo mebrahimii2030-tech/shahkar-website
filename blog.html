@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>وبلاگ | تعمیرگاه تخصصی شاهکار</title>
+
+<meta name="description" content="مجله تخصصی تعمیرگاه شاهکار؛ مقالات کاربردی درباره تعمیر موتور، گیربکس، برق خودرو و نگهداری دوره‌ای، برای اینکه با خیال راحت‌تری رانندگی کنید.">
+
+<link rel="stylesheet" href="css/variables.css" />
+<link rel="stylesheet" href="css/animations.css" />
+<link rel="stylesheet" href="css/utilities.css" />
+<link rel="stylesheet" href="css/style.css">
+<noscript><style>body{opacity:1 !important;}</style></noscript>
+<link rel="stylesheet" href="css/menu.css" />
+<link rel="stylesheet" href="css/footer.css">
+<link rel="stylesheet" href="css/blog.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link rel="stylesheet" href="css/responsive-fix.css" />
+<link rel="stylesheet" href="css/scroll-nav.css" />
+</head>
+
+<body>
+
+<div id="header"></div>
+
+
+
+<main>
+
+<section class="service-hero">
+  <div class="container">
+    <span class="section-badge">مجله شاهکار</span>
+    <h1>وبلاگ تعمیرگاه شاهکار</h1>
+    <p class="hero-lead">مقالات کاربردی و ساده درباره نگهداری، عیب‌یابی و تعمیر خودرو؛ نوشته‌شده توسط تیم فنی شاهکار تا قبل از مراجعه حضوری، تصویر روشنی از مشکل و راه‌حل آن داشته باشید.</p>
+  </div>
+</section>
+
+<section class="blog-content">
+  <div class="container">
+    <div class="blog-layout">
+
+      <div class="blog-main">
+
+        <div class="blog-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="blog-search-input" placeholder="جستجو در مطالب وبلاگ..." autocomplete="off">
+        </div>
+
+        <!-- پست ویژه (به‌صورت خودکار از دیتابیس پر می‌شود) -->
+        <article class="blog-featured" id="blog-featured-slot" hidden></article>
+
+        <div class="blog-list" id="blog-list"></div>
+
+        <p class="blog-loading" id="blog-loading">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          در حال بارگذاری مطالب وبلاگ...
+        </p>
+
+        <p class="blog-empty" id="blog-empty" hidden>
+          <i class="fa-solid fa-magnifying-glass"></i>
+          مطلبی با این مشخصات پیدا نشد. عبارت جستجو یا دسته‌بندی را تغییر دهید.
+        </p>
+
+      </div>
+
+      <aside class="blog-sidebar">
+
+        <div class="sidebar-box">
+          <h3><i class="fa-solid fa-list"></i> دسته‌بندی‌ها</h3>
+          <ul class="sidebar-categories" id="sidebar-categories">
+            <li><button class="cat-btn is-active" data-category="all" type="button">همه مطالب <span id="cat-count-all">۰</span></button></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-box">
+          <h3><i class="fa-solid fa-clock-rotate-left"></i> جدیدترین مطالب</h3>
+          <ul class="sidebar-popular" id="sidebar-latest"></ul>
+        </div>
+
+        <div class="sidebar-cta">
+          <i class="fa-solid fa-headset"></i>
+          <h3>سوالی درباره خودروتون دارید؟</h3>
+          <p>کارشناسان شاهکار آماده پاسخ‌گویی و راهنمایی رایگان هستند.</p>
+          <a href="tel:09191389418" class="btn-primary"><i class="fa-solid fa-phone"></i> تماس تلفنی</a>
+        </div>
+
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+
+<!-- دستیار هوشمند شاهکار -->
+<div class="ai-chat" id="ai-chat">
+
+  <button type="button" class="ai-chat-launcher" id="ai-chat-launcher" aria-expanded="false">
+    <i class="fa-solid fa-comment-dots"></i>
+    <span>سوال دارید؟ بپرسید</span>
+  </button>
+
+  <div class="ai-chat-window" id="ai-chat-window" hidden>
+
+    <div class="ai-chat-head">
+      <div>
+        <strong>دستیار هوشمند شاهکار</strong>
+        <span>پاسخ‌گوی سوالات شما درباره تعمیر خودرو</span>
+      </div>
+      <button type="button" class="ai-chat-close" id="ai-chat-close" aria-label="بستن">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="ai-chat-messages" id="ai-chat-messages">
+      <div class="ai-msg ai-msg--bot">
+        سلام! من دستیار هوشمند شاهکارم. هر سوالی درباره خدمات، قیمت‌ها یا مشکل خودروت داری بپرس.
+      </div>
+    </div>
+
+    <form class="ai-chat-form" id="ai-chat-form">
+      <input type="text" id="ai-chat-input" placeholder="سوالت رو بنویس..." autocomplete="off" maxlength="500" required>
+      <button type="submit" aria-label="ارسال"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<div id="footer"></div>
+
+<script src="js/jalali.js"></script>
+<script src="js/blog.js"></script>
+<script src="js/ai-chat.js"></script>
+
+<script src="js/menu.js"></script>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script src="js/scroll-nav.js"></script>
+
+</body>
+
+</html>

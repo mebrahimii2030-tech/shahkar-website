@@ -7,7 +7,7 @@
   "assets": {
     "directory": "./",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/panel-admin.html", "/panel-customer.html"]
+    "run_worker_first": ["/api/*", "/panel-admin.html", "/panel-customer.html", "/panel-blog.html"]
   },
 
   "d1_databases": [
