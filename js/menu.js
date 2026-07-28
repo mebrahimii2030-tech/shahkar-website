@@ -54,18 +54,54 @@ function initMenu() {
 
   overlay?.addEventListener("click", closeMenu);
 
-  document.querySelectorAll(".side-item").forEach((link) => {
+  // زیرمنوی «خدمات»: باز/بسته شدن با کلیک روی فلش، بدون این‌که کل منو بسته شود
+  document.querySelectorAll(".side-submenu-toggle").forEach((toggleBtn) => {
+    toggleBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const group = toggleBtn.closest(".side-item-group");
+      if (!group) return;
+      const isOpen = group.classList.toggle("open");
+      toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  });
+
+  // لینک‌های واقعی (که به یک صفحه می‌روند): روی موبایل بعد از کلیک، منو بسته شود
+  document.querySelectorAll(".side-item:not(.side-item-parent), .side-item-link, .side-subitem").forEach((link) => {
     link.addEventListener("click", () => {
       if (isMobile()) closeMenu();
     });
   });
 
-  // Highlight the active page link
+  // Highlight the active page link (هم آیتم‌های اصلی، هم زیرمنوی خدمات)
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
-  document.querySelectorAll(".side-item").forEach((link) => {
+
+  document.querySelectorAll(".side-item:not(.side-item-parent)").forEach((link) => {
     const href = link.getAttribute("href");
     if (href === currentPage) {
       link.classList.add("active");
+    }
+  });
+
+  document.querySelectorAll(".side-item-link").forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href === currentPage) {
+      link.closest(".side-item-parent")?.classList.add("active");
+    }
+  });
+
+  document.querySelectorAll(".side-subitem").forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href === currentPage) {
+      link.classList.add("active");
+      const group = link.closest(".side-item-group");
+      if (group) {
+        group.classList.add("open");
+        const parentItem = group.querySelector(".side-item-parent");
+        const toggleBtn = group.querySelector(".side-submenu-toggle");
+        parentItem?.classList.add("active");
+        toggleBtn?.setAttribute("aria-expanded", "true");
+      }
     }
   });
 }

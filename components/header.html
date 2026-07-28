@@ -22,10 +22,51 @@
           <span class="side-icon"><i class="fa-solid fa-house"></i></span>
           <span class="side-label">خانه</span>
         </a>
-        <a href="services.html" class="side-item">
-          <span class="side-icon"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-          <span class="side-label">خدمات</span>
-        </a>
+
+        <div class="side-item-group" id="servicesGroup">
+          <div class="side-item side-item-parent">
+            <a href="services.html" class="side-item-link">
+              <span class="side-icon"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+              <span class="side-label">خدمات</span>
+            </a>
+            <button
+              type="button"
+              class="side-submenu-toggle"
+              aria-expanded="false"
+              aria-controls="servicesSubmenu"
+              aria-label="نمایش زیرمنوی خدمات"
+            >
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+          </div>
+          <div class="side-submenu" id="servicesSubmenu">
+            <a href="engine.html" class="side-subitem">
+              <span class="side-subitem-icon"><i class="fa-solid fa-wrench"></i></span>
+              <span class="side-label">تعمیر موتور</span>
+            </a>
+            <a href="gearbox.html" class="side-subitem">
+              <span class="side-subitem-icon"><i class="fa-solid fa-gears"></i></span>
+              <span class="side-label">گیربکس</span>
+            </a>
+            <a href="electrical.html" class="side-subitem">
+              <span class="side-subitem-icon"><i class="fa-solid fa-car-battery"></i></span>
+              <span class="side-label">برق خودرو</span>
+            </a>
+            <a href="suspension.html" class="side-subitem">
+              <span class="side-subitem-icon"><i class="fa-solid fa-car-side"></i></span>
+              <span class="side-label">جلوبندی</span>
+            </a>
+            <a href="maintenance.html" class="side-subitem">
+              <span class="side-subitem-icon"><i class="fa-solid fa-oil-can"></i></span>
+              <span class="side-label">سرویس دوره‌ای</span>
+            </a>
+            <a href="diagnostics.html" class="side-subitem">
+              <span class="side-subitem-icon"><i class="fa-solid fa-laptop-code"></i></span>
+              <span class="side-label">دیاگ تخصصی</span>
+            </a>
+          </div>
+        </div>
+
         <a href="gallery.html" class="side-item">
           <span class="side-icon"><i class="fa-solid fa-images"></i></span>
           <span class="side-label">نمونه کارها</span>
@@ -44,6 +85,10 @@
         <a href="faq.html" class="side-item">
           <span class="side-icon"><i class="fa-solid fa-circle-question"></i></span>
           <span class="side-label">سوالات</span>
+        </a>
+        <a href="about.html" class="side-item">
+          <span class="side-icon"><i class="fa-solid fa-circle-info"></i></span>
+          <span class="side-label">درباره ما</span>
         </a>
         <a href="contact.html" class="side-item">
           <span class="side-icon"><i class="fa-solid fa-phone"></i></span>

@@ -259,6 +259,118 @@
   white-space: nowrap;
 }
 
+/* ---------- زیرمنوی آکاردئونی (خدمات) ---------- */
+
+.side-item-group {
+  position: relative;
+}
+
+.side-item-parent {
+  padding: 0;
+  gap: 0;
+}
+
+.side-item-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.side-submenu-toggle {
+  width: 44px;
+  height: 60px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--side-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease 0.05s, color 0.2s ease;
+}
+
+.side-menu.expanded .side-submenu-toggle,
+.side-menu:hover .side-submenu-toggle,
+.side-menu:focus-within .side-submenu-toggle {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.side-menu.force-collapsed .side-submenu-toggle {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.side-submenu-toggle i {
+  font-size: 13px;
+  transition: transform 0.25s ease;
+}
+
+.side-submenu-toggle:hover {
+  color: var(--secondary);
+}
+
+.side-item-group.open .side-submenu-toggle i {
+  transform: rotate(180deg);
+}
+
+.side-submenu {
+  max-height: 0;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+  transition: max-height 0.3s ease;
+}
+
+.side-item-group.open .side-submenu {
+  max-height: 320px;
+}
+
+/* وقتی کل ساید‌بار جمع‌شده (فقط آیکون)، زیرمنو هم باید بسته بماند
+   تا با باز شدنش، ارتفاع منو به‌هم نریزد */
+.side-menu:not(.expanded):not(:hover):not(:focus-within) .side-submenu,
+.side-menu.force-collapsed .side-submenu {
+  max-height: 0 !important;
+}
+
+.side-subitem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 46px;
+  padding: 0 16px;
+  text-decoration: none;
+  color: var(--side-text);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.side-subitem:hover,
+.side-subitem.active {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--secondary);
+}
+
+.side-subitem-icon {
+  flex-shrink: 0;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
 .side-item-cta:hover {
   background: var(--secondary-dark);
   color: var(--white);
