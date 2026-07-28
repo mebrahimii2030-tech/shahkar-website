@@ -86,7 +86,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
 <div class="about-image">
 
-<img src="assets/images/about.webp" alt="تعمیرگاه شاهکار">
+<img src="assets/images/about.webp" alt="تعمیرگاه شاهکار" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+<div class="about-image-fallback">
+<i class="fa-solid fa-warehouse"></i>
+<span>به‌زودی تصویری واقعی از تعمیرگاه اینجا قرار می‌گیرد</span>
+</div>
 
 </div>
 
@@ -265,7 +270,17 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
         <img src="assets/images/brands.webp"
              alt="برندهای تحت پوشش"
-             class="brands-image">
+             class="brands-image"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+        <div class="brands-fallback">
+            <div class="brands-fallback-icons">
+                <i class="fa-solid fa-car"></i>
+                <i class="fa-solid fa-car-side"></i>
+                <i class="fa-solid fa-truck-pickup"></i>
+            </div>
+            <span>پذیرای انواع خودروهای داخلی و خارجی</span>
+        </div>
 
     </div>
 

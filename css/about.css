@@ -1,4 +1,27 @@
 /* ==========================
+   PAGE THEME
+   این صفحه (فقط about.html) از ابتدا برای متن روشن روی پس‌زمینه‌ی
+   تیره طراحی شده بود (رنگ‌های #fff, #c7c7c7 و ...)، ولی پس‌زمینه‌ی
+   واقعی صفحه هیچ‌جا ست نشده بود؛ در نتیجه متن روشن روی پس‌زمینه‌ی
+   سفید سایت (body { background: var(--white) } در style.css) کاملاً
+   محو می‌شد. این قانون کل صفحه را روی همان تم تیره‌ای که هدر و کارت‌های
+   شیشه‌ای (backdrop-blur) برایش طراحی شده بودند می‌گذارد. چون این فایل
+   فقط در about.html لود می‌شود، روی بقیه‌ی صفحات سایت اثری ندارد.
+========================== */
+
+body {
+  background: linear-gradient(180deg, #0b1120 0%, var(--primary) 6%, var(--primary) 100%);
+}
+
+.about-story,
+.why-us,
+.mission,
+.brands-section,
+.about-cta {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* ==========================
    ABOUT HERO
 ========================== */
 
@@ -78,6 +101,34 @@ ABOUT STORY
   border-radius: 30px;
   display: block;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+}
+
+.about-image-fallback {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 380px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 179, 0, 0.14), transparent 55%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  padding: 30px;
+  text-align: center;
+}
+
+.about-image-fallback i {
+  font-size: 56px;
+  color: #ffb300;
+}
+
+.about-image-fallback span {
+  color: #9aa5b1;
+  font-size: 15px;
+  max-width: 260px;
+  line-height: 1.9;
 }
 
 .about-content h2 {
@@ -249,6 +300,37 @@ BRANDS
 .brands-image {
   width: 100%;
   border-radius: 24px;
+}
+
+.brands-fallback {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  min-height: 180px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 179, 0, 0.1), transparent 60%),
+    rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  padding: 36px 30px;
+}
+
+.brands-fallback-icons {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.brands-fallback-icons i {
+  font-size: 32px;
+  color: #ffb300;
+}
+
+.brands-fallback span {
+  color: #9aa5b1;
+  font-size: 15px;
 }
 
 /* ==========================
