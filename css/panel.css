@@ -745,6 +745,109 @@
   min-height: 18px;
 }
 
+.login-info {
+  color: var(--info);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  padding: 10px 14px;
+  margin: -6px 0 18px;
+}
+
+.login-info:empty {
+  display: none;
+}
+
+/* ---------- بنر امنیتی داشبورد (زمان آخرین ورود / هشدار ورود مشکوک) ---------- */
+
+.security-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: var(--gray-700);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin: 0 0 20px;
+  font-size: var(--fs-sm);
+  line-height: 1.8;
+}
+
+.security-banner i {
+  color: var(--info);
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.security-banner strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--gray-900);
+}
+
+.security-banner--suspicious {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.security-banner--suspicious i {
+  color: var(--danger);
+}
+
+/* ---------- هشدار خروج خودکار به‌دلیل عدم فعالیت ---------- */
+
+.idle-warning-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.idle-warning-box {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.idle-warning-box i {
+  font-size: 32px;
+  color: var(--secondary);
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.idle-warning-box h3 {
+  margin: 0 0 8px;
+  font-size: var(--fs-lg);
+  color: var(--gray-900);
+}
+
+.idle-warning-box p {
+  color: var(--gray-600);
+  font-size: var(--fs-sm);
+  margin: 0 0 20px;
+}
+
+.idle-warning-box #idle-countdown {
+  font-weight: 900;
+  color: var(--danger);
+}
+
+.idle-warning-box .btn {
+  width: 100%;
+  justify-content: center;
+}
+
 .login-submit {
   width: 100%;
   justify-content: center;

@@ -20,11 +20,18 @@
       <form class="login-card" id="login-form" autocomplete="off">
         <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
         <h1>ورود به پنل مدیریت</h1>
-        <p>برای ادامه، رمز عبور مدیریت را وارد کنید.</p>
+        <p>برای ادامه، نام کاربری و رمز عبور مدیریت را وارد کنید.</p>
+
+        <div class="login-info" id="login-info"></div>
+
+        <div class="login-field">
+          <label for="login-username">نام کاربری</label>
+          <input type="text" id="login-username" name="username" required autofocus autocomplete="username" />
+        </div>
 
         <div class="login-field">
           <label for="login-password">رمز عبور</label>
-          <input type="password" id="login-password" name="password" required autofocus />
+          <input type="password" id="login-password" name="password" required autocomplete="current-password" />
         </div>
 
         <div class="login-error" id="login-error"></div>
@@ -36,9 +43,16 @@
     <script>
       (function () {
         const form = document.getElementById("login-form");
+        const usernameInput = document.getElementById("login-username");
         const input = document.getElementById("login-password");
         const errorEl = document.getElementById("login-error");
+        const infoEl = document.getElementById("login-info");
         const submitBtn = document.getElementById("login-submit");
+
+        const reason = new URLSearchParams(window.location.search).get("reason");
+        if (reason === "idle") {
+          infoEl.textContent = "به‌دلیل عدم فعالیت طولانی، به‌صورت خودکار از پنل خارج شدید. لطفاً دوباره وارد شوید.";
+        }
 
         function allowedNextPath(path) {
           const allowed = [
@@ -59,8 +73,9 @@
         form.addEventListener("submit", async function (event) {
           event.preventDefault();
           errorEl.textContent = "";
+          const username = usernameInput.value.trim();
           const password = input.value;
-          if (!password) return;
+          if (!username || !password) return;
 
           submitBtn.disabled = true;
           submitBtn.textContent = "در حال بررسی...";
@@ -69,7 +84,7 @@
             const res = await fetch("/api/admin/login", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ password }),
+              body: JSON.stringify({ username, password }),
             });
             const data = await res.json().catch(() => null);
 

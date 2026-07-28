@@ -77,25 +77,98 @@ function unauthorizedApiResponse() {
   return errorResponse("دسترسی غیرمجاز. لطفاً دوباره وارد پنل مدیریت شوید.", 401);
 }
 
+// ---------- تاریخچه ورود مدیر (ثبت زمان ورود + تشخیص ورود مشکوک) ----------
+
+function getClientIp(request) {
+  return request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "نامشخص";
+}
+
+function getUserAgent(request) {
+  return (request.headers.get("User-Agent") || "نامشخص").slice(0, 300);
+}
+
+// جدول admin_logins ممکن است روی دیتابیس‌های قدیمی‌تر که هنوز مهاجرت
+// migration-add-admin-security.sql را اجرا نکرده‌اند وجود نداشته باشد؛
+// به همین دلیل همه‌ی توابع این بخش خطا را می‌بلعند تا ورود به پنل مختل نشود.
+
+async function recordLoginAttempt(env, { username, ip, userAgent, success, isSuspicious }) {
+  try {
+    await env.DB.prepare(
+      "INSERT INTO admin_logins (username, ip, user_agent, success, is_suspicious) VALUES (?, ?, ?, ?, ?)"
+    )
+      .bind(username || "", ip, userAgent, success ? 1 : 0, isSuspicious ? 1 : 0)
+      .run();
+  } catch (_) {
+    // بدون جدول مهاجرت‌نشده، فقط از ثبت تاریخچه صرف‌نظر می‌کنیم
+  }
+}
+
+async function getRecentSuccessfulLogins(env, limit = 2) {
+  try {
+    const { results } = await env.DB.prepare(
+      "SELECT username, ip, user_agent, is_suspicious, created_at FROM admin_logins WHERE success = 1 ORDER BY created_at DESC, id DESC LIMIT ?"
+    )
+      .bind(limit)
+      .all();
+    return results || [];
+  } catch (_) {
+    return [];
+  }
+}
+
+async function handleAdminSecurityInfo(env) {
+  const rows = await getRecentSuccessfulLogins(env, 2);
+  const current = rows[0] || null;
+  const previous = rows[1] || null;
+  return json({
+    lastLogin: current ? current.created_at : null,
+    lastLoginIp: current ? current.ip : null,
+    suspicious: current ? !!current.is_suspicious : false,
+    previousLogin: previous ? previous.created_at : null,
+  });
+}
+
 async function handleAdminLogin(request, env) {
-  if (!env.ADMIN_PASSWORD) {
+  if (!env.ADMIN_USERNAME || !env.ADMIN_PASSWORD) {
     return errorResponse(
-      "دسترسی به پنل مدیریت پیکربندی نشده است. متغیر ADMIN_PASSWORD را در Settings پروژه Worker تعریف کنید.",
+      "دسترسی به پنل مدیریت پیکربندی نشده است. متغیرهای ADMIN_USERNAME و ADMIN_PASSWORD را در Settings پروژه Worker تعریف کنید.",
       503
     );
   }
   const body = await request.json().catch(() => null);
+  const username = body && typeof body.username === "string" ? body.username.trim() : "";
   const password = body && typeof body.password === "string" ? body.password : "";
-  if (password !== env.ADMIN_PASSWORD) {
-    return errorResponse("رمز عبور اشتباه است.", 401);
+  const ip = getClientIp(request);
+  const userAgent = getUserAgent(request);
+
+  if (username !== env.ADMIN_USERNAME || password !== env.ADMIN_PASSWORD) {
+    await recordLoginAttempt(env, { username: username || "(خالی)", ip, userAgent, success: false, isSuspicious: false });
+    return errorResponse("نام کاربری یا رمز عبور اشتباه است.", 401);
   }
+
+  // ورود موفق قبلی را قبل از ثبت ورود فعلی می‌خوانیم تا بشود آدرس آن را با آدرس فعلی مقایسه کرد
+  const previousLogins = await getRecentSuccessfulLogins(env, 1);
+  const previousLogin = previousLogins[0] || null;
+  const isSuspicious = !!(previousLogin && previousLogin.ip && previousLogin.ip !== "نامشخص" && previousLogin.ip !== ip);
+
+  await recordLoginAttempt(env, { username, ip, userAgent, success: true, isSuspicious });
+
   const cookieValue = await createSessionCookieValue(env);
   const headers = new Headers({ "Content-Type": "application/json; charset=utf-8" });
   headers.append(
     "Set-Cookie",
     `${SESSION_COOKIE_NAME}=${encodeURIComponent(cookieValue)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_MAX_AGE_SECONDS}`
   );
-  return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      security: {
+        lastLogin: previousLogin ? previousLogin.created_at : null,
+        suspicious: isSuspicious,
+      },
+    }),
+    { status: 200, headers }
+  );
 }
 
 function handleAdminLogout() {
@@ -665,6 +738,7 @@ export default {
 
     if (path === "/api/admin/login" && method === "POST") return handleAdminLogin(request, env);
     if (path === "/api/admin/logout" && method === "POST") return handleAdminLogout();
+    if (path === "/api/admin/security" && method === "GET") return handleAdminSecurityInfo(env);
 
     return errorResponse("مسیر یافت نشد", 404);
   },

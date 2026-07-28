@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS customers;
 DROP TABLE IF EXISTS messages;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS articles;
+DROP TABLE IF EXISTS admin_logins;
 
 -- مشتری‌ها
 CREATE TABLE customers (
@@ -95,6 +96,17 @@ CREATE TABLE articles (
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- تاریخچه ورود به پنل مدیریت (برای ثبت زمان آخرین ورود و تشخیص ورود مشکوک)
+CREATE TABLE admin_logins (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT NOT NULL,
+  ip TEXT,
+  user_agent TEXT,
+  success INTEGER NOT NULL DEFAULT 1,     -- ۰ یعنی تلاش ناموفق (رمز/یوزرنیم اشتباه)
+  is_suspicious INTEGER NOT NULL DEFAULT 0, -- ۱ یعنی این ورود از آدرس اینترنتی متفاوت نسبت به ورود موفق قبلی بوده
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE INDEX idx_cars_customer ON cars(customer_id);
 CREATE INDEX idx_visits_car ON visits(car_id);
 CREATE INDEX idx_parts_visit ON parts_replaced(visit_id);
@@ -104,6 +116,8 @@ CREATE INDEX idx_messages_created ON messages(created_at);
 CREATE INDEX idx_reviews_created ON reviews(created_at);
 CREATE INDEX idx_articles_slug ON articles(slug);
 CREATE INDEX idx_articles_published ON articles(is_published, published_date);
+CREATE INDEX idx_admin_logins_created ON admin_logins(created_at);
+CREATE INDEX idx_admin_logins_username ON admin_logins(username);
 
 -- ده مطلبی که همین الان به‌صورت ثابت در blog.html نوشته شده بودند، اینجا به‌عنوان
 -- داده اولیه ثبت می‌شوند تا از همون اول در پنل مدیریت وبلاگ قابل ویرایش/حذف باشند.
