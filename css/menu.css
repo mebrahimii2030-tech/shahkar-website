@@ -554,4 +554,96 @@ body {
   .side-menu:focus-within .side-item-cta {
     height: 46px;
   }
+
+  /* ---------- تبدیل ریل آیکون به کشوی کاملاً مخفی (Off-canvas Drawer)
+     در گوشی، خود ریل هیچ فضایی از صفحه نمی‌گیرد (حتی جمع‌شده)؛ فقط
+     پنل داخلی (side-menu-inner) با کلیک از راست به داخل صفحه می‌لغزد ---------- */
+
+  body {
+    padding-right: 0;
+  }
+
+  .side-menu,
+  .side-menu.expanded {
+    width: 0 !important;
+  }
+
+  .side-menu-inner {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--side-expanded);
+    max-width: 86vw;
+    height: 100vh;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .side-menu.expanded .side-menu-inner {
+    transform: translateX(0);
+  }
+
+  /* دستگیره‌ی فلش: چون خود side-menu دیگر ترنسفورم/عرضی ندارد، همین
+     همیشه با position:fixed نسبت به کل صفحه (نه پنل کشویی) میخکوب
+     می‌ماند و حتی وقتی کشو کاملاً بسته است، دیده و قابل لمس است */
+  .side-menu-arrow {
+    position: fixed;
+    top: 50%;
+    left: auto;
+    right: 6px;
+    transform: translateY(-50%);
+  }
+
+  .side-menu.expanded .side-menu-arrow {
+    right: min(var(--side-expanded), 86vw);
+  }
+}
+
+/* ---------- دکمه‌ی همبرگری شناور بالای صفحه (فقط موبایل) ---------- */
+
+.mobile-top-toggle {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .mobile-top-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: var(--side-bg);
+    color: #fff;
+    font-size: 17px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    z-index: 10001;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .mobile-top-toggle:active {
+    transform: scale(0.93);
+  }
+
+  .mobile-top-toggle .fa-xmark {
+    display: none;
+  }
+
+  .mobile-top-toggle.is-open .fa-bars {
+    display: none;
+  }
+
+  .mobile-top-toggle.is-open .fa-xmark {
+    display: inline;
+  }
+
+  .mobile-top-toggle.is-open {
+    background: var(--secondary);
+    color: var(--primary);
+  }
 }

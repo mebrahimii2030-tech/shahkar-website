@@ -2,6 +2,7 @@ function initMenu() {
   const sideMenu = document.getElementById("sideMenu");
   const menuToggle = document.getElementById("menuToggle");
   const menuArrow = document.getElementById("menuArrow");
+  const mobileMenuToggle = document.getElementById("mobileMenuToggle");
   const overlay = document.getElementById("sideMenuOverlay");
 
   if (!sideMenu || !menuToggle) return;
@@ -10,12 +11,19 @@ function initMenu() {
     return window.innerWidth <= 640;
   }
 
+  function syncMobileToggleState(isOpen) {
+    if (!mobileMenuToggle) return;
+    mobileMenuToggle.classList.toggle("is-open", isOpen);
+    mobileMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  }
+
   function openMenu() {
     sideMenu.classList.add("expanded");
     if (isMobile()) {
       overlay?.classList.add("show");
       document.body.style.overflow = "hidden";
     }
+    syncMobileToggleState(true);
   }
 
   function closeMenu() {
@@ -23,6 +31,7 @@ function initMenu() {
     sideMenu.classList.add("force-collapsed");
     overlay?.classList.remove("show");
     document.body.style.overflow = "";
+    syncMobileToggleState(false);
   }
 
   // once the mouse actually leaves, let hover-to-expand work normally again
@@ -34,7 +43,13 @@ function initMenu() {
   // purely via CSS :hover, without the "expanded" class ever being
   // added. Checking classList alone would get out of sync with what
   // the user actually sees, so we check the real rendered width instead.
+  // روی موبایل این منطق کاربردی ندارد (هیچ باز شدن خودکاری با هاور
+  // وجود ندارد و منو دیگر با تغییر عرض خودش باز/بسته نمی‌شود، بلکه با
+  // ترنسفورم پنل داخلی)، پس همان کلاس «expanded» ملاک قابل‌اعتمادی است.
   function isVisuallyOpen() {
+    if (isMobile()) {
+      return sideMenu.classList.contains("expanded");
+    }
     const collapsed = parseInt(
       getComputedStyle(document.documentElement).getPropertyValue("--side-collapsed")
     );
@@ -51,6 +66,7 @@ function initMenu() {
 
   menuToggle.addEventListener("click", toggleMenu);
   menuArrow?.addEventListener("click", toggleMenu);
+  mobileMenuToggle?.addEventListener("click", toggleMenu);
 
   overlay?.addEventListener("click", closeMenu);
 
