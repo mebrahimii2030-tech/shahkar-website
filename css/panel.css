@@ -666,6 +666,123 @@
   pointer-events: none;
 }
 
+/* ---------- کارت‌های آمار بازدید (داشبورد) ---------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 0 0 28px;
+}
+
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-card__icon {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  background: var(--gray-50);
+  color: var(--secondary-dark);
+}
+
+.stat-card__value {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--gray-900);
+  line-height: 1.3;
+}
+
+.stat-card__label {
+  font-size: var(--fs-sm);
+  color: var(--gray-600);
+}
+
+.stat-card--panel .stat-card__icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.top-pages-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 22px;
+  margin: 0 0 28px;
+}
+
+.top-pages-card h3 {
+  margin: 0 0 14px;
+  font-size: var(--fs-md);
+  color: var(--gray-900);
+}
+
+.top-pages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-pages-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-sm);
+}
+
+.top-pages-row__name {
+  flex: 1;
+  color: var(--gray-700);
+  font-weight: 600;
+}
+
+.top-pages-row__bar {
+  flex: 2;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  overflow: hidden;
+}
+
+.top-pages-row__bar-fill {
+  height: 100%;
+  background: var(--secondary);
+  border-radius: 999px;
+}
+
+.top-pages-row__count {
+  flex-shrink: 0;
+  min-width: 34px;
+  text-align: left;
+  color: var(--gray-500);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .dashboard-card--soon .dashboard-card__count {
   color: var(--gray-400);
 }

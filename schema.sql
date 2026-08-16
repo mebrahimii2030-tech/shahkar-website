@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS messages;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS articles;
 DROP TABLE IF EXISTS admin_logins;
+DROP TABLE IF EXISTS page_views;
 
 -- مشتری‌ها
 CREATE TABLE customers (
@@ -107,6 +108,17 @@ CREATE TABLE admin_logins (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- آمار بازدید صفحات سایت و پنل مدیریت
+CREATE TABLE page_views (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  path TEXT NOT NULL,
+  referrer TEXT,
+  ip TEXT,
+  user_agent TEXT,
+  is_panel INTEGER NOT NULL DEFAULT 0, -- ۱ یعنی بازدید یکی از صفحات پنل مدیریت (panel-*.html)
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE INDEX idx_cars_customer ON cars(customer_id);
 CREATE INDEX idx_visits_car ON visits(car_id);
 CREATE INDEX idx_parts_visit ON parts_replaced(visit_id);
@@ -118,6 +130,9 @@ CREATE INDEX idx_articles_slug ON articles(slug);
 CREATE INDEX idx_articles_published ON articles(is_published, published_date);
 CREATE INDEX idx_admin_logins_created ON admin_logins(created_at);
 CREATE INDEX idx_admin_logins_username ON admin_logins(username);
+CREATE INDEX idx_page_views_created ON page_views(created_at);
+CREATE INDEX idx_page_views_path ON page_views(path);
+CREATE INDEX idx_page_views_panel ON page_views(is_panel);
 
 -- ده مطلبی که همین الان به‌صورت ثابت در blog.html نوشته شده بودند، اینجا به‌عنوان
 -- داده اولیه ثبت می‌شوند تا از همون اول در پنل مدیریت وبلاگ قابل ویرایش/حذف باشند.

@@ -128,6 +128,75 @@ async function handleAdminSecurityInfo(env) {
   });
 }
 
+// ---------- آمار بازدید سایت و پنل مدیریت ----------
+
+// جدول page_views ممکن است روی دیتابیس‌های قدیمی‌تر که هنوز مهاجرت
+// migration-add-page-views.sql را اجرا نکرده‌اند وجود نداشته باشد؛ به همین
+// دلیل خطای احتمالی را می‌بلعیم تا بارگذاری صفحه برای بازدیدکننده مختل نشود.
+
+async function handleTrackPageView(request, env) {
+  const body = await request.json().catch(() => null);
+  const path = body && typeof body.path === "string" ? body.path.slice(0, 200) : "";
+  if (!path) return json({ ok: true }); // چیزی برای ثبت نیست، ولی خطا هم برنمی‌گردانیم
+  const referrer = body && typeof body.referrer === "string" ? body.referrer.slice(0, 300) : null;
+  const isPanel = !!(body && body.is_panel);
+  const ip = getClientIp(request);
+  const userAgent = getUserAgent(request);
+  try {
+    await env.DB.prepare(
+      "INSERT INTO page_views (path, referrer, ip, user_agent, is_panel) VALUES (?, ?, ?, ?, ?)"
+    )
+      .bind(path, referrer, ip, userAgent, isPanel ? 1 : 0)
+      .run();
+  } catch (_) {
+    // بدون جدول مهاجرت‌نشده، فقط از ثبت آمار صرف‌نظر می‌کنیم
+  }
+  return json({ ok: true });
+}
+
+async function handleAdminAnalytics(env) {
+  const empty = {
+    totalViews: 0,
+    todayViews: 0,
+    last7DaysViews: 0,
+    panelViews: 0,
+    panelViewsToday: 0,
+    topPages: [],
+  };
+  try {
+    const totalRow = await env.DB.prepare("SELECT COUNT(*) AS c FROM page_views").first();
+    const todayRow = await env.DB
+      .prepare("SELECT COUNT(*) AS c FROM page_views WHERE created_at >= datetime('now', 'start of day')")
+      .first();
+    const last7Row = await env.DB
+      .prepare("SELECT COUNT(*) AS c FROM page_views WHERE created_at >= datetime('now', '-7 days')")
+      .first();
+    const panelRow = await env.DB.prepare("SELECT COUNT(*) AS c FROM page_views WHERE is_panel = 1").first();
+    const panelTodayRow = await env.DB
+      .prepare(
+        "SELECT COUNT(*) AS c FROM page_views WHERE is_panel = 1 AND created_at >= datetime('now', 'start of day')"
+      )
+      .first();
+    const { results: topPages } = await env.DB
+      .prepare(
+        "SELECT path, COUNT(*) AS views FROM page_views WHERE is_panel = 0 GROUP BY path ORDER BY views DESC LIMIT 8"
+      )
+      .all();
+
+    return json({
+      totalViews: totalRow?.c || 0,
+      todayViews: todayRow?.c || 0,
+      last7DaysViews: last7Row?.c || 0,
+      panelViews: panelRow?.c || 0,
+      panelViewsToday: panelTodayRow?.c || 0,
+      topPages: topPages || [],
+    });
+  } catch (_) {
+    // اگر جدول هنوز ساخته نشده (مهاجرت اجرا نشده)، صفر برمی‌گردانیم نه خطا
+    return json(empty);
+  }
+}
+
 async function handleAdminLogin(request, env) {
   if (!env.ADMIN_USERNAME || !env.ADMIN_PASSWORD) {
     return errorResponse(
@@ -673,7 +742,8 @@ export default {
     const isPublicArticleBySlug =
       !!articleSlugMatch && method === "GET" && !/^\d+$/.test(articleSlugMatch[1]) && articleSlugMatch[1] !== "admin";
     const isPublicAdminAuth = path === "/api/admin/login" || path === "/api/admin/logout";
-    if (!isPublicRead && !isPublicContact && !isPublicReviews && !isPublicChat && !isPublicArticlesList && !isPublicArticleBySlug && !isPublicAdminAuth) {
+    const isPublicTrack = path === "/api/track" && method === "POST";
+    if (!isPublicRead && !isPublicContact && !isPublicReviews && !isPublicChat && !isPublicArticlesList && !isPublicArticleBySlug && !isPublicAdminAuth && !isPublicTrack) {
       if (!(await isAuthorized(request, env))) return unauthorizedApiResponse();
     }
 
@@ -739,6 +809,8 @@ export default {
     if (path === "/api/admin/login" && method === "POST") return handleAdminLogin(request, env);
     if (path === "/api/admin/logout" && method === "POST") return handleAdminLogout();
     if (path === "/api/admin/security" && method === "GET") return handleAdminSecurityInfo(env);
+    if (path === "/api/track" && method === "POST") return handleTrackPageView(request, env);
+    if (path === "/api/admin/analytics" && method === "GET") return handleAdminAnalytics(env);
 
     return errorResponse("مسیر یافت نشد", 404);
   },
