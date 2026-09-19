@@ -753,11 +753,14 @@ function randomQrCode() {
   return code;
 }
 
-// برچسب نمایشی سریال از روی نوع QR ساخته می‌شود: سایت → S۱، S۲...  مسیریابی → M۱، M۲...
-function serialLabel(kind, serialNumber) {
-  if (!serialNumber) return "—";
-  const prefix = kind === "routing" ? "M" : "S";
-  return `${prefix}${serialNumber}`;
+// برچسب حرفه‌ای سریال: هر دو QR یک محدوده یک شماره مشترک دارند (location_seq که در همان
+// ستون serial_number ذخیره می‌شود)، فقط پسوند نوع فرق می‌کند: S برای سایت، M برای مسیریابی
+// مثال: SHK-001-S  و  SHK-001-M
+function serialLabel(kind, locationSeq) {
+  if (!locationSeq) return "—";
+  const padded = String(locationSeq).padStart(3, "0");
+  const suffix = kind === "routing" ? "M" : "S";
+  return `SHK-${padded}-${suffix}`;
 }
 
 async function listQrCampaigns(env) {
@@ -766,74 +769,78 @@ async function listQrCampaigns(env) {
        (SELECT COUNT(*) FROM qr_scans s WHERE s.campaign_id = c.id) AS scan_count,
        (SELECT COUNT(DISTINCT visitor_hash) FROM qr_scans s WHERE s.campaign_id = c.id) AS unique_count
      FROM qr_campaigns c
-     ORDER BY c.title ASC, c.kind ASC`
+     ORDER BY c.serial_number ASC, c.kind ASC`
   ).all();
   const campaigns = (results || []).map((c) => ({ ...c, serial: serialLabel(c.kind, c.serial_number) }));
   return json({ campaigns });
 }
 
-async function createQrCampaign(request, env) {
+// ساخت یک «محدوده» کامل: همزمان یک QR سایت و یک QR مسیریابی می‌سازد، با یک شماره سریال مشترک
+async function createQrLocation(request, env) {
   const body = await request.json().catch(() => null);
   const title = body && typeof body.title === "string" ? body.title.trim() : "";
   if (!title) return errorResponse("عنوان محدوده الزامی است");
 
-  const kind = body && body.kind === "routing" ? "routing" : "site";
+  let siteTarget = body && body.target_path ? String(body.target_path).trim() : "/";
+  if (!siteTarget.startsWith("/") && !/^https?:\/\//i.test(siteTarget)) siteTarget = `/${siteTarget}`;
 
-  let code = body && body.code ? String(body.code).trim().replace(/\s+/g, "-") : "";
-  if (!code) code = randomQrCode();
+  const maxRow = await env.DB.prepare("SELECT MAX(serial_number) AS maxN FROM qr_campaigns").first();
+  const seq = (maxRow && maxRow.maxN ? maxRow.maxN : 0) + 1;
 
-  const existing = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE code = ?").bind(code).first();
-  if (existing) return errorResponse("این کد قبلاً استفاده شده است", 409);
+  const siteCode = randomQrCode();
+  const routingCode = randomQrCode();
 
-  let targetPath = body && body.target_path ? String(body.target_path).trim() : "/";
-  // برای نوع «مسیریابی» مقصد یک لینک کامل نقشه است و نباید به شکل مسیر داخلی سایت تغییر کند
-  if (kind !== "routing" && !targetPath.startsWith("/") && !/^https?:\/\//i.test(targetPath)) {
-    targetPath = `/${targetPath}`;
-  }
-
-  const maxRow = await env.DB.prepare("SELECT MAX(serial_number) AS maxN FROM qr_campaigns WHERE kind = ?").bind(kind).first();
-  const serialNumber = (maxRow && maxRow.maxN ? maxRow.maxN : 0) + 1;
-
-  const result = await env.DB.prepare(
-    "INSERT INTO qr_campaigns (code, title, target_path, kind, serial_number, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))"
-  )
-    .bind(code, title, targetPath, kind, serialNumber)
-    .run();
+  await env.DB.batch([
+    env.DB.prepare(
+      "INSERT INTO qr_campaigns (code, title, target_path, kind, serial_number, created_at) VALUES (?, ?, ?, 'site', ?, datetime('now'))"
+    ).bind(siteCode, title, siteTarget, seq),
+    env.DB.prepare(
+      "INSERT INTO qr_campaigns (code, title, target_path, kind, serial_number, created_at) VALUES (?, ?, ?, 'routing', ?, datetime('now'))"
+    ).bind(routingCode, title, "/route.html", seq),
+  ]);
 
   return json(
-    { id: result.meta.last_row_id, code, title, target_path: targetPath, kind, serial_number: serialNumber, serial: serialLabel(kind, serialNumber) },
+    {
+      location_seq: seq,
+      title,
+      site: { code: siteCode, serial: serialLabel("site", seq) },
+      routing: { code: routingCode, serial: serialLabel("routing", seq) },
+    },
     201
   );
 }
 
-async function updateQrCampaign(code, request, env) {
-  const existing = await env.DB.prepare("SELECT id, kind FROM qr_campaigns WHERE code = ?").bind(code).first();
-  if (!existing) return errorResponse("محدوده یافت نشد", 404);
+// ویرایش یک محدوده: عنوان روی هر دو QR اعمال می‌شود، مقصد فقط روی QR سایت (مقصد مسیریابی ثابت است)
+async function updateQrLocation(seq, request, env) {
+  const exists = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE serial_number = ?").bind(seq).first();
+  if (!exists) return errorResponse("محدوده یافت نشد", 404);
 
   const body = await request.json().catch(() => null);
   if (!body) return errorResponse("داده نامعتبر است");
 
   const title = typeof body.title === "string" && body.title.trim() ? body.title.trim() : null;
-  let targetPath = typeof body.target_path === "string" && body.target_path.trim() ? body.target_path.trim() : null;
-  if (targetPath && existing.kind !== "routing" && !targetPath.startsWith("/") && !/^https?:\/\//i.test(targetPath)) {
-    targetPath = `/${targetPath}`;
-  }
+  let siteTarget = typeof body.target_path === "string" && body.target_path.trim() ? body.target_path.trim() : null;
+  if (siteTarget && !siteTarget.startsWith("/") && !/^https?:\/\//i.test(siteTarget)) siteTarget = `/${siteTarget}`;
 
-  await env.DB.prepare("UPDATE qr_campaigns SET title = COALESCE(?, title), target_path = COALESCE(?, target_path) WHERE code = ?")
-    .bind(title, targetPath, code)
-    .run();
+  await env.DB.batch([
+    env.DB.prepare("UPDATE qr_campaigns SET title = COALESCE(?, title) WHERE serial_number = ?").bind(title, seq),
+    env.DB.prepare("UPDATE qr_campaigns SET target_path = COALESCE(?, target_path) WHERE serial_number = ? AND kind = 'site'").bind(
+      siteTarget,
+      seq
+    ),
+  ]);
 
   return json({ ok: true });
 }
 
-async function deleteQrCampaign(code, env) {
-  const existing = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE code = ?").bind(code).first();
-  if (!existing) return errorResponse("محدوده یافت نشد", 404);
+// حذف یک محدوده: هر دو QR (سایت و مسیریابی) و آمار اسکن‌هایشان با هم حذف می‌شوند
+async function deleteQrLocation(seq, env) {
+  const { results } = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE serial_number = ?").bind(seq).all();
+  if (!results || !results.length) return errorResponse("محدوده یافت نشد", 404);
 
-  await env.DB.batch([
-    env.DB.prepare("DELETE FROM qr_scans WHERE campaign_id = ?").bind(existing.id),
-    env.DB.prepare("DELETE FROM qr_campaigns WHERE id = ?").bind(existing.id),
-  ]);
+  const stmts = results.map((row) => env.DB.prepare("DELETE FROM qr_scans WHERE campaign_id = ?").bind(row.id));
+  stmts.push(env.DB.prepare("DELETE FROM qr_campaigns WHERE serial_number = ?").bind(seq));
+  await env.DB.batch(stmts);
 
   return json({ ok: true });
 }
@@ -951,10 +958,10 @@ export default {
     if (path === "/api/admin/analytics" && method === "GET") return handleAdminAnalytics(env);
 
     if (path === "/api/qr" && method === "GET") return listQrCampaigns(env);
-    if (path === "/api/qr" && method === "POST") return createQrCampaign(request, env);
-    if ((m = path.match(/^\/api\/qr\/([^/]+)$/))) {
-      if (method === "PUT") return updateQrCampaign(decodeURIComponent(m[1]), request, env);
-      if (method === "DELETE") return deleteQrCampaign(decodeURIComponent(m[1]), env);
+    if (path === "/api/qr-locations" && method === "POST") return createQrLocation(request, env);
+    if ((m = path.match(/^\/api\/qr-locations\/(\d+)$/))) {
+      if (method === "PUT") return updateQrLocation(Number(m[1]), request, env);
+      if (method === "DELETE") return deleteQrLocation(Number(m[1]), env);
     }
 
     return errorResponse("مسیر یافت نشد", 404);

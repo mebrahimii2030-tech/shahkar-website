@@ -21,6 +21,13 @@
       .qr-kind-badge--site { background:#e6f4ea; color:#1e7a34; }
       .qr-kind-badge--routing { background:#e8eefc; color:#2b4fd1; }
       .qr-serial-result { margin-top:12px; padding:14px; border-radius:var(--radius-sm); background:var(--gray-50); display:none; }
+      .qr-location-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+      .qr-location-serial { font-family:monospace; direction:ltr; color:var(--gray-400); font-size:13px; }
+      .qr-pair { display:flex; gap:16px; flex-wrap:wrap; }
+      .qr-mini { flex:1; min-width:230px; border:1.5px solid var(--gray-100); border-radius:var(--radius-sm); padding:14px; display:flex; gap:12px; align-items:flex-start; }
+      .qr-mini img { border-radius:8px; flex-shrink:0; }
+      .qr-mini__body { flex:1; min-width:0; }
+      .qr-mini__link { font-family:monospace; direction:ltr; font-size:12px; color:var(--gray-400); word-break:break-all; display:block; margin:4px 0 8px; }
     </style>
   </head>
   <body class="panel-body">
@@ -54,7 +61,7 @@
           <input
             id="serial-search-input"
             type="text"
-            placeholder="مثلاً S3 یا M3"
+            placeholder="مثلاً SHK-003-S"
             style="border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 14px; font-family:var(--font-family); direction:ltr; max-width:220px;"
           />
           <button type="button" class="btn btn-primary" id="serial-search-btn">جستجو</button>
@@ -70,8 +77,7 @@
         </div>
 
         <form id="qr-form">
-          <input type="hidden" name="edit_code" />
-          <input type="hidden" name="edit_kind" />
+          <input type="hidden" name="edit_seq" />
 
           <div class="form-grid form-grid--full">
             <div class="field">
@@ -100,28 +106,9 @@
         </form>
       </div>
 
-      <!-- لیست محدوده‌ها -->
-      <div class="panel-card">
-        <div class="panel-card__head">
-          <h3>همه QR ها</h3>
-        </div>
-        <table class="customers-table">
-          <thead>
-            <tr>
-              <th>محدوده</th>
-              <th>نوع</th>
-              <th>سریال</th>
-              <th>آدرس QR</th>
-              <th>مقصد</th>
-              <th>اسکن (یکتا)</th>
-              <th>QR</th>
-              <th>عملیات</th>
-            </tr>
-          </thead>
-          <tbody id="qr-tbody">
-            <tr><td colspan="8" class="empty-state">در حال بارگذاری...</td></tr>
-          </tbody>
-        </table>
+      <!-- لیست محدوده‌ها: هر محدوده یک بلوک جدا با دو QR داخلش -->
+      <div id="qr-locations" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="panel-card"><p class="empty-state">در حال بارگذاری...</p></div>
       </div>
     </div>
 

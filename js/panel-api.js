@@ -161,24 +161,24 @@ const PanelAPI = {
     const res = await fetch("/api/qr");
     return readPanelResponse(res);
   },
-  async createQrCampaign(data) {
-    const res = await fetch("/api/qr", {
+  async createQrLocation(data) {
+    const res = await fetch("/api/qr-locations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     return readPanelResponse(res);
   },
-  async updateQrCampaign(code, data) {
-    const res = await fetch(`/api/qr/${encodeURIComponent(code)}`, {
+  async updateQrLocation(seq, data) {
+    const res = await fetch(`/api/qr-locations/${encodeURIComponent(seq)}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     return readPanelResponse(res);
   },
-  async deleteQrCampaign(code) {
-    const res = await fetch(`/api/qr/${encodeURIComponent(code)}`, { method: "DELETE" });
+  async deleteQrLocation(seq) {
+    const res = await fetch(`/api/qr-locations/${encodeURIComponent(seq)}`, { method: "DELETE" });
     return readPanelResponse(res);
   },
 };
