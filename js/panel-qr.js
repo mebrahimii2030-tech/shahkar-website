@@ -14,13 +14,13 @@ function qrFullUrl(code) {
   return `${window.location.origin}/qr/${encodeURIComponent(code)}`;
 }
 
-function qrImageUrl(code, size) {
-  const data = encodeURIComponent(qrFullUrl(code));
-  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${data}`;
-}
-
 function kindLabel(kind) {
   return kind === "routing" ? "مسیریابی" : "سایت";
+}
+
+// رنگ اختصاصی هر نوع QR: سایت → همرنگ برند اصلی، مسیریابی → کهربایی (رنگ ثانویه برند)
+function kindColor(kind) {
+  return kind === "routing" ? "#d97706" : "#0f172a";
 }
 
 // ---------- گروه‌بندی روی هم بر اساس محدوده ----------
@@ -56,24 +56,65 @@ function renderSummary() {
     box("مجموع کاربر یکتا", totalUnique, "soon");
 }
 
+// ---------- ساخت تصویر QR با لوگو و رنگ اختصاصی ----------
+
+const qrInstances = {};
+
+function buildQrCode(campaign) {
+  const color = kindColor(campaign.kind);
+  return new QRCodeStyling({
+    width: 140,
+    height: 140,
+    type: "canvas",
+    data: qrFullUrl(campaign.code),
+    margin: 4,
+    qrOptions: { errorCorrectionLevel: "H" },
+    image: "images/logo.png",
+    imageOptions: { crossOrigin: "anonymous", margin: 4, imageSize: 0.32, hideBackgroundDots: true },
+    dotsOptions: { color, type: "rounded" },
+    cornersSquareOptions: { color, type: "extra-rounded" },
+    cornersDotOptions: { color },
+    backgroundOptions: { color: "#ffffff" },
+  });
+}
+
+// بعد از این‌که HTML بلوک‌های محدوده در صفحه قرار گرفت، QR واقعی هر کدام ساخته و داخل جای خودش رندر می‌شود
+function renderQrImages() {
+  locations.forEach((loc) => {
+    [loc.site, loc.routing].forEach((c) => {
+      if (!c) return;
+      const holder = document.getElementById(`qr-canvas-${c.code}`);
+      if (!holder) return;
+      holder.innerHTML = "";
+      const qr = buildQrCode(c);
+      qr.append(holder);
+      qrInstances[c.code] = qr;
+    });
+  });
+}
+
+function downloadQr(code, serial) {
+  const qr = qrInstances[code];
+  if (!qr) return;
+  qr.download({ name: `qr-${serial}`, extension: "png" });
+}
+
 // ---------- بلوک هر محدوده ----------
 
 function qrMiniCard(campaign, kind) {
   if (!campaign) {
     return `<div class="qr-mini"><div class="qr-mini__body">QR ${kindLabel(kind)} برای این محدوده وجود ندارد.</div></div>`;
   }
-  const img = qrImageUrl(campaign.code, 90);
-  const downloadImg = qrImageUrl(campaign.code, 600);
   return `
     <div class="qr-mini">
-      <img src="${img}" width="72" height="72" alt="QR ${kindLabel(kind)}" />
+      <div class="qr-mini__canvas" id="qr-canvas-${escapeHtml(campaign.code)}"></div>
       <div class="qr-mini__body">
         <strong>${kindLabel(kind)}</strong> — سریال <span style="font-family:monospace;direction:ltr;">${escapeHtml(campaign.serial)}</span>
         <span class="qr-mini__link">${escapeHtml(qrFullUrl(campaign.code))}</span>
         اسکن: ${campaign.scan_count || 0} (یکتا: ${campaign.unique_count || 0})
         <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
           <button class="copy-link-btn" onclick="copyQrLink('${escapeHtml(campaign.code)}')">کپی لینک</button>
-          <a href="${downloadImg}" download="qr-${escapeHtml(campaign.serial)}.png" class="copy-link-btn">دانلود PNG</a>
+          <button class="copy-link-btn" onclick="downloadQr('${escapeHtml(campaign.code)}', '${escapeHtml(campaign.serial)}')">دانلود PNG</button>
         </div>
       </div>
     </div>`;
@@ -107,6 +148,8 @@ function renderLocations() {
       </div>`
     )
     .join("");
+
+  renderQrImages();
 }
 
 function copyQrLink(code) {

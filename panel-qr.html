@@ -25,7 +25,8 @@
       .qr-location-serial { font-family:monospace; direction:ltr; color:var(--gray-400); font-size:13px; }
       .qr-pair { display:flex; gap:16px; flex-wrap:wrap; }
       .qr-mini { flex:1; min-width:230px; border:1.5px solid var(--gray-100); border-radius:var(--radius-sm); padding:14px; display:flex; gap:12px; align-items:flex-start; }
-      .qr-mini img { border-radius:8px; flex-shrink:0; }
+      .qr-mini__canvas { width:72px; height:72px; flex-shrink:0; border-radius:8px; overflow:hidden; border:1px solid var(--gray-100); }
+      .qr-mini__canvas canvas, .qr-mini__canvas img { border-radius:8px; }
       .qr-mini__body { flex:1; min-width:0; }
       .qr-mini__link { font-family:monospace; direction:ltr; font-size:12px; color:var(--gray-400); word-break:break-all; display:block; margin:4px 0 8px; }
     </style>
@@ -112,6 +113,7 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
     <script src="js/panel-api.js"></script>
     <script src="js/panel-qr.js"></script>
     <script src="js/panel-logout.js"></script>
