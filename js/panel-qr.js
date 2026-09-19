@@ -56,7 +56,7 @@ function renderTable() {
       const img = qrImageUrl(c.code, 90);
       const downloadImg = qrImageUrl(c.code, 600);
       const badgeClass = c.kind === "routing" ? "qr-kind-badge--routing" : "qr-kind-badge--site";
-      const targetDisplay = c.kind === "routing" ? "لینک مسیریابی" : c.target_path;
+      const targetDisplay = c.kind === "routing" ? "صفحه انتخاب مسیریاب" : c.target_path;
       return `
         <tr>
           <td><span class="customer-name">${escapeHtml(c.title)}</span></td>
@@ -131,14 +131,15 @@ const submitBtn = document.getElementById("qr-submit-btn");
 const cancelBtn = document.getElementById("qr-cancel-btn");
 const newBtn = document.getElementById("qr-new-btn");
 const siteField = document.getElementById("site-target-field");
-const routingField = document.getElementById("routing-target-field");
+const routingNote = document.getElementById("routing-auto-note");
+const ROUTING_TARGET = "/route.html"; // صفحه ثابت انتخاب مسیریاب (گوگل‌مپ/نشان/بلد) — همیشه همین است، نیازی به لینک دستی نیست
 
 function resetForm() {
   form.reset();
   form.edit_code.value = "";
   form.edit_kind.value = "";
   siteField.hidden = false;
-  routingField.hidden = false;
+  routingNote.hidden = false;
   formTitle.textContent = "افزودن محدوده جدید";
   submitBtn.textContent = "ثبت محدوده";
   cancelBtn.hidden = true;
@@ -154,12 +155,12 @@ function openEditCampaign(code) {
   form.title.value = c.title;
 
   if (c.kind === "routing") {
+    // QR مسیریابی همیشه به یک صفحه ثابت می‌رود؛ فقط نام محدوده قابل ویرایش است
     siteField.hidden = true;
-    routingField.hidden = false;
-    form.maps_url.value = c.target_path;
+    routingNote.hidden = true;
   } else {
     siteField.hidden = false;
-    routingField.hidden = true;
+    routingNote.hidden = true;
     form.target_path.value = c.target_path;
   }
 
@@ -190,11 +191,11 @@ form.addEventListener("submit", async (e) => {
 
   let result;
   if (editCode) {
-    // ویرایش یک ردیف موجود (فقط همان نوع)
-    const targetValue = editKind === "routing" ? form.maps_url.value.trim() : form.target_path.value.trim() || "/";
+    // ویرایش یک ردیف موجود؛ برای نوع مسیریابی مقصد همیشه ثابت است
+    const targetValue = editKind === "routing" ? ROUTING_TARGET : form.target_path.value.trim() || "/";
     result = await PanelAPI.updateQrCampaign(editCode, { title, target_path: targetValue });
   } else {
-    // ساخت محدوده جدید: همیشه QR سایت، و اگر لینک مسیریابی پر شده بود، QR مسیریابی هم ساخته می‌شود
+    // ساخت محدوده جدید: همیشه هم QR سایت و هم QR مسیریابی با هم ساخته می‌شوند
     result = await PanelAPI.createQrCampaign({ title, kind: "site", target_path: form.target_path.value.trim() || "/" });
     if (!result || result.error) {
       submitBtn.disabled = false;
@@ -202,17 +203,14 @@ form.addEventListener("submit", async (e) => {
       alert((result && result.error) || "خطا در ساخت QR سایت");
       return;
     }
-    const mapsUrl = form.maps_url.value.trim();
-    if (mapsUrl) {
-      const routingResult = await PanelAPI.createQrCampaign({ title, kind: "routing", target_path: mapsUrl });
-      if (!routingResult || routingResult.error) {
-        submitBtn.disabled = false;
-        submitBtn.classList.remove("btn-loading");
-        alert("QR سایت ساخته شد، ولی ساخت QR مسیریابی با خطا مواجه شد: " + ((routingResult && routingResult.error) || ""));
-        resetForm();
-        await loadCampaigns();
-        return;
-      }
+    const routingResult = await PanelAPI.createQrCampaign({ title, kind: "routing", target_path: ROUTING_TARGET });
+    if (!routingResult || routingResult.error) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("btn-loading");
+      alert("QR سایت ساخته شد، ولی ساخت QR مسیریابی با خطا مواجه شد: " + ((routingResult && routingResult.error) || ""));
+      resetForm();
+      await loadCampaigns();
+      return;
     }
   }
 

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>مسیریابی تا تعمیرگاه شاهکار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0b1220;
+        font-family: "Vazirmatn", sans-serif;
+        padding: 20px;
+      }
+      .route-box {
+        background: #0f172a;
+        padding: 32px 26px;
+        border-radius: 18px;
+        width: 100%;
+        max-width: 360px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      }
+      .route-box img {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        margin-bottom: 12px;
+        border-radius: 12px;
+      }
+      .route-box h1 {
+        color: #fff;
+        font-size: 18px;
+        margin: 0 0 6px;
+      }
+      .route-box p {
+        color: #94a3b8;
+        font-size: 13px;
+        margin: 0 0 22px;
+      }
+      .map-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .map-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+      .map-item i { font-size: 19px; width: 22px; text-align: center; }
+      .map-item.google { background: #1a73e8; }
+      .map-item.neshan { background: #f59e0b; }
+      .map-item.balad { background: #22c55e; }
+      .map-item:hover { transform: scale(1.03); }
+      .route-back {
+        display: inline-block;
+        margin-top: 20px;
+        color: #64748b;
+        font-size: 13px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="route-box">
+      <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
+      <h1>مسیریابی تا تعمیرگاه شاهکار</h1>
+      <p>برنامه مسیریاب موردنظرت را انتخاب کن</p>
+
+      <div class="map-options">
+        <a href="https://www.google.com/maps?q=35.753389,51.159194" target="_blank" class="map-item google">
+          <i class="fa-brands fa-google"></i>
+          <span>Google Maps</span>
+        </a>
+
+        <a href="https://nshn.ir/b6_bvSdzYxFVCs" target="_blank" class="map-item neshan">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>نشان</span>
+        </a>
+
+        <a href="#" target="_blank" class="map-item balad">
+          <i class="fa-solid fa-map"></i>
+          <span>بلد</span>
+        </a>
+      </div>
+
+      <a href="index.html" class="route-back">بازگشت به سایت</a>
+    </div>
+  </body>
+</html>
