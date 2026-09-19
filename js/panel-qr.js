@@ -63,8 +63,8 @@ const qrInstances = {};
 function buildQrCode(campaign) {
   const color = kindColor(campaign.kind);
   return new QRCodeStyling({
-    width: 140,
-    height: 140,
+    width: 600,
+    height: 600,
     type: "canvas",
     data: qrFullUrl(campaign.code),
     margin: 4,
