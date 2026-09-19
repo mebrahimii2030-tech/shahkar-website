@@ -705,6 +705,117 @@ async function handleChat(request, env) {
   }
 }
 
+// ---------- ردیابی QR تبلیغاتی (تراکت‌ها) ----------
+
+// هر محدوده (برج ۱، برج ۲ و...) یک کد کوتاه دارد که در آدرس /qr/کد چاپ می‌شود.
+// این تابع اسکن را ثبت می‌کند (بدون این‌که مانع هدایت کاربر شود) و بعد او را
+// به صفحه مقصدِ همان محدوده هدایت می‌کند.
+async function handleQrRedirect(rawCode, request, env) {
+  const url = new URL(request.url);
+  const fallback = `${url.origin}/`;
+  const code = decodeURIComponent(rawCode || "").trim();
+  if (!code) return Response.redirect(fallback, 302);
+
+  let campaign = null;
+  try {
+    campaign = await env.DB.prepare("SELECT * FROM qr_campaigns WHERE code = ?").bind(code).first();
+  } catch (err) {
+    // اگر جدول هنوز ساخته نشده (مهاجرت اجرا نشده)، حداقل کاربر را به سایت هدایت کن
+    return Response.redirect(fallback, 302);
+  }
+  if (!campaign) return Response.redirect(fallback, 302);
+
+  try {
+    const ip = getClientIp(request);
+    const ua = getUserAgent(request);
+    const visitorHash = await hmacHex(`${ip}|${ua}`, env.ADMIN_PASSWORD || "qr-salt");
+    await env.DB.prepare(
+      "INSERT INTO qr_scans (campaign_id, visitor_hash, user_agent, scanned_at) VALUES (?, ?, ?, datetime('now'))"
+    )
+      .bind(campaign.id, visitorHash, ua)
+      .run();
+  } catch (err) {
+    // ثبت آمار نباید مانع هدایت کاربر شود
+  }
+
+  const target = String(campaign.target_path || "/").trim();
+  const targetPath = target.startsWith("/") ? target : `/${target}`;
+  return Response.redirect(`${url.origin}${targetPath}`, 302);
+}
+
+function randomQrCode() {
+  const chars = "abcdefghijkmnpqrstuvwxyz23456789";
+  let code = "q";
+  const bytes = new Uint8Array(5);
+  crypto.getRandomValues(bytes);
+  for (let i = 0; i < bytes.length; i++) code += chars[bytes[i] % chars.length];
+  return code;
+}
+
+async function listQrCampaigns(env) {
+  const { results } = await env.DB.prepare(
+    `SELECT c.id, c.code, c.title, c.target_path, c.created_at,
+       (SELECT COUNT(*) FROM qr_scans s WHERE s.campaign_id = c.id) AS scan_count,
+       (SELECT COUNT(DISTINCT visitor_hash) FROM qr_scans s WHERE s.campaign_id = c.id) AS unique_count
+     FROM qr_campaigns c
+     ORDER BY c.created_at DESC`
+  ).all();
+  return json({ campaigns: results });
+}
+
+async function createQrCampaign(request, env) {
+  const body = await request.json().catch(() => null);
+  const title = body && typeof body.title === "string" ? body.title.trim() : "";
+  if (!title) return errorResponse("عنوان محدوده الزامی است");
+
+  let code = body && body.code ? String(body.code).trim().replace(/\s+/g, "-") : "";
+  if (!code) code = randomQrCode();
+
+  const existing = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE code = ?").bind(code).first();
+  if (existing) return errorResponse("این کد قبلاً استفاده شده است", 409);
+
+  let targetPath = body && body.target_path ? String(body.target_path).trim() : "/";
+  if (!targetPath.startsWith("/")) targetPath = `/${targetPath}`;
+
+  const result = await env.DB.prepare(
+    "INSERT INTO qr_campaigns (code, title, target_path, created_at) VALUES (?, ?, ?, datetime('now'))"
+  )
+    .bind(code, title, targetPath)
+    .run();
+
+  return json({ id: result.meta.last_row_id, code, title, target_path: targetPath }, 201);
+}
+
+async function updateQrCampaign(code, request, env) {
+  const existing = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE code = ?").bind(code).first();
+  if (!existing) return errorResponse("محدوده یافت نشد", 404);
+
+  const body = await request.json().catch(() => null);
+  if (!body) return errorResponse("داده نامعتبر است");
+
+  const title = typeof body.title === "string" && body.title.trim() ? body.title.trim() : null;
+  let targetPath = typeof body.target_path === "string" && body.target_path.trim() ? body.target_path.trim() : null;
+  if (targetPath && !targetPath.startsWith("/")) targetPath = `/${targetPath}`;
+
+  await env.DB.prepare("UPDATE qr_campaigns SET title = COALESCE(?, title), target_path = COALESCE(?, target_path) WHERE code = ?")
+    .bind(title, targetPath, code)
+    .run();
+
+  return json({ ok: true });
+}
+
+async function deleteQrCampaign(code, env) {
+  const existing = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE code = ?").bind(code).first();
+  if (!existing) return errorResponse("محدوده یافت نشد", 404);
+
+  await env.DB.batch([
+    env.DB.prepare("DELETE FROM qr_scans WHERE campaign_id = ?").bind(existing.id),
+    env.DB.prepare("DELETE FROM qr_campaigns WHERE id = ?").bind(existing.id),
+  ]);
+
+  return json({ ok: true });
+}
+
 // ---------- روتر اصلی ----------
 
 export default {
@@ -713,8 +824,13 @@ export default {
     const path = url.pathname;
     const method = request.method;
 
+    // اسکن QR تراکت‌ها: قبل از هر بررسی دیگری، چون مسیر عمومی و بدون /api/ است
+    if (path.startsWith("/qr/")) {
+      return handleQrRedirect(path.slice(4), request, env);
+    }
+
     // صفحات پنل مدیریت: نیاز به نشست ورود معتبر دارند، وگرنه به صفحه‌ی ورود اختصاصی هدایت می‌شوند
-    if (path === "/panel-admin.html" || path === "/panel-customers.html" || path === "/panel-customer.html" || path === "/panel-blog.html") {
+    if (path === "/panel-admin.html" || path === "/panel-customers.html" || path === "/panel-customer.html" || path === "/panel-blog.html" || path === "/panel-qr.html") {
       if (!(await isAuthorized(request, env))) {
         const nextParam = encodeURIComponent(path + url.search);
         return Response.redirect(`${url.origin}/panel-login.html?next=${nextParam}`, 302);
@@ -811,6 +927,13 @@ export default {
     if (path === "/api/admin/security" && method === "GET") return handleAdminSecurityInfo(env);
     if (path === "/api/track" && method === "POST") return handleTrackPageView(request, env);
     if (path === "/api/admin/analytics" && method === "GET") return handleAdminAnalytics(env);
+
+    if (path === "/api/qr" && method === "GET") return listQrCampaigns(env);
+    if (path === "/api/qr" && method === "POST") return createQrCampaign(request, env);
+    if ((m = path.match(/^\/api\/qr\/([^/]+)$/))) {
+      if (method === "PUT") return updateQrCampaign(decodeURIComponent(m[1]), request, env);
+      if (method === "DELETE") return deleteQrCampaign(decodeURIComponent(m[1]), env);
+    }
 
     return errorResponse("مسیر یافت نشد", 404);
   },

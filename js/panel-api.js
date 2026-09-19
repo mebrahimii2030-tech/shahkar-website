@@ -155,4 +155,30 @@ const PanelAPI = {
     const res = await fetch(`/api/articles/${id}`, { method: "DELETE" });
     return readPanelResponse(res);
   },
+
+  // ---------- محدوده‌های QR تبلیغاتی ----------
+  async listQrCampaigns() {
+    const res = await fetch("/api/qr");
+    return readPanelResponse(res);
+  },
+  async createQrCampaign(data) {
+    const res = await fetch("/api/qr", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return readPanelResponse(res);
+  },
+  async updateQrCampaign(code, data) {
+    const res = await fetch(`/api/qr/${encodeURIComponent(code)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return readPanelResponse(res);
+  },
+  async deleteQrCampaign(code) {
+    const res = await fetch(`/api/qr/${encodeURIComponent(code)}`, { method: "DELETE" });
+    return readPanelResponse(res);
+  },
 };

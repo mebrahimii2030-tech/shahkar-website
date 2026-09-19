@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>مدیریت QR تبلیغاتی | تعمیرگاه تخصصی شاهکار</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/panel.css" />
+    <style>
+      .field-hint { margin: 6px 2px 0; font-size: var(--fs-xs); color: var(--gray-400); }
+    </style>
+  </head>
+  <body class="panel-body">
+    <div class="panel-topbar">
+      <div class="panel-topbar__brand">
+        <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
+        <div class="panel-topbar__title">مدیریت <span>QR تبلیغاتی</span></div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">داشبورد مدیریت</a>
+        <a href="index.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">بازگشت به سایت</a>
+        <button type="button" id="panel-logout-btn" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">خروج</button>
+      </div>
+    </div>
+
+    <div class="panel-wrap">
+      <!-- خلاصه وضعیت -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h2>خلاصه کل محدوده‌ها</h2>
+        </div>
+        <div id="qr-summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
+      </div>
+
+      <!-- افزودن/ویرایش محدوده -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h3 id="qr-form-title">افزودن محدوده جدید</h3>
+          <button type="button" class="btn btn-ghost" id="qr-new-btn" hidden>+ محدوده جدید</button>
+        </div>
+
+        <form id="qr-form">
+          <input type="hidden" name="original_code" />
+
+          <div class="form-grid">
+            <div class="field">
+              <label>نام محدوده</label>
+              <input type="text" name="title" required placeholder="مثلاً: برج ۱، یا اطراف شهرک" />
+            </div>
+            <div class="field">
+              <label>کد آدرس (اختیاری)</label>
+              <input type="text" name="code" placeholder="مثلاً T01 — اگر خالی بگذاری خودکار ساخته می‌شود" />
+              <p class="field-hint">این کد داخل آدرس QR می‌آید: سایت/qr/کد. بعد از ساختن محدوده قابل‌تغییر نیست.</p>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--full">
+            <div class="field">
+              <label>مقصد بعد از اسکن</label>
+              <input type="text" name="target_path" placeholder="مثلاً /index.html یا /pricing.html — پیش‌فرض: صفحه اصلی" />
+            </div>
+          </div>
+
+          <div style="margin-top:14px; display:flex; gap:10px;">
+            <button type="submit" class="btn btn-primary" id="qr-submit-btn">ثبت محدوده</button>
+            <button type="button" class="btn btn-ghost" id="qr-cancel-btn" hidden>انصراف از ویرایش</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- لیست محدوده‌ها -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h3>همه محدوده‌ها</h3>
+        </div>
+        <table class="customers-table">
+          <thead>
+            <tr>
+              <th>محدوده</th>
+              <th>آدرس QR</th>
+              <th>مقصد</th>
+              <th>اسکن (یکتا)</th>
+              <th>QR</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody id="qr-tbody">
+            <tr><td colspan="6" class="empty-state">در حال بارگذاری...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="js/panel-api.js"></script>
+    <script src="js/panel-qr.js"></script>
+    <script src="js/panel-logout.js"></script>
+    <script src="js/panel-idle-logout.js"></script>
+    <script src="js/track.js"></script>
+  </body>
+</html>
