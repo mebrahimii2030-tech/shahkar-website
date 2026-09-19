@@ -18,9 +18,14 @@ function qrImageUrl(code, size) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${data}`;
 }
 
+function kindLabel(kind) {
+  return kind === "routing" ? "مسیریابی" : "سایت";
+}
+
 // ---------- خلاصه وضعیت ----------
 
 function renderSummary() {
+  const locations = new Set(allCampaigns.map((c) => c.title)).size;
   const totalScans = allCampaigns.reduce((sum, c) => sum + (c.scan_count || 0), 0);
   const totalUnique = allCampaigns.reduce((sum, c) => sum + (c.unique_count || 0), 0);
 
@@ -30,7 +35,8 @@ function renderSummary() {
     </div>`;
 
   document.getElementById("qr-summary-boxes").innerHTML =
-    box("تعداد محدوده", allCampaigns.length, "none") +
+    box("تعداد محدوده", locations, "none") +
+    box("تعداد QR", allCampaigns.length, "none") +
     box("مجموع اسکن", totalScans, "ok") +
     box("مجموع کاربر یکتا", totalUnique, "soon");
 }
@@ -40,7 +46,7 @@ function renderSummary() {
 function renderTable() {
   const tbody = document.getElementById("qr-tbody");
   if (!allCampaigns.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">هنوز محدوده‌ای ثبت نشده است</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">هنوز محدوده‌ای ثبت نشده است</td></tr>`;
     return;
   }
 
@@ -49,19 +55,23 @@ function renderTable() {
       const link = qrFullUrl(c.code);
       const img = qrImageUrl(c.code, 90);
       const downloadImg = qrImageUrl(c.code, 600);
+      const badgeClass = c.kind === "routing" ? "qr-kind-badge--routing" : "qr-kind-badge--site";
+      const targetDisplay = c.kind === "routing" ? "لینک مسیریابی" : c.target_path;
       return `
         <tr>
           <td><span class="customer-name">${escapeHtml(c.title)}</span></td>
+          <td><span class="qr-kind-badge ${badgeClass}">${kindLabel(c.kind)}</span></td>
+          <td style="font-family:monospace; direction:ltr;">${escapeHtml(c.serial)}</td>
           <td>
             <span style="font-family:monospace; direction:ltr; display:inline-block;">${escapeHtml(link)}</span>
             <button class="copy-link-btn" onclick="copyQrLink('${escapeHtml(c.code)}')">کپی</button>
           </td>
-          <td>${escapeHtml(c.target_path)}</td>
+          <td>${escapeHtml(targetDisplay)}</td>
           <td>${c.scan_count || 0} (${c.unique_count || 0})</td>
           <td>
             <img src="${img}" width="70" height="70" alt="QR ${escapeHtml(c.title)}" style="border-radius:6px;" />
             <br />
-            <a href="${downloadImg}" download="qr-${escapeHtml(c.code)}.png" class="copy-link-btn">دانلود PNG</a>
+            <a href="${downloadImg}" download="qr-${escapeHtml(c.serial)}.png" class="copy-link-btn">دانلود PNG</a>
           </td>
           <td>
             <button class="copy-link-btn" onclick="openEditCampaign('${escapeHtml(c.code)}')">ویرایش</button>
@@ -79,6 +89,40 @@ function copyQrLink(code) {
   );
 }
 
+// ---------- جستجوی سریال ----------
+
+function normalizeSerial(s) {
+  return String(s || "").trim().toUpperCase();
+}
+
+function runSerialSearch() {
+  const box = document.getElementById("serial-search-result");
+  const q = normalizeSerial(document.getElementById("serial-search-input").value);
+  if (!q) {
+    box.style.display = "none";
+    return;
+  }
+  const found = allCampaigns.find((c) => normalizeSerial(c.serial) === q);
+  box.style.display = "block";
+  if (!found) {
+    box.innerHTML = `<strong>یافت نشد.</strong> سریال «${escapeHtml(q)}» به هیچ محدوده‌ای اختصاص داده نشده.`;
+    return;
+  }
+  box.innerHTML = `
+    <strong>سریال ${escapeHtml(found.serial)}</strong> متعلق به محدوده «${escapeHtml(found.title)}» — نوع: ${kindLabel(found.kind)}<br />
+    آدرس QR: <span style="direction:ltr; display:inline-block; font-family:monospace;">${escapeHtml(qrFullUrl(found.code))}</span><br />
+    تعداد اسکن تا الان: ${found.scan_count || 0} (یکتا: ${found.unique_count || 0})
+  `;
+}
+
+document.getElementById("serial-search-btn").addEventListener("click", runSerialSearch);
+document.getElementById("serial-search-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    runSerialSearch();
+  }
+});
+
 // ---------- فرم افزودن/ویرایش ----------
 
 const form = document.getElementById("qr-form");
@@ -86,11 +130,15 @@ const formTitle = document.getElementById("qr-form-title");
 const submitBtn = document.getElementById("qr-submit-btn");
 const cancelBtn = document.getElementById("qr-cancel-btn");
 const newBtn = document.getElementById("qr-new-btn");
+const siteField = document.getElementById("site-target-field");
+const routingField = document.getElementById("routing-target-field");
 
 function resetForm() {
   form.reset();
-  form.original_code.value = "";
-  form.code.disabled = false;
+  form.edit_code.value = "";
+  form.edit_kind.value = "";
+  siteField.hidden = false;
+  routingField.hidden = false;
   formTitle.textContent = "افزودن محدوده جدید";
   submitBtn.textContent = "ثبت محدوده";
   cancelBtn.hidden = true;
@@ -100,13 +148,22 @@ function resetForm() {
 function openEditCampaign(code) {
   const c = allCampaigns.find((x) => x.code === code);
   if (!c) return;
-  form.original_code.value = c.code;
-  form.title.value = c.title;
-  form.code.value = c.code;
-  form.code.disabled = true; // کد بعد از ساخت قابل تغییر نیست چون روی تراکت‌های چاپ‌شده هم هست
-  form.target_path.value = c.target_path;
 
-  formTitle.textContent = `ویرایش محدوده: ${c.title}`;
+  form.edit_code.value = c.code;
+  form.edit_kind.value = c.kind;
+  form.title.value = c.title;
+
+  if (c.kind === "routing") {
+    siteField.hidden = true;
+    routingField.hidden = false;
+    form.maps_url.value = c.target_path;
+  } else {
+    siteField.hidden = false;
+    routingField.hidden = true;
+    form.target_path.value = c.target_path;
+  }
+
+  formTitle.textContent = `ویرایش QR ${kindLabel(c.kind)} — ${c.title} (سریال ${c.serial})`;
   submitBtn.textContent = "ذخیره تغییرات";
   cancelBtn.hidden = false;
   newBtn.hidden = false;
@@ -120,7 +177,8 @@ newBtn.addEventListener("click", resetForm);
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const originalCode = form.original_code.value;
+  const editCode = form.edit_code.value;
+  const editKind = form.edit_kind.value;
   const title = form.title.value.trim();
   if (!title) {
     alert("نام محدوده الزامی است");
@@ -131,17 +189,31 @@ form.addEventListener("submit", async (e) => {
   submitBtn.classList.add("btn-loading");
 
   let result;
-  if (originalCode) {
-    result = await PanelAPI.updateQrCampaign(originalCode, {
-      title,
-      target_path: form.target_path.value.trim() || "/",
-    });
+  if (editCode) {
+    // ویرایش یک ردیف موجود (فقط همان نوع)
+    const targetValue = editKind === "routing" ? form.maps_url.value.trim() : form.target_path.value.trim() || "/";
+    result = await PanelAPI.updateQrCampaign(editCode, { title, target_path: targetValue });
   } else {
-    result = await PanelAPI.createQrCampaign({
-      title,
-      code: form.code.value.trim(),
-      target_path: form.target_path.value.trim() || "/",
-    });
+    // ساخت محدوده جدید: همیشه QR سایت، و اگر لینک مسیریابی پر شده بود، QR مسیریابی هم ساخته می‌شود
+    result = await PanelAPI.createQrCampaign({ title, kind: "site", target_path: form.target_path.value.trim() || "/" });
+    if (!result || result.error) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("btn-loading");
+      alert((result && result.error) || "خطا در ساخت QR سایت");
+      return;
+    }
+    const mapsUrl = form.maps_url.value.trim();
+    if (mapsUrl) {
+      const routingResult = await PanelAPI.createQrCampaign({ title, kind: "routing", target_path: mapsUrl });
+      if (!routingResult || routingResult.error) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("btn-loading");
+        alert("QR سایت ساخته شد، ولی ساخت QR مسیریابی با خطا مواجه شد: " + ((routingResult && routingResult.error) || ""));
+        resetForm();
+        await loadCampaigns();
+        return;
+      }
+    }
   }
 
   submitBtn.disabled = false;
@@ -158,8 +230,8 @@ form.addEventListener("submit", async (e) => {
 
 async function handleDeleteCampaign(code) {
   const c = allCampaigns.find((x) => x.code === code);
-  const title = c ? c.title : "این محدوده";
-  const sure = confirm(`آیا مطمئن هستی می‌خواهی «${title}» را حذف کنی؟ QR چاپ‌شده مربوط به آن دیگر کار نخواهد کرد.`);
+  const label = c ? `${c.title} (${kindLabel(c.kind)}، سریال ${c.serial})` : "این QR";
+  const sure = confirm(`آیا مطمئن هستی می‌خواهی «${label}» را حذف کنی؟ QR چاپ‌شده مربوط به آن دیگر کار نخواهد کرد.`);
   if (!sure) return;
 
   const result = await PanelAPI.deleteQrCampaign(code);

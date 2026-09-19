@@ -739,8 +739,9 @@ async function handleQrRedirect(rawCode, request, env) {
   }
 
   const target = String(campaign.target_path || "/").trim();
-  const targetPath = target.startsWith("/") ? target : `/${target}`;
-  return Response.redirect(`${url.origin}${targetPath}`, 302);
+  const isExternal = /^https?:\/\//i.test(target);
+  const destination = isExternal ? target : `${url.origin}${target.startsWith("/") ? target : `/${target}`}`;
+  return Response.redirect(destination, 302);
 }
 
 function randomQrCode() {
@@ -752,21 +753,31 @@ function randomQrCode() {
   return code;
 }
 
+// برچسب نمایشی سریال از روی نوع QR ساخته می‌شود: سایت → S۱، S۲...  مسیریابی → M۱، M۲...
+function serialLabel(kind, serialNumber) {
+  if (!serialNumber) return "—";
+  const prefix = kind === "routing" ? "M" : "S";
+  return `${prefix}${serialNumber}`;
+}
+
 async function listQrCampaigns(env) {
   const { results } = await env.DB.prepare(
-    `SELECT c.id, c.code, c.title, c.target_path, c.created_at,
+    `SELECT c.id, c.code, c.title, c.target_path, c.kind, c.serial_number, c.created_at,
        (SELECT COUNT(*) FROM qr_scans s WHERE s.campaign_id = c.id) AS scan_count,
        (SELECT COUNT(DISTINCT visitor_hash) FROM qr_scans s WHERE s.campaign_id = c.id) AS unique_count
      FROM qr_campaigns c
-     ORDER BY c.created_at DESC`
+     ORDER BY c.title ASC, c.kind ASC`
   ).all();
-  return json({ campaigns: results });
+  const campaigns = (results || []).map((c) => ({ ...c, serial: serialLabel(c.kind, c.serial_number) }));
+  return json({ campaigns });
 }
 
 async function createQrCampaign(request, env) {
   const body = await request.json().catch(() => null);
   const title = body && typeof body.title === "string" ? body.title.trim() : "";
   if (!title) return errorResponse("عنوان محدوده الزامی است");
+
+  const kind = body && body.kind === "routing" ? "routing" : "site";
 
   let code = body && body.code ? String(body.code).trim().replace(/\s+/g, "-") : "";
   if (!code) code = randomQrCode();
@@ -775,19 +786,28 @@ async function createQrCampaign(request, env) {
   if (existing) return errorResponse("این کد قبلاً استفاده شده است", 409);
 
   let targetPath = body && body.target_path ? String(body.target_path).trim() : "/";
-  if (!targetPath.startsWith("/")) targetPath = `/${targetPath}`;
+  // برای نوع «مسیریابی» مقصد یک لینک کامل نقشه است و نباید به شکل مسیر داخلی سایت تغییر کند
+  if (kind !== "routing" && !targetPath.startsWith("/") && !/^https?:\/\//i.test(targetPath)) {
+    targetPath = `/${targetPath}`;
+  }
+
+  const maxRow = await env.DB.prepare("SELECT MAX(serial_number) AS maxN FROM qr_campaigns WHERE kind = ?").bind(kind).first();
+  const serialNumber = (maxRow && maxRow.maxN ? maxRow.maxN : 0) + 1;
 
   const result = await env.DB.prepare(
-    "INSERT INTO qr_campaigns (code, title, target_path, created_at) VALUES (?, ?, ?, datetime('now'))"
+    "INSERT INTO qr_campaigns (code, title, target_path, kind, serial_number, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))"
   )
-    .bind(code, title, targetPath)
+    .bind(code, title, targetPath, kind, serialNumber)
     .run();
 
-  return json({ id: result.meta.last_row_id, code, title, target_path: targetPath }, 201);
+  return json(
+    { id: result.meta.last_row_id, code, title, target_path: targetPath, kind, serial_number: serialNumber, serial: serialLabel(kind, serialNumber) },
+    201
+  );
 }
 
 async function updateQrCampaign(code, request, env) {
-  const existing = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE code = ?").bind(code).first();
+  const existing = await env.DB.prepare("SELECT id, kind FROM qr_campaigns WHERE code = ?").bind(code).first();
   if (!existing) return errorResponse("محدوده یافت نشد", 404);
 
   const body = await request.json().catch(() => null);
@@ -795,7 +815,9 @@ async function updateQrCampaign(code, request, env) {
 
   const title = typeof body.title === "string" && body.title.trim() ? body.title.trim() : null;
   let targetPath = typeof body.target_path === "string" && body.target_path.trim() ? body.target_path.trim() : null;
-  if (targetPath && !targetPath.startsWith("/")) targetPath = `/${targetPath}`;
+  if (targetPath && existing.kind !== "routing" && !targetPath.startsWith("/") && !/^https?:\/\//i.test(targetPath)) {
+    targetPath = `/${targetPath}`;
+  }
 
   await env.DB.prepare("UPDATE qr_campaigns SET title = COALESCE(?, title), target_path = COALESCE(?, target_path) WHERE code = ?")
     .bind(title, targetPath, code)

@@ -17,6 +17,10 @@
     <link rel="stylesheet" href="css/panel.css" />
     <style>
       .field-hint { margin: 6px 2px 0; font-size: var(--fs-xs); color: var(--gray-400); }
+      .qr-kind-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; }
+      .qr-kind-badge--site { background:#e6f4ea; color:#1e7a34; }
+      .qr-kind-badge--routing { background:#e8eefc; color:#2b4fd1; }
+      .qr-serial-result { margin-top:12px; padding:14px; border-radius:var(--radius-sm); background:var(--gray-50); display:none; }
     </style>
   </head>
   <body class="panel-body">
@@ -41,7 +45,24 @@
         <div id="qr-summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
       </div>
 
-      <!-- افزودن/ویرایش محدوده -->
+      <!-- جستجوی سریال -->
+      <div class="panel-card">
+        <div class="panel-card__head">
+          <h3>جستجو با سریال</h3>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input
+            id="serial-search-input"
+            type="text"
+            placeholder="مثلاً S3 یا M3"
+            style="border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 14px; font-family:var(--font-family); direction:ltr; max-width:220px;"
+          />
+          <button type="button" class="btn btn-primary" id="serial-search-btn">جستجو</button>
+        </div>
+        <div id="serial-search-result" class="qr-serial-result"></div>
+      </div>
+
+      <!-- افزودن محدوده جدید -->
       <div class="panel-card">
         <div class="panel-card__head">
           <h3 id="qr-form-title">افزودن محدوده جدید</h3>
@@ -49,24 +70,29 @@
         </div>
 
         <form id="qr-form">
-          <input type="hidden" name="original_code" />
+          <input type="hidden" name="edit_code" />
+          <input type="hidden" name="edit_kind" />
 
-          <div class="form-grid">
+          <div class="form-grid form-grid--full">
             <div class="field">
               <label>نام محدوده</label>
               <input type="text" name="title" required placeholder="مثلاً: برج ۱، یا اطراف شهرک" />
             </div>
+          </div>
+
+          <div class="form-grid form-grid--full" id="site-target-field">
             <div class="field">
-              <label>کد آدرس (اختیاری)</label>
-              <input type="text" name="code" placeholder="مثلاً T01 — اگر خالی بگذاری خودکار ساخته می‌شود" />
-              <p class="field-hint">این کد داخل آدرس QR می‌آید: سایت/qr/کد. بعد از ساختن محدوده قابل‌تغییر نیست.</p>
+              <label>مقصد QR سایت (بعد از اسکن به کجا برود)</label>
+              <input type="text" name="target_path" placeholder="مثلاً /index.html — پیش‌فرض: صفحه اصلی" />
+              <p class="field-hint">این مسیر داخل خودِ سایت است، مثلاً /pricing.html</p>
             </div>
           </div>
 
-          <div class="form-grid form-grid--full">
+          <div class="form-grid form-grid--full" id="routing-target-field">
             <div class="field">
-              <label>مقصد بعد از اسکن</label>
-              <input type="text" name="target_path" placeholder="مثلاً /index.html یا /pricing.html — پیش‌فرض: صفحه اصلی" />
+              <label>لینک مسیریابی (گوگل‌مپ یا نشان)</label>
+              <input type="text" name="maps_url" placeholder="لینک کامل مکان روی گوگل‌مپ یا نشان" style="direction:ltr;" />
+              <p class="field-hint">اگر خالی بگذاری، برای این محدوده QR مسیریابی ساخته نمی‌شود.</p>
             </div>
           </div>
 
@@ -80,12 +106,14 @@
       <!-- لیست محدوده‌ها -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3>همه محدوده‌ها</h3>
+          <h3>همه QR ها</h3>
         </div>
         <table class="customers-table">
           <thead>
             <tr>
               <th>محدوده</th>
+              <th>نوع</th>
+              <th>سریال</th>
               <th>آدرس QR</th>
               <th>مقصد</th>
               <th>اسکن (یکتا)</th>
@@ -94,7 +122,7 @@
             </tr>
           </thead>
           <tbody id="qr-tbody">
-            <tr><td colspan="6" class="empty-state">در حال بارگذاری...</td></tr>
+            <tr><td colspan="8" class="empty-state">در حال بارگذاری...</td></tr>
           </tbody>
         </table>
       </div>
