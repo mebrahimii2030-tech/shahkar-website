@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /panel-admin.html
+Disallow: /panel-login.html
+Disallow: /panel-customer.html
+Disallow: /panel-customers.html
+Disallow: /panel-blog.html
+Disallow: /panel-qr.html
+Disallow: /route.html
+Disallow: /qr/
+Disallow: /api/
+
+Sitemap: https://shahkarpro.com/sitemap.xml
