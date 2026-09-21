@@ -21,7 +21,7 @@
     <div class="panel-topbar">
       <div class="panel-topbar__brand">
         <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
-        <div class="panel-topbar__title">پنل مدیریت <span>وبلاگ</span></div>
+        <div class="panel-topbar__title"><i class="fa-solid fa-newspaper" style="margin-inline-end:8px; color:var(--secondary);"></i>پنل مدیریت <span>وبلاگ</span></div>
       </div>
       <div style="display:flex; gap:10px;">
         <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">داشبورد مدیریت</a>
@@ -34,7 +34,10 @@
       <!-- خلاصه وضعیت -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h2>وضعیت کلی وبلاگ</h2>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-chart-simple"></i></span>
+            <h2>وضعیت کلی وبلاگ</h2>
+          </div>
         </div>
         <div id="blog-summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
       </div>
@@ -42,7 +45,10 @@
       <!-- افزودن/ویرایش مقاله -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3 id="form-title">افزودن مقاله جدید</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-pen-nib"></i></span>
+            <h3 id="form-title">افزودن مقاله جدید</h3>
+          </div>
           <button type="button" class="btn btn-ghost" id="new-article-btn" hidden>+ مقاله جدید</button>
         </div>
 
@@ -134,7 +140,10 @@
       <!-- لیست مقالات -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3>همه مقالات</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-book-open"></i></span>
+            <h3>همه مقالات</h3>
+          </div>
           <input
             id="search-box"
             type="text"

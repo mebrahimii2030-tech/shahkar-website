@@ -157,6 +157,32 @@ function copyQrLink(code) {
   );
 }
 
+// ---------- نسخه پشتیبان ----------
+// یک فایل CSV از همه کدها/سریال‌ها/عنوان‌ها می‌سازد تا مستقل از دیتابیس، همیشه یک مدرک
+// از چیزی که واقعاً روی تراکت چاپ شده داشته باشیم
+function downloadBackup() {
+  if (!allCampaigns.length) {
+    alert("هنوز محدوده‌ای برای پشتیبان‌گیری وجود ندارد.");
+    return;
+  }
+  const rows = [["سریال", "محدوده", "نوع", "کد QR", "آدرس QR", "مقصد", "تاریخ ساخت"]];
+  allCampaigns.forEach((c) => {
+    rows.push([c.serial, c.title, kindLabel(c.kind), c.code, qrFullUrl(c.code), c.target_path, c.created_at]);
+  });
+  const csv = "\uFEFF" + rows.map((r) => r.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `qr-backup-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("qr-backup-btn").addEventListener("click", downloadBackup);
+
 // ---------- جستجوی سریال ----------
 
 function normalizeSerial(s) {
@@ -260,8 +286,18 @@ form.addEventListener("submit", async (e) => {
 async function handleDeleteLocation(seq) {
   const loc = locations.find((x) => x.seq === seq);
   const label = loc ? loc.title : "این محدوده";
-  const sure = confirm(`آیا مطمئن هستی می‌خواهی «${label}» و هر دو QR آن را حذف کنی؟ QR های چاپ‌شده مربوط به آن دیگر کار نخواهند کرد.`);
-  if (!sure) return;
+  const serialTag = `SHK-${String(seq).padStart(3, "0")}`;
+
+  // چون این QR ها احتمالاً چاپ شده‌اند، حذف تصادفی با یک کلیک اشتباه ممکن نیست؛
+  // باید سریال محدوده را عیناً تایپ کنی تا حذف واقعاً انجام شود
+  const typed = prompt(
+    `برای حذف «${label}» (${serialTag}) و هر دو QR آن، سریال را دقیقاً تایپ کن:\n${serialTag}\n\nاگر مطمئن نیستی، این پنجره را ببند.`
+  );
+  if (typed === null) return;
+  if (typed.trim().toUpperCase() !== serialTag) {
+    alert("سریال درست تایپ نشد؛ محدوده حذف نشد.");
+    return;
+  }
 
   const result = await PanelAPI.deleteQrLocation(seq);
   if (result && result.error) {

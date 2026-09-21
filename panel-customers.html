@@ -12,6 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <link rel="stylesheet" href="css/variables.css" />
     <link rel="stylesheet" href="css/panel.css" />
   </head>
@@ -19,7 +20,7 @@
     <div class="panel-topbar">
       <div class="panel-topbar__brand">
         <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
-        <div class="panel-topbar__title">مدیریت <span>مشتریان</span></div>
+        <div class="panel-topbar__title"><i class="fa-solid fa-users" style="margin-inline-end:8px; color:var(--secondary);"></i>مدیریت <span>مشتریان</span></div>
       </div>
       <div style="display:flex; gap:10px;">
         <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">داشبورد مدیریت</a>
@@ -31,7 +32,10 @@
       <!-- خلاصه وضعیت -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h2>وضعیت کلی موعدها</h2>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-gauge-high"></i></span>
+            <h2>وضعیت کلی موعدها</h2>
+          </div>
         </div>
         <div id="summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
       </div>
@@ -39,7 +43,10 @@
       <!-- افزودن مشتری جدید -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3>افزودن مشتری جدید</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-user-plus"></i></span>
+            <h3>افزودن مشتری جدید</h3>
+          </div>
         </div>
         <form id="new-customer-form">
           <div class="form-grid">
@@ -65,7 +72,10 @@
       <!-- لیست مشتری‌ها -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3>همه مشتری‌ها</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-users"></i></span>
+            <h3>همه مشتری‌ها</h3>
+          </div>
           <input
             id="search-box"
             type="text"
@@ -92,7 +102,10 @@
       <!-- دیدگاه‌های ثبت‌شده در سایت -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3>دیدگاه‌های مشتریان</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-star"></i></span>
+            <h3>دیدگاه‌های مشتریان</h3>
+          </div>
         </div>
         <table class="customers-table">
           <thead>
@@ -113,7 +126,10 @@
       <!-- پیام‌های فرم تماس با ما -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3>پیام‌های تماس با ما</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-envelope"></i></span>
+            <h3>پیام‌های تماس با ما</h3>
+          </div>
         </div>
         <table class="customers-table">
           <thead>

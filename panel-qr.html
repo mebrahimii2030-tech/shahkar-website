@@ -20,22 +20,24 @@
       .qr-kind-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; }
       .qr-kind-badge--site { background:#e6f4ea; color:#1e7a34; }
       .qr-kind-badge--routing { background:#e8eefc; color:#2b4fd1; }
-      .qr-serial-result { margin-top:12px; padding:14px; border-radius:var(--radius-sm); background:var(--gray-50); display:none; }
-      .qr-location-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+      .qr-serial-result { margin-top:12px; padding:14px; border-radius:10px; background:var(--gray-50); border:1px solid var(--gray-100); display:none; }
+      .qr-location-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid var(--gray-100); }
       .qr-location-serial { font-family:monospace; direction:ltr; color:var(--gray-400); font-size:13px; }
       .qr-pair { display:flex; gap:16px; flex-wrap:wrap; }
-      .qr-mini { flex:1; min-width:230px; border:1.5px solid var(--gray-100); border-radius:var(--radius-sm); padding:14px; display:flex; gap:12px; align-items:flex-start; }
-      .qr-mini__canvas { width:110px; height:110px; flex-shrink:0; border-radius:8px; overflow:hidden; border:1px solid var(--gray-100); }
+      .qr-mini { flex:1; min-width:230px; border:1.5px solid var(--gray-100); border-radius:12px; padding:14px; display:flex; gap:12px; align-items:flex-start; transition:box-shadow .15s, border-color .15s; }
+      .qr-mini:hover { border-color: var(--gray-200); box-shadow: 0 4px 14px rgba(15,23,42,.06); }
+      .qr-mini__canvas { width:110px; height:110px; flex-shrink:0; border-radius:10px; overflow:hidden; border:1px solid var(--gray-100); }
       .qr-mini__canvas canvas { display:block; width:100%; height:100%; }
       .qr-mini__body { flex:1; min-width:0; }
       .qr-mini__link { font-family:monospace; direction:ltr; font-size:12px; color:var(--gray-400); word-break:break-all; display:block; margin:4px 0 8px; }
+      .qr-location-head strong { color:var(--primary); }
     </style>
   </head>
   <body class="panel-body">
     <div class="panel-topbar">
       <div class="panel-topbar__brand">
         <img src="images/logo.png" alt="شاهکار" onerror="this.style.display='none'" />
-        <div class="panel-topbar__title">مدیریت <span>QR تبلیغاتی</span></div>
+        <div class="panel-topbar__title"><i class="fa-solid fa-qrcode" style="margin-inline-end:8px; color:var(--secondary);"></i>مدیریت <span>QR تبلیغاتی</span></div>
       </div>
       <div style="display:flex; gap:10px;">
         <a href="panel-admin.html" class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3)">داشبورد مدیریت</a>
@@ -48,7 +50,11 @@
       <!-- خلاصه وضعیت -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h2>خلاصه کل محدوده‌ها</h2>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-gauge-high"></i></span>
+            <h2>خلاصه کل محدوده‌ها</h2>
+          </div>
+          <button type="button" class="btn btn-ghost" id="qr-backup-btn"><i class="fa-solid fa-download" style="margin-inline-end:6px;"></i>دانلود نسخه پشتیبان</button>
         </div>
         <div id="qr-summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
       </div>
@@ -56,14 +62,17 @@
       <!-- جستجوی سریال -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3>جستجو با سریال</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <h3>جستجو با سریال</h3>
+          </div>
         </div>
         <div style="display:flex; gap:10px; align-items:center;">
           <input
             id="serial-search-input"
             type="text"
             placeholder="مثلاً SHK-003-S"
-            style="border:1.5px solid var(--gray-200); border-radius:var(--radius-sm); padding:9px 14px; font-family:var(--font-family); direction:ltr; max-width:220px;"
+            style="border:1.5px solid var(--gray-200); border-radius:8px; padding:9px 14px; font-family:var(--font-family); direction:ltr; max-width:220px;"
           />
           <button type="button" class="btn btn-primary" id="serial-search-btn">جستجو</button>
         </div>
@@ -73,7 +82,10 @@
       <!-- افزودن محدوده جدید -->
       <div class="panel-card">
         <div class="panel-card__head">
-          <h3 id="qr-form-title">افزودن محدوده جدید</h3>
+          <div class="panel-card__head-title">
+            <span class="panel-card__icon"><i class="fa-solid fa-location-dot"></i></span>
+            <h3 id="qr-form-title">افزودن محدوده جدید</h3>
+          </div>
           <button type="button" class="btn btn-ghost" id="qr-new-btn" hidden>+ محدوده جدید</button>
         </div>
 

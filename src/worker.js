@@ -713,35 +713,42 @@ async function handleChat(request, env) {
 async function handleQrRedirect(rawCode, request, env) {
   const url = new URL(request.url);
   const fallback = `${url.origin}/`;
-  const code = decodeURIComponent(rawCode || "").trim();
-  if (!code) return Response.redirect(fallback, 302);
 
-  let campaign = null;
+  // این تابع تحت هیچ شرایطی نباید خطا نشان بدهد؛ هر اتفاق پیش‌بینی‌نشده‌ای هم بیفتد،
+  // کاربر را به صفحه اصلی سایت هدایت می‌کنیم تا QR چاپ‌شده هیچ‌وقت «از کار افتاده» به نظر نرسد
   try {
-    campaign = await env.DB.prepare("SELECT * FROM qr_campaigns WHERE code = ?").bind(code).first();
+    const code = decodeURIComponent(rawCode || "").trim();
+    if (!code) return Response.redirect(fallback, 302);
+
+    let campaign = null;
+    try {
+      campaign = await env.DB.prepare("SELECT * FROM qr_campaigns WHERE code = ?").bind(code).first();
+    } catch (err) {
+      // اگر جدول هنوز ساخته نشده یا دیتابیس مشکل موقتی داشت، حداقل کاربر را به سایت هدایت کن
+      return Response.redirect(fallback, 302);
+    }
+    if (!campaign) return Response.redirect(fallback, 302);
+
+    try {
+      const ip = getClientIp(request);
+      const ua = getUserAgent(request);
+      const visitorHash = await hmacHex(`${ip}|${ua}`, env.ADMIN_PASSWORD || "qr-salt");
+      await env.DB.prepare(
+        "INSERT INTO qr_scans (campaign_id, visitor_hash, user_agent, scanned_at) VALUES (?, ?, ?, datetime('now'))"
+      )
+        .bind(campaign.id, visitorHash, ua)
+        .run();
+    } catch (err) {
+      // ثبت آمار نباید مانع هدایت کاربر شود
+    }
+
+    const target = String(campaign.target_path || "/").trim();
+    const isExternal = /^https?:\/\//i.test(target);
+    const destination = isExternal ? target : `${url.origin}${target.startsWith("/") ? target : `/${target}`}`;
+    return Response.redirect(destination, 302);
   } catch (err) {
-    // اگر جدول هنوز ساخته نشده (مهاجرت اجرا نشده)، حداقل کاربر را به سایت هدایت کن
     return Response.redirect(fallback, 302);
   }
-  if (!campaign) return Response.redirect(fallback, 302);
-
-  try {
-    const ip = getClientIp(request);
-    const ua = getUserAgent(request);
-    const visitorHash = await hmacHex(`${ip}|${ua}`, env.ADMIN_PASSWORD || "qr-salt");
-    await env.DB.prepare(
-      "INSERT INTO qr_scans (campaign_id, visitor_hash, user_agent, scanned_at) VALUES (?, ?, ?, datetime('now'))"
-    )
-      .bind(campaign.id, visitorHash, ua)
-      .run();
-  } catch (err) {
-    // ثبت آمار نباید مانع هدایت کاربر شود
-  }
-
-  const target = String(campaign.target_path || "/").trim();
-  const isExternal = /^https?:\/\//i.test(target);
-  const destination = isExternal ? target : `${url.origin}${target.startsWith("/") ? target : `/${target}`}`;
-  return Response.redirect(destination, 302);
 }
 
 function randomQrCode() {

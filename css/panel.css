@@ -4,20 +4,22 @@
 ===================================================== */
 
 .panel-body {
-  background: var(--gray-50);
+  background: radial-gradient(1200px 500px at 50% -120px, #ffffff 0%, var(--gray-50) 55%);
   min-height: 100vh;
   font-family: var(--font-family);
 }
 
 /* ---------- نوار بالای پنل ---------- */
 .panel-topbar {
-  background: var(--primary);
+  background: linear-gradient(180deg, var(--primary) 0%, #0b1324 100%);
   color: var(--white);
   padding: 18px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 0 var(--secondary), 0 10px 24px rgba(2, 6, 23, 0.25);
+  position: relative;
+  z-index: 5;
 }
 
 .panel-topbar__brand {
@@ -33,6 +35,7 @@
 .panel-topbar__title {
   font-weight: 800;
   font-size: var(--fs-lg);
+  letter-spacing: 0.2px;
 }
 
 .panel-topbar__title span {
@@ -48,8 +51,9 @@
 /* ---------- کارت‌ها ---------- */
 .panel-card {
   background: var(--white);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 24px rgba(15, 23, 42, 0.06);
   padding: 22px;
   margin-bottom: 20px;
 }
@@ -63,11 +67,32 @@
   gap: 10px;
 }
 
+.panel-card__head-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-card__icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: linear-gradient(155deg, #fff7e6, #fef3c7);
+  color: var(--secondary-dark);
+  box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.15);
+}
+
 .panel-card__head h2,
 .panel-card__head h3 {
   margin: 0;
   color: var(--primary);
   font-weight: 800;
+  letter-spacing: 0.1px;
 }
 
 /* ---------- نشانگر وضعیت موعد (به شکل چراغ داشبورد) ---------- */
@@ -128,31 +153,46 @@
 /* ---------- جدول مشتری‌ها در پنل مدیریت ---------- */
 .customers-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
+
+.customers-table thead th:first-child { border-top-right-radius: 10px; }
+.customers-table thead th:last-child { border-top-left-radius: 10px; }
 
 .customers-table th {
   text-align: right;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   color: var(--gray-500);
-  font-weight: 700;
-  padding: 10px 12px;
-  border-bottom: 2px solid var(--gray-200);
+  font-weight: 800;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border-bottom: 1.5px solid var(--gray-200);
+  letter-spacing: 0.2px;
 }
 
 .customers-table td {
-  padding: 13px 12px;
+  padding: 14px;
   border-bottom: 1px solid var(--gray-100);
   font-size: var(--fs-md);
 }
 
 .customers-table tr {
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.customers-table tbody tr {
+  box-shadow: inset 3px 0 0 transparent;
 }
 
 .customers-table tbody tr:hover {
   background: var(--gray-50);
+  box-shadow: inset 3px 0 0 var(--secondary);
+}
+
+.customers-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .customer-name {
@@ -161,12 +201,13 @@
 }
 
 .copy-link-btn {
-  border: 1px solid var(--gray-200);
+  border: 1.5px solid var(--gray-200);
   background: var(--white);
   color: var(--gray-600);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
+  border-radius: 8px;
+  padding: 6px 11px;
   font-size: var(--fs-xs);
+  font-weight: 600;
   cursor: pointer;
   font-family: var(--font-family);
   transition: 0.15s;
@@ -174,6 +215,7 @@
 .copy-link-btn:hover {
   border-color: var(--secondary);
   color: var(--secondary-dark);
+  background: #fffbeb;
 }
 
 .copy-link-btn--danger {
@@ -205,11 +247,12 @@
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   box-sizing: border-box;
   border: 1.5px solid var(--gray-200);
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   padding: 10px 12px;
   font-family: var(--font-family);
   font-size: var(--fs-md);
@@ -219,7 +262,8 @@
 }
 
 .field input:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   outline: none;
   border-color: var(--secondary);
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
@@ -233,7 +277,7 @@
 .btn {
   font-family: var(--font-family);
   font-weight: 700;
-  border-radius: var(--radius-sm);
+  border-radius: 9px;
   padding: 11px 22px;
   font-size: var(--fs-md);
   border: none;
@@ -242,12 +286,15 @@
 }
 
 .btn-primary {
-  background: var(--secondary);
+  background: linear-gradient(180deg, #fbbf24, var(--secondary));
   color: var(--primary);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 6px 14px rgba(217, 119, 6, 0.28);
 }
 .btn-primary:hover {
   background: var(--secondary-dark);
   color: var(--white);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(217, 119, 6, 0.35);
 }
 
 .btn-ghost {
@@ -258,6 +305,7 @@
 .btn-ghost:hover {
   border-color: var(--gray-400);
   color: var(--primary);
+  background: var(--gray-50);
 }
 
 .btn-danger-ghost {
@@ -505,8 +553,18 @@
 .empty-state {
   text-align: center;
   color: var(--gray-400);
-  padding: 40px 10px;
+  padding: 44px 10px;
   font-size: var(--fs-md);
+}
+
+.empty-state::before {
+  content: "\f057";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  display: block;
+  font-size: 22px;
+  color: var(--gray-300);
+  margin-bottom: 10px;
 }
 
 .modal-overlay {
@@ -526,12 +584,13 @@
 
 .modal-box {
   background: var(--white);
-  border-radius: var(--radius-md);
-  padding: 24px;
+  border-radius: 16px;
+  padding: 26px;
   width: 100%;
   max-width: 520px;
   max-height: 88vh;
   overflow-y: auto;
+  box-shadow: var(--shadow-lg);
 }
 
 .modal-box h3 {
