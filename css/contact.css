@@ -145,6 +145,10 @@
   color: #7dd3fc;
 }
 
+.dial-btn--telegram {
+  color: #93c5fd;
+}
+
 .dial-item:hover .dial-btn {
   transform: translateY(-5px);
   border-color: #fbbf24;
