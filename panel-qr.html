@@ -61,6 +61,10 @@
             <h2>خلاصه کل محدوده‌ها</h2>
           </div>
           <button type="button" class="btn btn-ghost" id="qr-backup-btn"><i class="fa-solid fa-download" style="margin-inline-end:6px;"></i>دانلود نسخه پشتیبان</button>
+          <label class="btn btn-ghost" for="qr-restore-input" style="cursor:pointer; margin-inline-start:8px;">
+            <i class="fa-solid fa-upload" style="margin-inline-end:6px;"></i>بازیابی از فایل پشتیبان
+          </label>
+          <input type="file" id="qr-restore-input" accept=".csv" hidden />
         </div>
         <div id="qr-summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
       </div>
@@ -117,6 +121,14 @@
             به‌صورت خودکار یک QR «مسیریابی» هم برای همین محدوده ساخته می‌شود که با اسکن آن،
             صفحه انتخاب مسیریاب سایت (گوگل‌مپ / نشان / بلد) باز می‌شود — نیازی به وارد‌کردن لینک نیست.
           </p>
+
+          <div class="form-grid form-grid--full" id="routing-target-field" hidden>
+            <div class="field">
+              <label>مقصد QR مسیریابی</label>
+              <input type="text" name="routing_target" placeholder="مثلاً /route.html یا یک لینک مستقیم گوگل‌مپ/نشان" style="direction:ltr;" />
+              <p class="field-hint">پیش‌فرض صفحه انتخاب مسیریاب سایت است؛ می‌توانی هر لینک دیگری هم بگذاری، بدون این‌که خود QR چاپ‌شده تغییر کند.</p>
+            </div>
+          </div>
 
           <div style="margin-top:14px; display:flex; gap:10px;">
             <button type="submit" class="btn btn-primary" id="qr-submit-btn">ثبت محدوده</button>

@@ -9,6 +9,9 @@
   if (!listEl || !form) return;
 
   const submitBtn = form.querySelector(".send-btn");
+  const starInput = document.getElementById("rv-star-input");
+  const ratingField = document.getElementById("rv-rating");
+  const averageEl = document.getElementById("reviews-average");
 
   function escapeHtml(str) {
     return String(str)
@@ -17,6 +20,45 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  // ---------- ورودی امتیاز ستاره‌ای ----------
+  function paintStars(value) {
+    if (!starInput) return;
+    starInput.querySelectorAll("i").forEach((star) => {
+      star.classList.toggle("active", Number(star.dataset.star) <= value);
+    });
+  }
+  if (starInput && ratingField) {
+    paintStars(Number(ratingField.value) || 5);
+    starInput.querySelectorAll("i").forEach((star) => {
+      star.addEventListener("click", () => {
+        ratingField.value = star.dataset.star;
+        paintStars(Number(star.dataset.star));
+      });
+      star.addEventListener("mouseenter", () => paintStars(Number(star.dataset.star)));
+    });
+    starInput.addEventListener("mouseleave", () => paintStars(Number(ratingField.value) || 5));
+  }
+
+  function starsHtml(rating) {
+    const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+    let out = "";
+    for (let i = 1; i <= 5; i++) out += `<i class="fa-solid fa-star" style="${i > r ? "opacity:.25" : ""}"></i>`;
+    return out;
+  }
+
+  function renderAverage(summary) {
+    if (!averageEl) return;
+    if (!summary || !summary.average) {
+      averageEl.innerHTML = "";
+      return;
+    }
+    averageEl.innerHTML = `
+      <div class="reviews-average">
+        <span class="stars-display">${starsHtml(summary.average)}</span>
+        <span>${summary.average} از ۵ (${summary.count} دیدگاه)</span>
+      </div>`;
   }
 
   function formatDate(raw) {
@@ -43,6 +85,7 @@
           <div class="review-name">${escapeHtml(name)}</div>
           <div class="review-date">${escapeHtml(formatDate(review.created_at))}</div>
         </div>
+        <div class="stars-display">${starsHtml(review.rating)}</div>
         <div class="review-comment">${escapeHtml(review.comment)}</div>
       </div>`;
   }
@@ -67,6 +110,7 @@
       const res = await fetch("/api/reviews");
       const data = await res.json();
       renderReviews(data.reviews || []);
+      renderAverage(data.summary);
     } catch (err) {
       listEl.innerHTML = `<p class="reviews-empty">خطا در بارگذاری دیدگاه‌ها. لطفاً صفحه را دوباره بارگذاری کنید.</p>`;
     }
@@ -85,6 +129,7 @@
     const name = form.name.value.trim();
     const phone = form.phone.value.trim();
     const comment = form.comment.value.trim();
+    const rating = Number(ratingField && ratingField.value) || 5;
 
     if (!name || !phone || !comment) {
       setStatus("لطفاً نام، شماره تماس و متن دیدگاه را کامل وارد کنید.", "error");
@@ -98,7 +143,7 @@
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, comment }),
+        body: JSON.stringify({ name, phone, comment, rating }),
       });
 
       let data = null;
@@ -115,10 +160,13 @@
       prependReview({
         name,
         comment,
+        rating,
         created_at: new Date().toISOString().slice(0, 10),
       });
 
       form.reset();
+      if (ratingField) ratingField.value = "5";
+      paintStars(5);
       setStatus("دیدگاه شما با موفقیت ثبت شد. با تشکر از شما.", "success");
     } catch (err) {
       setStatus(err.message || "ارتباط با سرور برقرار نشد. لطفاً دوباره تلاش کنید.", "error");

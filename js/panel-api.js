@@ -181,4 +181,12 @@ const PanelAPI = {
     const res = await fetch(`/api/qr-locations/${encodeURIComponent(seq)}`, { method: "DELETE" });
     return readPanelResponse(res);
   },
+  async restoreQrCampaigns(campaigns) {
+    const res = await fetch("/api/qr-restore", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ campaigns }),
+    });
+    return readPanelResponse(res);
+  },
 };

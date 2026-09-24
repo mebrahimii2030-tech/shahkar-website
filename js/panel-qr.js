@@ -183,6 +183,108 @@ function downloadBackup() {
 
 document.getElementById("qr-backup-btn").addEventListener("click", downloadBackup);
 
+// ---------- بازیابی از فایل پشتیبان ----------
+// فایلی که خود دکمه «دانلود نسخه پشتیبان» ساخته را می‌خواند و محدوده‌های
+// گم‌شده را با همان کد QR قبلی (که روی تراکت چاپ شده) دوباره می‌سازد.
+
+function parseCsvLine(line) {
+  const result = [];
+  let cur = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        cur += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ",") {
+      result.push(cur);
+      cur = "";
+    } else {
+      cur += c;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+function serialToKindAndSeq(serial) {
+  const m = String(serial || "").trim().match(/^SHK-(\d+)-([SM])$/i);
+  if (!m) return null;
+  return { serial_number: parseInt(m[1], 10), kind: m[2].toUpperCase() === "M" ? "routing" : "site" };
+}
+
+async function handleRestoreFile(file) {
+  const text = await file.text();
+  const clean = text.replace(/^\uFEFF/, "");
+  const lines = clean.split(/\r\n|\n/).filter((l) => l.trim() !== "");
+  if (lines.length < 2) {
+    alert("فایل خالی است یا چیزی برای بازیابی ندارد.");
+    return;
+  }
+
+  const header = parseCsvLine(lines[0]).map((h) => h.trim());
+  const idx = (name) => header.indexOf(name);
+  const iSerial = idx("سریال");
+  const iTitle = idx("محدوده");
+  const iCode = idx("کد QR");
+  const iTarget = idx("مقصد");
+  const iCreated = idx("تاریخ ساخت");
+
+  if (iSerial === -1 || iTitle === -1 || iCode === -1) {
+    alert("ساختار فایل شناخته نشد. فقط فایلی را وارد کن که خودِ همین پنل با «دانلود نسخه پشتیبان» ساخته باشد.");
+    return;
+  }
+
+  const campaigns = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCsvLine(lines[i]);
+    const info = serialToKindAndSeq(cells[iSerial]);
+    if (!info || !cells[iCode] || !cells[iTitle]) continue;
+    campaigns.push({
+      code: cells[iCode],
+      title: cells[iTitle],
+      target_path: iTarget !== -1 ? cells[iTarget] : "/",
+      kind: info.kind,
+      serial_number: info.serial_number,
+      created_at: iCreated !== -1 ? cells[iCreated] : null,
+    });
+  }
+
+  if (!campaigns.length) {
+    alert("هیچ ردیف قابل بازیابی در فایل پیدا نشد.");
+    return;
+  }
+
+  const result = await PanelAPI.restoreQrCampaigns(campaigns);
+  if (result && result.error) {
+    alert(result.error);
+    return;
+  }
+  alert(`${result.restored} مورد بازیابی شد. ${result.skipped} مورد رد شد (از قبل موجود بود یا ناقص بود).`);
+  await loadCampaigns();
+}
+
+document.getElementById("qr-restore-input").addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    await handleRestoreFile(file);
+  } catch (err) {
+    alert("خواندن فایل با خطا مواجه شد. مطمئن شو فایل همان CSV دانلودشده از همین پنل است.");
+  }
+});
+
 // ---------- جستجوی سریال ----------
 
 function normalizeSerial(s) {
@@ -224,6 +326,8 @@ const formTitle = document.getElementById("qr-form-title");
 const submitBtn = document.getElementById("qr-submit-btn");
 const cancelBtn = document.getElementById("qr-cancel-btn");
 const newBtn = document.getElementById("qr-new-btn");
+const routingAutoNote = document.getElementById("routing-auto-note");
+const routingTargetField = document.getElementById("routing-target-field");
 
 function resetForm() {
   form.reset();
@@ -232,6 +336,8 @@ function resetForm() {
   submitBtn.textContent = "ثبت محدوده";
   cancelBtn.hidden = true;
   newBtn.hidden = true;
+  routingAutoNote.hidden = false;
+  routingTargetField.hidden = true;
 }
 
 function openEditLocation(seq) {
@@ -241,6 +347,10 @@ function openEditLocation(seq) {
   form.edit_seq.value = loc.seq;
   form.title.value = loc.title;
   form.target_path.value = loc.site ? loc.site.target_path : "/";
+  form.routing_target.value = loc.routing ? loc.routing.target_path : "/route.html";
+
+  routingAutoNote.hidden = true;
+  routingTargetField.hidden = false;
 
   formTitle.textContent = `ویرایش محدوده «${loc.title}» (SHK-${String(loc.seq).padStart(3, "0")})`;
   submitBtn.textContent = "ذخیره تغییرات";
@@ -268,7 +378,11 @@ form.addEventListener("submit", async (e) => {
 
   const targetPath = form.target_path.value.trim() || "/";
   const result = editSeq
-    ? await PanelAPI.updateQrLocation(editSeq, { title, target_path: targetPath })
+    ? await PanelAPI.updateQrLocation(editSeq, {
+        title,
+        target_path: targetPath,
+        routing_target: form.routing_target.value.trim() || "/route.html",
+      })
     : await PanelAPI.createQrLocation({ title, target_path: targetPath });
 
   submitBtn.disabled = false;

@@ -504,20 +504,31 @@ async function createReview(request, env) {
   if (String(body.name).length > 100 || String(body.phone).length > 30 || String(body.comment).length > 2000) {
     return errorResponse("طول ورودی مجاز نیست");
   }
+  let rating = parseInt(body.rating, 10);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) rating = 5;
   const result = await env.DB.prepare(
-    "INSERT INTO reviews (name, phone, comment) VALUES (?, ?, ?)"
+    "INSERT INTO reviews (name, phone, comment, rating) VALUES (?, ?, ?, ?)"
   )
-    .bind(body.name, body.phone, body.comment)
+    .bind(body.name, body.phone, body.comment, rating)
     .run();
   return json({ id: result.meta.last_row_id });
 }
 
-// نسخه عمومی: فقط نام و متن دیدگاه؛ شماره تماس هرگز به این مسیر برنمی‌گردد
+// نسخه عمومی: فقط نام، متن دیدگاه و امتیاز؛ شماره تماس هرگز به این مسیر برنمی‌گردد
 async function listReviewsPublic(env) {
   const { results } = await env.DB.prepare(
-    "SELECT id, name, comment, created_at FROM reviews ORDER BY created_at DESC LIMIT 100"
+    "SELECT id, name, comment, rating, created_at FROM reviews ORDER BY created_at DESC LIMIT 100"
   ).all();
-  return json({ reviews: results });
+  const avgRow = await env.DB.prepare(
+    "SELECT AVG(rating) AS avg, COUNT(*) AS count FROM reviews WHERE rating IS NOT NULL"
+  ).first();
+  return json({
+    reviews: results,
+    summary: {
+      average: avgRow && avgRow.avg ? Math.round(avgRow.avg * 10) / 10 : null,
+      count: avgRow ? avgRow.count : 0,
+    },
+  });
 }
 
 // نسخه مدیریتی: شامل شماره تماس، فقط با رمز عبور مدیر
@@ -826,13 +837,22 @@ async function updateQrLocation(seq, request, env) {
   if (!body) return errorResponse("داده نامعتبر است");
 
   const title = typeof body.title === "string" && body.title.trim() ? body.title.trim() : null;
+
   let siteTarget = typeof body.target_path === "string" && body.target_path.trim() ? body.target_path.trim() : null;
   if (siteTarget && !siteTarget.startsWith("/") && !/^https?:\/\//i.test(siteTarget)) siteTarget = `/${siteTarget}`;
+
+  // مقصد QR مسیریابی هم قابل تغییر است (مثلاً می‌خواهید مستقیم به گوگل‌مپ برود، نه صفحه انتخاب مسیریاب)
+  let routingTarget = typeof body.routing_target === "string" && body.routing_target.trim() ? body.routing_target.trim() : null;
+  if (routingTarget && !routingTarget.startsWith("/") && !/^https?:\/\//i.test(routingTarget)) routingTarget = `/${routingTarget}`;
 
   await env.DB.batch([
     env.DB.prepare("UPDATE qr_campaigns SET title = COALESCE(?, title) WHERE serial_number = ?").bind(title, seq),
     env.DB.prepare("UPDATE qr_campaigns SET target_path = COALESCE(?, target_path) WHERE serial_number = ? AND kind = 'site'").bind(
       siteTarget,
+      seq
+    ),
+    env.DB.prepare("UPDATE qr_campaigns SET target_path = COALESCE(?, target_path) WHERE serial_number = ? AND kind = 'routing'").bind(
+      routingTarget,
       seq
     ),
   ]);
@@ -850,6 +870,48 @@ async function deleteQrLocation(seq, env) {
   await env.DB.batch(stmts);
 
   return json({ ok: true });
+}
+
+// بازیابی از فایل پشتیبان (CSV دانلودشده از همین پنل): برخلاف ساخت محدوده معمولی،
+// اینجا کد QR و سریال دقیقاً همان‌هایی می‌مانند که قبلاً روی تراکت چاپ شده بودند —
+// چون تمام هدف این است که QR چاپی بعد از بازیابی هم‌چنان درست کار کند.
+async function restoreQrCampaigns(request, env) {
+  const body = await request.json().catch(() => null);
+  const rows = body && Array.isArray(body.campaigns) ? body.campaigns : null;
+  if (!rows || !rows.length) return errorResponse("داده‌ای برای بازیابی ارسال نشده است");
+
+  let restored = 0;
+  let skipped = 0;
+
+  for (const row of rows) {
+    const code = row && row.code ? String(row.code).trim() : "";
+    const title = row && row.title ? String(row.title).trim() : "";
+    const kind = row && row.kind === "routing" ? "routing" : "site";
+    const serialNumber = parseInt(row && row.serial_number, 10);
+    let targetPath = row && row.target_path ? String(row.target_path).trim() : "/";
+    if (!targetPath.startsWith("/") && !/^https?:\/\//i.test(targetPath)) targetPath = `/${targetPath}`;
+    const createdAt = row && row.created_at ? String(row.created_at).trim() : null;
+
+    if (!code || !title || !Number.isInteger(serialNumber) || serialNumber < 1) {
+      skipped++;
+      continue;
+    }
+
+    const existing = await env.DB.prepare("SELECT id FROM qr_campaigns WHERE code = ?").bind(code).first();
+    if (existing) {
+      skipped++;
+      continue;
+    }
+
+    await env.DB.prepare(
+      "INSERT INTO qr_campaigns (code, title, target_path, kind, serial_number, created_at) VALUES (?, ?, ?, ?, ?, COALESCE(?, datetime('now')))"
+    )
+      .bind(code, title, targetPath, kind, serialNumber, createdAt)
+      .run();
+    restored++;
+  }
+
+  return json({ restored, skipped });
 }
 
 // ---------- روتر اصلی ----------
@@ -966,6 +1028,7 @@ export default {
 
     if (path === "/api/qr" && method === "GET") return listQrCampaigns(env);
     if (path === "/api/qr-locations" && method === "POST") return createQrLocation(request, env);
+    if (path === "/api/qr-restore" && method === "POST") return restoreQrCampaigns(request, env);
     if ((m = path.match(/^\/api\/qr-locations\/(\d+)$/))) {
       if (method === "PUT") return updateQrLocation(Number(m[1]), request, env);
       if (method === "DELETE") return deleteQrLocation(Number(m[1]), env);

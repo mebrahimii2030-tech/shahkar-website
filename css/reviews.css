@@ -25,6 +25,50 @@
   line-height: 1.9;
 }
 
+.reviews-average {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 8px 18px;
+  background: var(--white);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.reviews-average .stars-display {
+  color: #f59e0b;
+  letter-spacing: 2px;
+}
+
+.stars-display {
+  color: #f59e0b;
+  font-size: 14px;
+}
+
+.star-rating-input {
+  display: flex;
+  gap: 6px;
+  font-size: 26px;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.star-rating-input i {
+  color: var(--gray-300);
+  transition: color 0.15s, transform 0.15s;
+}
+
+.star-rating-input i.active {
+  color: #f59e0b;
+}
+
+.star-rating-input i:hover {
+  transform: scale(1.15);
+}
+
 .reviews-grid {
   display: grid;
   grid-template-columns: 1fr 380px;
