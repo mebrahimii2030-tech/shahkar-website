@@ -60,11 +60,11 @@
             <span class="panel-card__icon"><i class="fa-solid fa-gauge-high"></i></span>
             <h2>خلاصه کل محدوده‌ها</h2>
           </div>
-          <button type="button" class="btn btn-ghost" id="qr-backup-btn"><i class="fa-solid fa-download" style="margin-inline-end:6px;"></i>دانلود نسخه پشتیبان</button>
+          <button type="button" class="btn btn-ghost" id="qr-backup-btn"><i class="fa-solid fa-download" style="margin-inline-end:6px;"></i>دانلود نسخه پشتیبان (با عکس‌ها)</button>
           <label class="btn btn-ghost" for="qr-restore-input" style="cursor:pointer; margin-inline-start:8px;">
             <i class="fa-solid fa-upload" style="margin-inline-end:6px;"></i>بازیابی از فایل پشتیبان
           </label>
-          <input type="file" id="qr-restore-input" accept=".csv" hidden />
+          <input type="file" id="qr-restore-input" accept=".zip,.csv" hidden />
         </div>
         <div id="qr-summary-boxes" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
       </div>
@@ -143,6 +143,7 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
     <script src="js/panel-api.js"></script>
     <script src="js/panel-qr.js"></script>

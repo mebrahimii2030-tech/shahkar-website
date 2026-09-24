@@ -160,25 +160,52 @@ function copyQrLink(code) {
 // ---------- نسخه پشتیبان ----------
 // یک فایل CSV از همه کدها/سریال‌ها/عنوان‌ها می‌سازد تا مستقل از دیتابیس، همیشه یک مدرک
 // از چیزی که واقعاً روی تراکت چاپ شده داشته باشیم
-function downloadBackup() {
+async function downloadBackup() {
   if (!allCampaigns.length) {
     alert("هنوز محدوده‌ای برای پشتیبان‌گیری وجود ندارد.");
     return;
   }
-  const rows = [["سریال", "محدوده", "نوع", "کد QR", "آدرس QR", "مقصد", "تاریخ ساخت"]];
-  allCampaigns.forEach((c) => {
-    rows.push([c.serial, c.title, kindLabel(c.kind), c.code, qrFullUrl(c.code), c.target_path, c.created_at]);
-  });
-  const csv = "\uFEFF" + rows.map((r) => r.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `qr-backup-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+
+  const backupBtn = document.getElementById("qr-backup-btn");
+  backupBtn.disabled = true;
+  const originalLabel = backupBtn.innerHTML;
+  backupBtn.innerHTML = "در حال آماده‌سازی...";
+
+  try {
+    const rows = [["سریال", "محدوده", "نوع", "کد QR", "آدرس QR", "مقصد", "تاریخ ساخت"]];
+    allCampaigns.forEach((c) => {
+      rows.push([c.serial, c.title, kindLabel(c.kind), c.code, qrFullUrl(c.code), c.target_path, c.created_at]);
+    });
+    const csv = "\uFEFF" + rows.map((r) => r.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(",")).join("\r\n");
+
+    const zip = new JSZip();
+    zip.file("backup.csv", csv);
+    const imagesFolder = zip.folder("qr-images");
+
+    // خود عکس هر QR (با کیفیت مناسب چاپ) هم داخل زیپ گذاشته می‌شود، نه فقط لیست کدها
+    for (const c of allCampaigns) {
+      try {
+        const qr = buildQrCode(c);
+        const blob = await qr.getRawData("png");
+        if (blob) imagesFolder.file(`qr-${c.serial}.png`, blob);
+      } catch (err) {
+        // اگر ساخت یک عکس خاص خطا داد، بقیه پشتیبان‌گیری را متوقف نکن
+      }
+    }
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `qr-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } finally {
+    backupBtn.disabled = false;
+    backupBtn.innerHTML = originalLabel;
+  }
 }
 
 document.getElementById("qr-backup-btn").addEventListener("click", downloadBackup);
@@ -224,7 +251,19 @@ function serialToKindAndSeq(serial) {
 }
 
 async function handleRestoreFile(file) {
-  const text = await file.text();
+  let text;
+  if (/\.zip$/i.test(file.name)) {
+    const zip = await JSZip.loadAsync(file);
+    const csvEntry = zip.file("backup.csv");
+    if (!csvEntry) {
+      alert("داخل این فایل ZIP، backup.csv پیدا نشد. مطمئن شو فایلی که همین پنل ساخته را انتخاب کردی.");
+      return;
+    }
+    text = await csvEntry.async("string");
+  } else {
+    text = await file.text();
+  }
+
   const clean = text.replace(/^\uFEFF/, "");
   const lines = clean.split(/\r\n|\n/).filter((l) => l.trim() !== "");
   if (lines.length < 2) {
